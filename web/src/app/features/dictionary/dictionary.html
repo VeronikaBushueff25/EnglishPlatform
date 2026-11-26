@@ -1,0 +1,211 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <h1 class="text-2xl font-semibold tracking-tight">Словарь</h1>
+    <div class="flex gap-2">
+      <a hlmBtn variant="outline" size="sm" routerLink="/dictionary/import" aria-label="Импорт из CSV">
+        <ng-icon name="lucideFileUp" />
+        <span class="hidden sm:inline">Импорт</span>
+      </a>
+      <a hlmBtn size="sm" routerLink="/dictionary/words/new">
+        <ng-icon name="lucidePlus" />
+        Своё слово
+      </a>
+    </div>
+  </div>
+
+  <div class="bg-muted grid grid-cols-2 gap-1 rounded-full p-1" role="tablist" aria-label="Разделы словаря">
+    <button
+      type="button"
+      role="tab"
+      class="h-10 rounded-full text-sm font-medium transition-colors"
+      [class]="tab() === 'mine' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'"
+      [attr.aria-selected]="tab() === 'mine'"
+      (click)="selectTab('mine')"
+    >
+      Мои слова
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="h-10 rounded-full text-sm font-medium transition-colors"
+      [class]="tab() === 'base' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'"
+      [attr.aria-selected]="tab() === 'base'"
+      (click)="selectTab('base')"
+    >
+      Общая база
+    </button>
+  </div>
+
+  <app-lexeme-filters
+    [(value)]="filter"
+    [categories]="categories.hasValue() ? categories.value() : []"
+    [placeholder]="tab() === 'mine' ? 'Искать в моих словах' : 'Искать слово или перевод'"
+  />
+
+  @if (loadError(); as message) {
+    <app-error-alert [message]="message" />
+  }
+
+  <div class="-mb-2 flex min-h-8 items-center justify-between gap-2">
+    <p class="text-muted-foreground text-sm" aria-live="polite">
+      @if (loaded()) {
+        {{ tab() === 'mine' ? 'В словаре' : 'Найдено' }}: {{ totalCount() }}
+      }
+    </p>
+    @if (tab() === 'mine' && totalCount() > 0 && !selecting()) {
+      <button hlmBtn variant="ghost" size="sm" type="button" (click)="toggleSelecting()">
+        <ng-icon name="lucideListChecks" />
+        Выбрать
+      </button>
+    }
+  </div>
+
+  @if (tab() === 'mine') {
+    <ul class="flex flex-col gap-2 transition-opacity" [class.opacity-60]="myWords.isLoading()">
+      @if (myWords.hasValue()) {
+        @for (word of myWords.value().items; track word.id) {
+          <li>
+            <ng-template #wordBody>
+              <div class="flex items-start gap-2 p-4">
+                @if (selecting()) {
+                  <!-- Не hlm-checkbox: вся карточка — кнопка, а кнопка внутри кнопки недопустима. -->
+                  <span
+                    class="mt-1 flex size-5 shrink-0 items-center justify-center rounded-md border transition-colors"
+                    [class]="selected().has(word.id) ? 'bg-primary border-primary text-primary-foreground' : 'border-input'"
+                    aria-hidden="true"
+                  >
+                    @if (selected().has(word.id)) {
+                      <ng-icon name="lucideCheck" class="text-sm" />
+                    }
+                  </span>
+                }
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                  <div class="flex flex-wrap items-baseline gap-x-2">
+                    <span class="text-base font-semibold break-words">{{ word.text }}</span>
+                    <span class="text-muted-foreground font-mono text-sm">{{ transcription(word.transcription) }}</span>
+                  </div>
+                  <span class="text-sm break-words">{{ word.translations.join(', ') }}</span>
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    @if (word.level) {
+                      <span hlmBadge variant="secondary">{{ word.level }}</span>
+                    }
+                    @if (word.type !== 'Word') {
+                      <span hlmBadge variant="outline">{{ typeLabels[word.type] }}</span>
+                    }
+                    @if (!word.lexemeId) {
+                      <span hlmBadge variant="outline">своё</span>
+                    }
+                  </div>
+                </div>
+                @if (!selecting()) {
+                  <app-speak-button [text]="word.text" [audioUrl]="word.audioUrl" />
+                }
+              </div>
+            </ng-template>
+            @if (selecting()) {
+              <button
+                hlmCard
+                type="button"
+                class="w-full gap-0 py-0 text-start transition-colors"
+                [class.border-primary]="selected().has(word.id)"
+                [attr.aria-pressed]="selected().has(word.id)"
+                (click)="toggle(word.id)"
+              >
+                <ng-container [ngTemplateOutlet]="wordBody" />
+              </button>
+            } @else {
+              <a hlmCard [routerLink]="['/dictionary/words', word.id]" class="hover:border-primary/40 gap-0 py-0 transition-colors">
+                <ng-container [ngTemplateOutlet]="wordBody" />
+              </a>
+            }
+          </li>
+        } @empty {
+          <li class="flex flex-col items-center gap-3 py-10 text-center">
+            @if (filtered()) {
+              <p class="text-muted-foreground">Ничего не нашли среди ваших слов.</p>
+            } @else {
+              <p class="font-medium">Словарь пока пуст</p>
+              <p class="text-muted-foreground max-w-xs text-sm">
+                Добавьте слова из общей базы, своё слово или загрузите список из CSV.
+              </p>
+              <button hlmBtn type="button" class="h-11" (click)="selectTab('base')">Открыть общую базу</button>
+            }
+          </li>
+        }
+      } @else if (myWords.isLoading()) {
+        <li class="text-muted-foreground flex items-center gap-2"><hlm-spinner aria-label="Загрузка" /> Загружаем…</li>
+      }
+    </ul>
+  } @else {
+    <ul class="flex flex-col gap-2 transition-opacity" [class.opacity-60]="lexemes.isLoading()">
+      @if (lexemes.hasValue()) {
+        @for (lexeme of lexemes.value().items; track lexeme.id) {
+          <li>
+            <a hlmCard [routerLink]="['/dictionary/lexemes', lexeme.id]" class="hover:border-primary/40 gap-0 py-0 transition-colors">
+              <div class="flex items-start gap-2 p-4">
+                <div class="flex min-w-0 flex-1 flex-col gap-1">
+                  <div class="flex flex-wrap items-baseline gap-x-2">
+                    <span class="text-base font-semibold break-words">{{ lexeme.text }}</span>
+                    <span class="text-muted-foreground font-mono text-sm">{{ transcription(lexeme.transcription) }}</span>
+                  </div>
+                  <span class="text-sm break-words">{{ lexeme.translations.join(', ') }}</span>
+                  <div class="flex flex-wrap gap-1.5 pt-1">
+                    @if (lexeme.level) {
+                      <span hlmBadge variant="secondary">{{ lexeme.level }}</span>
+                    }
+                    @if (lexeme.type !== 'Word') {
+                      <span hlmBadge variant="outline">{{ typeLabels[lexeme.type] }}</span>
+                    }
+                  </div>
+                </div>
+                <div class="flex shrink-0 items-center gap-1">
+                  <app-speak-button [text]="lexeme.text" />
+                  @if (lexeme.myWordId) {
+                    <span class="text-success flex size-9 items-center justify-center" title="Уже в вашем словаре" aria-label="Уже в вашем словаре">
+                      <ng-icon name="lucideCheck" class="text-lg" />
+                    </span>
+                  } @else {
+                    <button
+                      hlmBtn
+                      variant="outline"
+                      size="icon"
+                      type="button"
+                      [attr.aria-label]="'Добавить в словарь: ' + lexeme.text"
+                      [disabled]="adding().has(lexeme.id)"
+                      (click)="$event.preventDefault(); $event.stopPropagation(); add(lexeme)"
+                    >
+                      @if (adding().has(lexeme.id)) {
+                        <hlm-spinner />
+                      } @else {
+                        <ng-icon name="lucidePlus" />
+                      }
+                    </button>
+                  }
+                </div>
+              </div>
+            </a>
+          </li>
+        } @empty {
+          <li class="text-muted-foreground py-10 text-center">
+            Ничего не нашли. Можно
+            <a routerLink="/dictionary/words/new" class="text-primary font-medium underline-offset-4 hover:underline">добавить своё слово</a>.
+          </li>
+        }
+      } @else if (lexemes.isLoading()) {
+        <li class="text-muted-foreground flex items-center gap-2"><hlm-spinner aria-label="Загрузка" /> Загружаем…</li>
+      }
+    </ul>
+  }
+
+  <app-pager [(page)]="page" [totalPages]="totalPages()" [disabled]="loading()" />
+
+  @if (selecting()) {
+    <app-bulk-bar
+      [count]="selected().size"
+      [busy]="applying()"
+      (apply)="applyBulk($event)"
+      (selectPage)="selectPage()"
+      (cancel)="toggleSelecting()"
+    />
+  }
+</div>

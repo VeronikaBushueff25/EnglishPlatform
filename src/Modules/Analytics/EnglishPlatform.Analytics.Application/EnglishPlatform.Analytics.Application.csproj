@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.Analytics.Domain/EnglishPlatform.Analytics.Domain.csproj" />
+    <ProjectReference Include="../EnglishPlatform.Analytics.Contracts/EnglishPlatform.Analytics.Contracts.csproj" />
+  </ItemGroup>
+</Project>

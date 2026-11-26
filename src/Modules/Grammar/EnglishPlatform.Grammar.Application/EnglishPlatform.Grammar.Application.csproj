@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.Grammar.Domain/EnglishPlatform.Grammar.Domain.csproj" />
+    <ProjectReference Include="../EnglishPlatform.Grammar.Contracts/EnglishPlatform.Grammar.Contracts.csproj" />
+  </ItemGroup>
+</Project>

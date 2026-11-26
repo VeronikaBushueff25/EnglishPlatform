@@ -1,0 +1,150 @@
+text;translation;type;part_of_speech;transcription;level;example;example_translation;categories
+apple;яблоко;word;noun;ˈæpl;A1;She eats an apple every morning.;Она съедает яблоко каждое утро.;food
+bread;хлеб;word;noun;bred;A1;Can you buy some bread on the way home?;Купишь хлеба по дороге домой?;food|shopping
+water;вода;word;noun;ˈwɔːtə;A1;I drink a lot of water when it's hot.;Я пью много воды, когда жарко.;food
+coffee;кофе;word;noun;ˈkɒfi;A1;Let's grab a coffee after work.;Давай выпьем кофе после работы.;food
+breakfast;завтрак;word;noun;ˈbrekfəst;A1;What did you have for breakfast?;Что ты ел на завтрак?;food
+dinner;ужин|обед;word;noun;ˈdɪnə;A1;We usually have dinner at seven.;Обычно мы ужинаем в семь.;food
+delicious;очень вкусный;word;adjective;dɪˈlɪʃəs;A2;This soup is delicious!;Этот суп очень вкусный!;food
+hungry;голодный;word;adjective;ˈhʌŋɡri;A1;I'm hungry. Let's eat.;Я голоден. Давай поедим.;food|emotions
+recipe;рецепт;word;noun;ˈresəpi;B1;Could you share the recipe for this cake?;Поделишься рецептом этого торта?;food|home
+vegetable;овощ;word;noun;ˈvedʒtəbl;A1;Children should eat more vegetables.;Детям нужно есть больше овощей.;food|health
+cook;готовить;word;verb;kʊk;A1;My dad cooks on Sundays.;Мой папа готовит по воскресеньям.;food|home
+taste;вкус|пробовать на вкус;word;noun;teɪst;A2;I don't like the taste of olives.;Мне не нравится вкус оливок.;food
+the bill;счёт (в ресторане);phrase;;ðə bɪl;A2;Could we have the bill, please?;Можно нам счёт, пожалуйста?;food|travel
+ticket;билет;word;noun;ˈtɪkɪt;A1;I bought a ticket to London.;Я купил билет в Лондон.;travel
+luggage;багаж;word;noun;ˈlʌɡɪdʒ;A2;How much luggage can I take?;Сколько багажа можно взять?;travel
+passport;паспорт;word;noun;ˈpɑːspɔːt;A1;Don't forget your passport.;Не забудь паспорт.;travel
+journey;поездка|путешествие;word;noun;ˈdʒɜːni;A2;The journey took six hours.;Поездка заняла шесть часов.;travel
+abroad;за границей|за границу;word;adverb;əˈbrɔːd;B1;She has never been abroad.;Она никогда не была за границей.;travel
+destination;пункт назначения;word;noun;ˌdestɪˈneɪʃn;B1;Paris is a popular destination.;Париж — популярное направление.;travel
+book;бронировать;word;verb;bʊk;A2;I need to book a hotel room.;Мне нужно забронировать номер в отеле.;travel
+book;книга;word;noun;bʊk;A1;I'm reading a good book.;Я читаю хорошую книгу.;everyday
+delay;задержка|задерживать;word;noun;dɪˈleɪ;B1;There was a two-hour delay at the airport.;В аэропорту была задержка на два часа.;travel
+check in;зарегистрироваться (в отеле, аэропорту);phrasal verb;verb;ˌtʃek ˈɪn;A2;We checked in at the hotel at noon.;Мы заселились в отель в полдень.;travel
+set off;отправиться в путь;phrasal verb;verb;ˌset ˈɒf;B1;We set off early in the morning.;Мы отправились в путь рано утром.;travel
+get lost;заблудиться;phrase;;ɡet lɒst;A2;We got lost in the old town.;Мы заблудились в старом городе.;travel
+sightseeing;осмотр достопримечательностей;word;noun;ˈsaɪtsiːɪŋ;B1;We spent the day sightseeing.;Мы весь день осматривали достопримечательности.;travel
+job;работа;word;noun;dʒɒb;A1;She loves her new job.;Ей нравится её новая работа.;work
+colleague;коллега;word;noun;ˈkɒliːɡ;B1;My colleagues are very friendly.;Мои коллеги очень дружелюбные.;work|people
+meeting;встреча|совещание;word;noun;ˈmiːtɪŋ;A2;The meeting starts at ten.;Совещание начинается в десять.;work
+deadline;срок сдачи|дедлайн;word;noun;ˈdedlaɪn;B1;We have to meet the deadline.;Нам нужно уложиться в срок.;work
+salary;зарплата;word;noun;ˈsæləri;B1;He asked for a higher salary.;Он попросил повысить зарплату.;work
+experience;опыт;word;noun;ɪkˈspɪəriəns;A2;Do you have any experience in sales?;У вас есть опыт в продажах?;work
+skill;навык|умение;word;noun;skɪl;A2;Communication is an important skill.;Общение — важный навык.;work
+apply for;подавать заявление (на работу и т. п.);phrasal verb;verb;əˈplaɪ fɔː;B1;She applied for a job at a bank.;Она подала заявление на работу в банк.;work
+take over;взять на себя|перенять;phrasal verb;verb;ˌteɪk ˈəʊvə;B2;Who will take over when you leave?;Кто возьмёт на себя дела, когда ты уйдёшь?;work
+run out of;израсходовать|закончиться;phrasal verb;verb;ˌrʌn ˈaʊt əv;B1;We've run out of paper.;У нас закончилась бумага.;everyday|work
+figure out;разобраться|понять;phrasal verb;verb;ˌfɪɡər ˈaʊt;B1;I can't figure out how this works.;Не могу разобраться, как это работает.;everyday
+look forward to;с нетерпением ждать;phrasal verb;verb;ˌlʊk ˈfɔːwəd tə;B1;I'm looking forward to the holidays.;Жду не дождусь каникул.;emotions|communication
+give up;бросить|сдаться;phrasal verb;verb;ˌɡɪv ˈʌp;A2;Don't give up!;Не сдавайся!;everyday
+find out;узнать|выяснить;phrasal verb;verb;ˌfaɪnd ˈaʊt;A2;I found out the truth yesterday.;Я вчера узнал правду.;everyday
+get up;вставать (с постели);phrasal verb;verb;ˌɡet ˈʌp;A1;I get up at seven.;Я встаю в семь.;everyday|time
+look after;присматривать|заботиться;phrasal verb;verb;ˌlʊk ˈɑːftə;A2;Can you look after my cat?;Можешь присмотреть за моей кошкой?;people|home
+put off;откладывать;phrasal verb;verb;ˌpʊt ˈɒf;B1;Stop putting off your homework.;Хватит откладывать домашку.;time
+turn down;отклонить|убавить (звук);phrasal verb;verb;ˌtɜːn ˈdaʊn;B1;She turned down the offer.;Она отклонила предложение.;work|communication
+come up with;придумать;phrasal verb;verb;ˌkʌm ˈʌp wɪð;B2;He came up with a great idea.;Он придумал отличную идею.;work
+get along with;ладить с кем-то;phrasal verb;verb;ˌɡet əˈlɒŋ wɪð;B1;I get along with my neighbours.;Я хорошо лажу с соседями.;people
+house;дом;word;noun;haʊs;A1;They live in a big house.;Они живут в большом доме.;home
+kitchen;кухня;word;noun;ˈkɪtʃɪn;A1;The kitchen is next to the living room.;Кухня рядом с гостиной.;home
+neighbour;сосед;word;noun;ˈneɪbə;A2;Our neighbours are very quiet.;Наши соседи очень тихие.;home|people
+rent;арендная плата|снимать (жильё);word;noun;rent;B1;The rent is due on Monday.;Аренду нужно заплатить в понедельник.;home|shopping
+tidy;аккуратный|прибирать;word;adjective;ˈtaɪdi;A2;Keep your room tidy.;Держи комнату в порядке.;home
+furniture;мебель;word;noun;ˈfɜːnɪtʃə;A2;We need new furniture.;Нам нужна новая мебель.;home
+comfortable;удобный|уютный;word;adjective;ˈkʌmftəbl;A2;This sofa is very comfortable.;Этот диван очень удобный.;home
+family;семья;word;noun;ˈfæməli;A1;I have a big family.;У меня большая семья.;people
+friend;друг|подруга;word;noun;frend;A1;She is my best friend.;Она моя лучшая подруга.;people
+parents;родители;word;noun;ˈpeərənts;A1;My parents live in Kazan.;Мои родители живут в Казани.;people
+brother;брат;word;noun;ˈbrʌðə;A1;My brother is older than me.;Мой брат старше меня.;people
+child;ребёнок;word;noun;tʃaɪld;A1;Every child needs love.;Каждому ребёнку нужна любовь.;people
+stranger;незнакомец;word;noun;ˈstreɪndʒə;B1;Don't talk to strangers.;Не разговаривай с незнакомцами.;people
+relationship;отношения;word;noun;rɪˈleɪʃnʃɪp;B1;They have a good relationship.;У них хорошие отношения.;people|emotions
+reliable;надёжный;word;adjective;rɪˈlaɪəbl;B1;He is a very reliable person.;Он очень надёжный человек.;people
+generous;щедрый;word;adjective;ˈdʒenərəs;B1;It was generous of you to help.;Ты очень щедро поступил, что помог.;people
+friendly;дружелюбный;word;adjective;ˈfrendli;A1;The staff were very friendly.;Персонал был очень дружелюбным.;people
+happy;счастливый|довольный;word;adjective;ˈhæpi;A1;I'm happy to see you.;Я рад тебя видеть.;emotions
+sad;грустный;word;adjective;sæd;A1;Why are you so sad?;Почему ты такой грустный?;emotions
+angry;сердитый|злой;word;adjective;ˈæŋɡri;A1;She was angry with me.;Она злилась на меня.;emotions
+tired;уставший;word;adjective;ˈtaɪəd;A1;I'm too tired to go out.;Я слишком устал, чтобы куда-то идти.;emotions|health
+worried;обеспокоенный;word;adjective;ˈwʌrid;A2;I'm worried about the exam.;Я волнуюсь из-за экзамена.;emotions
+excited;взволнованный (радостно)|в предвкушении;word;adjective;ɪkˈsaɪtɪd;A2;The kids are excited about the trip.;Дети в предвкушении поездки.;emotions
+embarrassed;смущённый;word;adjective;ɪmˈbærəst;B1;I felt embarrassed when I fell.;Мне было неловко, когда я упал.;emotions
+proud;гордый;word;adjective;praʊd;B1;I'm proud of you.;Я горжусь тобой.;emotions
+disappointed;разочарованный;word;adjective;ˌdɪsəˈpɔɪntɪd;B1;We were disappointed with the film.;Фильм нас разочаровал.;emotions
+scared;испуганный;word;adjective;skeəd;A2;She's scared of spiders.;Она боится пауков.;emotions
+lonely;одинокий;word;adjective;ˈləʊnli;B1;He felt lonely in the new city.;Ему было одиноко в новом городе.;emotions|people
+time;время|раз;word;noun;taɪm;A1;What time is it?;Который час?;time
+today;сегодня;word;adverb;təˈdeɪ;A1;It's cold today.;Сегодня холодно.;time
+tomorrow;завтра;word;adverb;təˈmɒrəʊ;A1;See you tomorrow!;Увидимся завтра!;time
+yesterday;вчера;word;adverb;ˈjestədeɪ;A1;I called her yesterday.;Я звонил ей вчера.;time
+week;неделя;word;noun;wiːk;A1;I go to the gym three times a week.;Я хожу в спортзал три раза в неделю.;time
+early;рано|ранний;word;adverb;ˈɜːli;A1;She always arrives early.;Она всегда приходит рано.;time
+late;поздно|опоздавший;word;adjective;leɪt;A1;Sorry I'm late.;Извини, что опоздал.;time
+soon;скоро;word;adverb;suːn;A1;I'll be back soon.;Я скоро вернусь.;time
+already;уже;word;adverb;ɔːlˈredi;A2;I've already finished.;Я уже закончил.;time
+still;всё ещё;word;adverb;stɪl;A2;Are you still at work?;Ты всё ещё на работе?;time
+usually;обычно;word;adverb;ˈjuːʒuəli;A1;I usually walk to work.;Я обычно хожу на работу пешком.;time|everyday
+appointment;запись (к врачу)|встреча;word;noun;əˈpɔɪntmənt;B1;I have a doctor's appointment at three.;У меня запись к врачу на три.;time|health
+in time;вовремя (не опоздав);phrase;;ɪn taɪm;B1;We arrived just in time for the film.;Мы приехали как раз к началу фильма.;time
+on time;точно в срок|по расписанию;phrase;;ɒn taɪm;A2;The train left on time.;Поезд отправился по расписанию.;time|travel
+weather;погода;word;noun;ˈweðə;A1;What's the weather like today?;Какая сегодня погода?;nature
+rain;дождь|идти (о дожде);word;noun;reɪn;A1;Take an umbrella, it might rain.;Возьми зонт, может пойти дождь.;nature
+sunny;солнечный;word;adjective;ˈsʌni;A1;It's a sunny day.;Сегодня солнечный день.;nature
+tree;дерево;word;noun;triː;A1;There is an old tree in our garden.;В нашем саду растёт старое дерево.;nature
+river;река;word;noun;ˈrɪvə;A1;We swam in the river.;Мы купались в реке.;nature|travel
+mountain;гора;word;noun;ˈmaʊntən;A1;They climbed the mountain.;Они поднялись на гору.;nature|travel
+environment;окружающая среда;word;noun;ɪnˈvaɪrənmənt;B1;We must protect the environment.;Мы должны беречь окружающую среду.;nature
+health;здоровье;word;noun;helθ;A2;Smoking is bad for your health.;Курение вредно для здоровья.;health
+headache;головная боль;word;noun;ˈhedeɪk;A2;I've got a terrible headache.;У меня ужасно болит голова.;health
+medicine;лекарство;word;noun;ˈmedsn;A2;Take this medicine twice a day.;Принимай это лекарство дважды в день.;health
+exercise;физические упражнения|упражнение;word;noun;ˈeksəsaɪz;A2;Regular exercise is good for you.;Регулярные упражнения полезны.;health
+healthy;здоровый|полезный;word;adjective;ˈhelθi;A1;Fruit is healthy food.;Фрукты — полезная еда.;health|food
+recover;выздоравливать|восстанавливаться;word;verb;rɪˈkʌvə;B1;He recovered quickly after the operation.;Он быстро поправился после операции.;health
+feel under the weather;неважно себя чувствовать;idiom;;fiːl ˌʌndə ðə ˈweðə;B2;I'm feeling a bit under the weather today.;Сегодня я неважно себя чувствую.;health
+shop;магазин;word;noun;ʃɒp;A1;Is there a shop near here?;Здесь поблизости есть магазин?;shopping
+price;цена;word;noun;praɪs;A1;The price is too high.;Цена слишком высокая.;shopping
+cheap;дешёвый;word;adjective;tʃiːp;A1;This phone was really cheap.;Этот телефон был совсем дешёвым.;shopping
+expensive;дорогой;word;adjective;ɪkˈspensɪv;A1;London is an expensive city.;Лондон — дорогой город.;shopping|travel
+discount;скидка;word;noun;ˈdɪskaʊnt;B1;Do you give a student discount?;У вас есть скидка для студентов?;shopping
+receipt;чек|квитанция;word;noun;rɪˈsiːt;B1;Keep the receipt in case you want to return it.;Сохрани чек на случай возврата.;shopping
+afford;позволить себе (по деньгам);word;verb;əˈfɔːd;B1;We can't afford a new car.;Мы не можем позволить себе новую машину.;shopping
+try on;примерять;phrasal verb;verb;ˌtraɪ ˈɒn;A2;Can I try on these jeans?;Можно примерить эти джинсы?;shopping
+it costs an arm and a leg;стоит целое состояние;idiom;;ɪt kɒsts ən ˌɑːm ənd ə ˈleɡ;B2;That watch costs an arm and a leg.;Эти часы стоят целое состояние.;shopping
+say;сказать;word;verb;seɪ;A1;What did she say?;Что она сказала?;communication
+tell;рассказать|сказать (кому-то);word;verb;tel;A1;Tell me about your day.;Расскажи мне о своём дне.;communication
+ask;спросить|попросить;word;verb;ɑːsk;A1;Can I ask you a question?;Можно задать вопрос?;communication
+answer;ответ|отвечать;word;noun;ˈɑːnsə;A1;I don't know the answer.;Я не знаю ответа.;communication
+explain;объяснять;word;verb;ɪkˈspleɪn;A2;Could you explain that again?;Можешь объяснить ещё раз?;communication
+agree;соглашаться;word;verb;əˈɡriː;A2;I completely agree with you.;Я полностью с тобой согласен.;communication
+suggest;предлагать;word;verb;səˈdʒest;B1;I suggest we take a break.;Предлагаю сделать перерыв.;communication
+apologise;извиняться;word;verb;əˈpɒlədʒaɪz;B1;He apologised for being late.;Он извинился за опоздание.;communication
+argue;спорить;word;verb;ˈɑːɡjuː;B1;They argue about money all the time.;Они всё время спорят о деньгах.;communication|people
+by the way;кстати;phrase;;baɪ ðə ˈweɪ;A2;By the way, have you seen Tom?;Кстати, ты видел Тома?;communication
+to be honest;честно говоря;phrase;;tə bi ˈɒnɪst;B1;To be honest, I didn't like it.;Честно говоря, мне не понравилось.;communication
+it's up to you;решать тебе;phrase;;ɪts ˈʌp tə juː;B1;We can go now or later, it's up to you.;Можем пойти сейчас или позже — решай сам.;communication
+no worries;не беспокойся|ничего страшного;phrase;;nəʊ ˈwʌriz;A2;Sorry I'm late. — No worries!;Извини, что опоздал. — Ничего страшного!;communication
+break the ice;растопить лёд (начать общение);idiom;;ˌbreɪk ði ˈaɪs;B2;He told a joke to break the ice.;Он пошутил, чтобы разрядить обстановку.;communication|people
+a piece of cake;проще простого;idiom;;ə ˌpiːs əv ˈkeɪk;B1;The test was a piece of cake.;Тест был проще простого.;everyday
+hit the sack;завалиться спать;idiom;;ˌhɪt ðə ˈsæk;B2;I'm exhausted, I'm going to hit the sack.;Я вымотался, пойду спать.;everyday|time
+once in a blue moon;очень редко|раз в сто лет;idiom;;ˌwʌns ɪn ə ˌbluː ˈmuːn;B2;I see him once in a blue moon.;Я вижу его раз в сто лет.;time
+better late than never;лучше поздно, чем никогда;idiom;;ˈbetə ˌleɪt ðən ˈnevə;B1;You finally came — better late than never!;Ты наконец пришёл — лучше поздно, чем никогда!;time
+the ball is in your court;теперь твой ход|решение за тобой;idiom;;ðə ˈbɔːl ɪz ɪn jɔː ˈkɔːt;B2;I've made my offer, now the ball is in your court.;Я сделал предложение, теперь решение за тобой.;communication|work
+make;делать|создавать;word;verb;meɪk;A1;She made a cake for my birthday.;Она испекла торт на мой день рождения.;everyday
+do;делать;word;verb;duː;A1;What are you doing?;Что ты делаешь?;everyday
+take;брать|взять;word;verb;teɪk;A1;Take your coat, it's cold.;Возьми пальто, холодно.;everyday
+need;нуждаться|нужно;word;verb;niːd;A1;I need your help.;Мне нужна твоя помощь.;everyday
+remember;помнить|вспоминать;word;verb;rɪˈmembə;A1;Do you remember his name?;Ты помнишь, как его зовут?;everyday
+forget;забывать;word;verb;fəˈɡet;A1;Don't forget to call me.;Не забудь мне позвонить.;everyday
+decide;решать;word;verb;dɪˈsaɪd;A2;We decided to stay at home.;Мы решили остаться дома.;everyday
+improve;улучшать;word;verb;ɪmˈpruːv;B1;I want to improve my English.;Я хочу улучшить свой английский.;work|everyday
+achieve;достигать;word;verb;əˈtʃiːv;B1;She achieved all her goals.;Она достигла всех своих целей.;work
+avoid;избегать;word;verb;əˈvɔɪd;B1;Try to avoid sugar.;Старайся избегать сахара.;everyday|health
+important;важный;word;adjective;ɪmˈpɔːtnt;A1;This is very important.;Это очень важно.;everyday
+difficult;трудный;word;adjective;ˈdɪfɪkəlt;A1;The exam was difficult.;Экзамен был трудным.;everyday
+easy;лёгкий|простой;word;adjective;ˈiːzi;A1;The first exercise is easy.;Первое упражнение лёгкое.;everyday
+busy;занятой|загруженный;word;adjective;ˈbɪzi;A1;I'm very busy this week.;На этой неделе я очень занят.;work|time
+available;доступный|свободный;word;adjective;əˈveɪləbl;B1;Is this room available?;Этот номер свободен?;work|travel
+convenient;удобный (по времени, месту);word;adjective;kənˈviːniənt;B1;Is Monday convenient for you?;Тебе удобно в понедельник?;time|communication
+probably;вероятно|наверное;word;adverb;ˈprɒbəbli;A2;It will probably rain tomorrow.;Завтра, вероятно, будет дождь.;everyday
+although;хотя;word;conjunction;ɔːlˈðəʊ;B1;Although it was late, we kept working.;Хотя было поздно, мы продолжали работать.;communication
+however;однако;word;adverb;haʊˈevə;B1;It's expensive. However, it's worth it.;Это дорого. Однако оно того стоит.;communication

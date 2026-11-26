@@ -1,0 +1,64 @@
+@if (auth.user(); as user) {
+  <section hlmCard>
+    <div hlmCardHeader>
+      <h1 hlmCardTitle class="text-2xl">С возвращением!</h1>
+      <p hlmCardDescription>Вы вошли как {{ user.email }}.</p>
+    </div>
+    <div hlmCardContent class="text-muted-foreground">
+      Словарь и занятия появятся на следующих этапах. Пока можно настроить цели и дневную нагрузку.
+    </div>
+    <div hlmCardFooter>
+      <a hlmBtn routerLink="/profile" class="h-11 w-full sm:w-auto">Настроить профиль</a>
+    </div>
+  </section>
+} @else {
+  <section class="py-6 text-center sm:py-12">
+    <span hlmBadge variant="secondary" class="mb-4">
+      <ng-icon name="lucideSparkles" />
+      10–15 минут в день
+    </span>
+    <h1 class="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">Учим английский каждый день</h1>
+    <p class="text-muted-foreground mx-auto mt-3 max-w-md text-balance">
+      Короткие занятия, повторение слов по интервалам и разбор ваших ошибок.
+    </p>
+    <div class="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+      <a hlmBtn routerLink="/register" class="h-11 px-6">Начать бесплатно</a>
+      <a hlmBtn variant="outline" routerLink="/login" class="h-11 px-6">У меня есть аккаунт</a>
+    </div>
+  </section>
+
+  <section class="grid gap-3 sm:grid-cols-3">
+    @for (feature of features; track feature.title) {
+      <div hlmCard class="gap-2 py-5">
+        <div hlmCardHeader class="px-5">
+          <span class="bg-primary/10 text-primary mb-1 flex size-9 items-center justify-center rounded-xl">
+            <ng-icon [name]="feature.icon" class="text-lg" />
+          </span>
+          <h2 hlmCardTitle>{{ feature.title }}</h2>
+        </div>
+        <p hlmCardContent class="text-muted-foreground px-5 text-sm">{{ feature.text }}</p>
+      </div>
+    }
+  </section>
+}
+
+<p class="text-muted-foreground mt-8 flex items-center justify-center gap-2 text-xs">
+  <span
+    class="size-2 rounded-full"
+    [class.bg-success]="apiStatus() === 'ok'"
+    [class.bg-destructive]="apiStatus() === 'unavailable'"
+    [class.bg-muted-foreground]="!apiStatus()"
+  ></span>
+  API:
+  @switch (apiStatus()) {
+    @case ('ok') {
+      доступен
+    }
+    @case ('unavailable') {
+      недоступен
+    }
+    @default {
+      проверяю…
+    }
+  }
+</p>

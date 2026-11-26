@@ -1,0 +1,93 @@
+<div class="flex flex-col gap-4">
+  <app-admin-nav />
+
+  <h1 class="text-2xl font-semibold tracking-tight">Категории</h1>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <h2 hlmCardTitle>{{ editingId() ? 'Правка категории' : 'Новая категория' }}</h2>
+    </div>
+    <div hlmCardContent>
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div hlmFieldGroup>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div hlmField>
+              <label hlmFieldLabel for="name">Название</label>
+              <input hlmInput id="name" formControlName="name" autocomplete="off" class="h-11" placeholder="Путешествия" />
+              <hlm-field-error>Введите название</hlm-field-error>
+            </div>
+            <div hlmField>
+              <label hlmFieldLabel for="slug">Идентификатор</label>
+              <input hlmInput id="slug" formControlName="slug" autocomplete="off" autocapitalize="none" spellcheck="false" class="h-11 font-mono" placeholder="travel" />
+              <p hlmFieldDescription>Латиница, цифры и дефис. По нему категорию указывают в CSV.</p>
+              <hlm-field-error>Только a–z, 0–9 и дефис, например daily-life</hlm-field-error>
+            </div>
+          </div>
+          <div hlmField>
+            <label hlmFieldLabel for="description">Описание</label>
+            <input hlmInput id="description" formControlName="description" autocomplete="off" class="h-11" />
+          </div>
+
+          @if (error(); as message) {
+            <app-error-alert [message]="message" />
+          }
+
+          <div class="flex flex-col gap-2 sm:flex-row">
+            <button hlmBtn type="submit" class="h-11" [disabled]="saving()">
+              @if (saving()) {
+                <hlm-spinner aria-label="Сохраняем" />
+              } @else if (!editingId()) {
+                <ng-icon name="lucidePlus" />
+              }
+              {{ editingId() ? 'Сохранить' : 'Создать' }}
+            </button>
+            @if (editingId()) {
+              <button hlmBtn variant="ghost" type="button" class="h-11" (click)="cancelEdit()">Отмена</button>
+            }
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  @if (loadError(); as message) {
+    <app-error-alert [message]="message" />
+  }
+
+  <ul class="flex flex-col gap-2">
+    @if (categories.hasValue()) {
+      @for (category of categories.value(); track category.id) {
+        <li hlmCard class="gap-0 py-0" [class.border-primary]="editingId() === category.id">
+          <div class="flex items-center gap-2 p-4">
+            <div class="flex min-w-0 flex-1 flex-col gap-0.5">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-medium">{{ category.name }}</span>
+                <span class="text-muted-foreground font-mono text-xs">{{ category.slug }}</span>
+              </div>
+              @if (category.description) {
+                <span class="text-muted-foreground text-sm">{{ category.description }}</span>
+              }
+            </div>
+            <span hlmBadge variant="secondary" class="tabular-nums" [attr.aria-label]="'Слов в категории: ' + category.lexemeCount">
+              {{ category.lexemeCount }}
+            </span>
+            <button hlmBtn variant="ghost" size="icon" type="button" [attr.aria-label]="'Изменить ' + category.name" (click)="edit(category)">
+              <ng-icon name="lucidePencil" />
+            </button>
+            <app-confirm-delete
+              iconOnly
+              [label]="'Удалить ' + category.name"
+              [title]="'Удалить категорию «' + category.name + '»?'"
+              description="Слова останутся в базе, с них просто снимется эта категория."
+              (confirmed)="remove(category)"
+            />
+          </div>
+        </li>
+      } @empty {
+        <li class="text-muted-foreground py-6 text-center">Категорий пока нет.</li>
+      }
+    } @else if (categories.isLoading()) {
+      <li class="text-muted-foreground flex items-center gap-2"><hlm-spinner aria-label="Загрузка" /> Загружаем…</li>
+    }
+  </ul>
+</div>

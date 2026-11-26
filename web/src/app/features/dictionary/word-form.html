@@ -1,0 +1,151 @@
+<div class="flex flex-col gap-4">
+  <a hlmBtn variant="ghost" size="sm" routerLink="/dictionary" class="self-start">
+    <ng-icon name="lucideArrowLeft" />
+    Мой словарь
+  </a>
+
+  @if (loadError(); as message) {
+    <app-error-alert [message]="message" />
+  } @else if (isNew() || word.hasValue()) {
+    <section hlmCard>
+      <div hlmCardHeader>
+        <div class="flex items-start gap-2">
+          <h1 hlmCardTitle class="flex-1 text-xl">{{ isNew() ? 'Новое слово' : form.controls.text.value || 'Слово' }}</h1>
+          @if (!isNew() && word.hasValue()) {
+            <app-speak-button [text]="word.value().text" [audioUrl]="word.value().audioUrl" />
+          }
+        </div>
+        @if (isNew()) {
+          <p hlmCardDescription>Слово, фраза или выражение, которого нет в общей базе.</p>
+        }
+      </div>
+
+      <div hlmCardContent>
+        @if (!isNew() && word.hasValue() && word.value().lexemeId) {
+          <div hlmAlert class="mb-5">
+            <ng-icon name="lucideInfo" class="text-primary!" />
+            <p hlmAlertDescription>
+              @if (word.value().isEdited) {
+                Слово из общей базы, вы его правили — обновления базы его больше не меняют.
+              } @else {
+                Слово из общей базы. Если поправить перевод или пример, обновления базы перестанут его менять. Заметку менять можно свободно.
+              }
+            </p>
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+          <div hlmFieldGroup>
+            <div hlmField>
+              <label hlmFieldLabel for="text">Слово или фраза</label>
+              <input hlmInput id="text" formControlName="text" autocomplete="off" autocapitalize="none" lang="en" spellcheck="false" class="h-11" />
+              <hlm-field-error>Введите слово, до 128 символов</hlm-field-error>
+            </div>
+
+            <fieldset hlmFieldSet>
+              <legend hlmFieldLegend variant="label">Перевод</legend>
+              <div formArrayName="translations" class="flex flex-col gap-2">
+                @for (control of translations.controls; track control; let i = $index) {
+                  <div class="flex gap-2">
+                    <input
+                      hlmInput
+                      [formControlName]="i"
+                      class="h-11 flex-1"
+                      autocomplete="off"
+                      [attr.aria-label]="'Перевод ' + (i + 1)"
+                      [placeholder]="i === 0 ? 'Например: счастливая случайность' : 'Ещё вариант'"
+                    />
+                    @if (translations.length > 1) {
+                      <button hlmBtn variant="ghost" size="icon-lg" type="button" aria-label="Убрать перевод" (click)="removeTranslation(i)">
+                        <ng-icon name="lucideX" />
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+              @if (translations.length < maxTranslations) {
+                <button hlmBtn variant="ghost" size="sm" type="button" class="self-start" (click)="addTranslation()">
+                  <ng-icon name="lucidePlus" />
+                  Ещё перевод
+                </button>
+              }
+            </fieldset>
+
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div hlmField>
+                <label hlmFieldLabel for="type">Тип</label>
+                <hlm-native-select selectId="type" formControlName="type" selectClass="h-11" class="w-full">
+                  @for (type of types; track type) {
+                    <option [value]="type">{{ typeLabels[type] }}</option>
+                  }
+                </hlm-native-select>
+              </div>
+              <div hlmField>
+                <label hlmFieldLabel for="level">Уровень</label>
+                <hlm-native-select selectId="level" formControlName="level" selectClass="h-11" class="w-full">
+                  <option value="">—</option>
+                  @for (level of levels; track level) {
+                    <option [value]="level">{{ level }}</option>
+                  }
+                </hlm-native-select>
+              </div>
+              <div hlmField class="col-span-2 sm:col-span-1">
+                <label hlmFieldLabel for="partOfSpeech">Часть речи</label>
+                <hlm-native-select selectId="partOfSpeech" formControlName="partOfSpeech" selectClass="h-11" class="w-full">
+                  <option value="">—</option>
+                  @for (part of parts; track part) {
+                    <option [value]="part">{{ partLabels[part] }}</option>
+                  }
+                </hlm-native-select>
+              </div>
+            </div>
+
+            <div hlmField>
+              <label hlmFieldLabel for="transcription">Транскрипция</label>
+              <input hlmInput id="transcription" formControlName="transcription" autocomplete="off" class="h-11 font-mono" placeholder="ˌserənˈdɪpəti" />
+            </div>
+
+            <div hlmField>
+              <label hlmFieldLabel for="example">Пример</label>
+              <input hlmInput id="example" formControlName="example" autocomplete="off" lang="en" class="h-11" />
+            </div>
+            <div hlmField>
+              <label hlmFieldLabel for="exampleTranslation">Перевод примера</label>
+              <input hlmInput id="exampleTranslation" formControlName="exampleTranslation" autocomplete="off" class="h-11" />
+            </div>
+
+            <div hlmField>
+              <label hlmFieldLabel for="note">Заметка</label>
+              <textarea hlmTextarea id="note" formControlName="note" rows="3" placeholder="Где встретили, с чем путаете"></textarea>
+              <hlm-field-error>До 1000 символов</hlm-field-error>
+            </div>
+
+            @if (error(); as message) {
+              <app-error-alert [message]="message" />
+            }
+
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+              @if (!isNew()) {
+                <app-confirm-delete
+                  label="Удалить из словаря"
+                  [title]="'Удалить «' + form.controls.text.value + '»?'"
+                  description="Слово пропадёт из вашего словаря. Отменить это нельзя."
+                  [disabled]="deleting()"
+                  (confirmed)="remove()"
+                />
+              }
+              <button hlmBtn type="submit" class="h-11 w-full sm:ms-auto sm:w-auto" [disabled]="saving() || (!isNew() && form.pristine)">
+                @if (saving()) {
+                  <hlm-spinner aria-label="Сохраняем" />
+                }
+                {{ isNew() ? 'Добавить в словарь' : 'Сохранить' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  } @else {
+    <div class="text-muted-foreground flex items-center gap-2"><hlm-spinner aria-label="Загрузка" /> Загружаем…</div>
+  }
+</div>

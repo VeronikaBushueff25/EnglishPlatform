@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.SpacedRepetition.Domain/EnglishPlatform.SpacedRepetition.Domain.csproj" />
+    <ProjectReference Include="../EnglishPlatform.SpacedRepetition.Contracts/EnglishPlatform.SpacedRepetition.Contracts.csproj" />
+  </ItemGroup>
+</Project>

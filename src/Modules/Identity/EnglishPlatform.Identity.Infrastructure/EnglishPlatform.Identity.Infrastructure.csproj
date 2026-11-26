@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.Identity.Application/EnglishPlatform.Identity.Application.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/EnglishPlatform.BuildingBlocks.Infrastructure/EnglishPlatform.BuildingBlocks.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  </ItemGroup>
+
+</Project>

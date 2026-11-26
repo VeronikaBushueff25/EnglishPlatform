@@ -1,0 +1,130 @@
+<div class="flex flex-col gap-4">
+  <h1 class="text-2xl font-semibold tracking-tight">Профиль</h1>
+
+  @if (welcome()) {
+    <div hlmAlert>
+      <ng-icon name="lucidePartyPopper" class="text-primary!" />
+      <h2 hlmAlertTitle>Аккаунт создан</h2>
+      <p hlmAlertDescription>Расскажите немного о себе: цели и дневная нагрузка помогут подобрать занятия.</p>
+    </div>
+  }
+
+  @if (loadError(); as message) {
+    <app-error-alert [message]="message" />
+  } @else if (me.hasValue()) {
+    @let profile = me.value();
+
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>Аккаунт</h2>
+        <p hlmCardDescription class="break-all">{{ profile.email }}</p>
+        <div hlmCardAction>
+          <span hlmBadge variant="secondary">{{ planLabels[profile.plan] }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>О себе</h2>
+      </div>
+      <div hlmCardContent>
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+          <div hlmFieldGroup>
+            <div hlmField>
+              <label hlmFieldLabel for="displayName">Как к вам обращаться</label>
+              <input hlmInput id="displayName" type="text" formControlName="displayName" autocomplete="nickname" maxlength="64" class="h-11" />
+            </div>
+
+            <div hlmField>
+              <label hlmFieldLabel for="timeZone">Часовой пояс</label>
+              <input hlmInput id="timeZone" type="text" formControlName="timeZone" list="time-zones" autocomplete="off" class="h-11" />
+              <datalist id="time-zones">
+                @for (zone of timeZones; track zone) {
+                  <option [value]="zone"></option>
+                }
+              </datalist>
+              <p hlmFieldDescription>
+                От него зависит, когда начинается новый учебный день.
+                @if (browserZone && browserZone !== profileForm.controls.timeZone.value) {
+                  <button type="button" class="text-primary underline-offset-4 hover:underline" (click)="useBrowserZone()">
+                    Взять с устройства: {{ browserZone }}
+                  </button>
+                }
+              </p>
+              <hlm-field-error>Укажите часовой пояс</hlm-field-error>
+            </div>
+
+            <button hlmBtn type="submit" class="h-11 w-full sm:w-auto sm:self-start" [disabled]="profileSaving() || profileForm.pristine">
+              @if (profileSaving()) {
+                <hlm-spinner aria-label="Сохраняем" />
+              }
+              Сохранить
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section hlmCard>
+      <div hlmCardHeader>
+        <h2 hlmCardTitle>Обучение</h2>
+        <p hlmCardDescription>Цели и нагрузку можно менять в любой момент.</p>
+      </div>
+      <div hlmCardContent>
+        <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" novalidate>
+          <div hlmFieldGroup>
+            <fieldset hlmFieldSet>
+              <legend hlmFieldLegend variant="label">Зачем вам английский</legend>
+              <div class="grid gap-2 sm:grid-cols-2">
+                @for (goal of goals; track goal) {
+                  <label
+                    class="hover:bg-muted/50 has-data-checked:border-primary/40 has-data-checked:bg-primary/5 flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm transition-colors"
+                  >
+                    <hlm-checkbox [checked]="hasGoal(goal)" (checkedChange)="toggleGoal(goal, $event)" />
+                    {{ goalLabels[goal] }}
+                  </label>
+                }
+              </div>
+            </fieldset>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div hlmField>
+                <label hlmFieldLabel for="dailyNewWords">Новых слов в день</label>
+                <input hlmInput id="dailyNewWords" type="number" inputmode="numeric" min="1" max="100" formControlName="dailyNewWords" class="h-11" />
+                <hlm-field-error>От 1 до 100</hlm-field-error>
+              </div>
+
+              <div hlmField>
+                <label hlmFieldLabel for="dailyReviews">Повторений в день</label>
+                <input hlmInput id="dailyReviews" type="number" inputmode="numeric" min="10" max="1000" formControlName="dailyReviews" class="h-11" />
+                <hlm-field-error>От 10 до 1000</hlm-field-error>
+              </div>
+            </div>
+
+            <div hlmField>
+              <label hlmFieldLabel for="interfaceLanguage">Язык интерфейса</label>
+              <hlm-native-select selectId="interfaceLanguage" formControlName="interfaceLanguage" selectClass="h-11">
+                @for (language of languages; track language) {
+                  <option hlmNativeSelectOption [value]="language">{{ languageLabels[language] }}</option>
+                }
+              </hlm-native-select>
+            </div>
+
+            <button hlmBtn type="submit" class="h-11 w-full sm:w-auto sm:self-start" [disabled]="settingsSaving() || settingsForm.pristine">
+              @if (settingsSaving()) {
+                <hlm-spinner aria-label="Сохраняем" />
+              }
+              Сохранить
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  } @else {
+    <div class="text-muted-foreground flex items-center gap-2">
+      <hlm-spinner aria-label="Загрузка" />
+      Загружаем профиль…
+    </div>
+  }
+</div>

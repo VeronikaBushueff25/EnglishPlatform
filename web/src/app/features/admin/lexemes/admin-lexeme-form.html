@@ -1,0 +1,163 @@
+<div class="flex flex-col gap-4">
+  <a hlmBtn variant="ghost" size="sm" routerLink="/admin/lexemes" class="self-start">
+    <ng-icon name="lucideArrowLeft" />
+    Слова общей базы
+  </a>
+
+  @if (loadError(); as message) {
+    <app-error-alert [message]="message" />
+  } @else if (isNew() || lexeme.hasValue()) {
+    <section hlmCard>
+      <div hlmCardHeader>
+        <div class="flex items-start gap-2">
+          <h1 hlmCardTitle class="flex-1 text-xl">{{ isNew() ? 'Новое слово' : form.controls.text.value }}</h1>
+          @if (!isNew() && form.controls.text.value) {
+            <app-speak-button [text]="form.controls.text.value" [audioUrl]="form.controls.audioUrl.value || null" />
+          }
+        </div>
+        @if (!isNew()) {
+          <p hlmCardDescription>Правка перевода и примеров дойдёт до личных словарей, где слово не меняли вручную.</p>
+        }
+      </div>
+
+      <div hlmCardContent>
+        <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+          <div hlmFieldGroup>
+            <div hlmField>
+              <label hlmFieldLabel for="text">Слово или фраза</label>
+              <input hlmInput id="text" formControlName="text" autocomplete="off" autocapitalize="none" lang="en" spellcheck="false" class="h-11" />
+              <hlm-field-error>Введите слово, до 128 символов</hlm-field-error>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div hlmField>
+                <label hlmFieldLabel for="type">Тип</label>
+                <hlm-native-select selectId="type" formControlName="type" selectClass="h-11" class="w-full">
+                  @for (type of types; track type) {
+                    <option [value]="type">{{ typeLabels[type] }}</option>
+                  }
+                </hlm-native-select>
+              </div>
+              <div hlmField>
+                <label hlmFieldLabel for="level">Уровень</label>
+                <hlm-native-select selectId="level" formControlName="level" selectClass="h-11" class="w-full">
+                  <option value="">—</option>
+                  @for (level of levels; track level) {
+                    <option [value]="level">{{ level }}</option>
+                  }
+                </hlm-native-select>
+              </div>
+              <div hlmField class="col-span-2 sm:col-span-1">
+                <label hlmFieldLabel for="partOfSpeech">Часть речи</label>
+                <hlm-native-select selectId="partOfSpeech" formControlName="partOfSpeech" selectClass="h-11" class="w-full">
+                  <option value="">—</option>
+                  @for (part of parts; track part) {
+                    <option [value]="part">{{ partLabels[part] }}</option>
+                  }
+                </hlm-native-select>
+              </div>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div hlmField>
+                <label hlmFieldLabel for="transcription">Транскрипция (IPA)</label>
+                <input hlmInput id="transcription" formControlName="transcription" autocomplete="off" class="h-11 font-mono" placeholder="ˈæpl" />
+              </div>
+              <div hlmField>
+                <label hlmFieldLabel for="audioUrl">Ссылка на аудио</label>
+                <input hlmInput id="audioUrl" type="url" formControlName="audioUrl" autocomplete="off" class="h-11" placeholder="https://…" />
+                <p hlmFieldDescription>Если пусто, озвучивает браузер.</p>
+                <hlm-field-error>Нужна ссылка http(s)</hlm-field-error>
+              </div>
+            </div>
+
+            <fieldset hlmFieldSet>
+              <legend hlmFieldLegend variant="label">Переводы</legend>
+              <div formArrayName="translations" class="flex flex-col gap-2">
+                @for (control of translations.controls; track control; let i = $index) {
+                  <div class="flex gap-2">
+                    <input hlmInput [formControlName]="i" class="h-11 flex-1" autocomplete="off" [attr.aria-label]="'Перевод ' + (i + 1)" />
+                    @if (translations.length > 1) {
+                      <button hlmBtn variant="ghost" size="icon-lg" type="button" aria-label="Убрать перевод" (click)="removeAt(translations, i)">
+                        <ng-icon name="lucideX" />
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+              @if (translations.length < maxItems) {
+                <button hlmBtn variant="ghost" size="sm" type="button" class="self-start" (click)="addTranslation()">
+                  <ng-icon name="lucidePlus" />
+                  Ещё перевод
+                </button>
+              }
+            </fieldset>
+
+            <fieldset hlmFieldSet>
+              <legend hlmFieldLegend variant="label">Примеры</legend>
+              <div formArrayName="examples" class="flex flex-col gap-3">
+                @for (group of examples.controls; track group; let i = $index) {
+                  <div [formGroupName]="i" class="flex gap-2">
+                    <div class="flex flex-1 flex-col gap-2">
+                      <input hlmInput formControlName="text" class="h-11" autocomplete="off" lang="en" [attr.aria-label]="'Пример ' + (i + 1)" placeholder="Пример на английском" />
+                      <input hlmInput formControlName="translation" class="h-11" autocomplete="off" [attr.aria-label]="'Перевод примера ' + (i + 1)" placeholder="Перевод" />
+                    </div>
+                    <button hlmBtn variant="ghost" size="icon-lg" type="button" aria-label="Убрать пример" (click)="removeAt(examples, i)">
+                      <ng-icon name="lucideX" />
+                    </button>
+                  </div>
+                }
+              </div>
+              @if (examples.length < maxItems) {
+                <button hlmBtn variant="ghost" size="sm" type="button" class="self-start" (click)="addExample()">
+                  <ng-icon name="lucidePlus" />
+                  Добавить пример
+                </button>
+              }
+            </fieldset>
+
+            @if (categories.hasValue() && categories.value().length > 0) {
+              <fieldset hlmFieldSet>
+                <legend hlmFieldLegend variant="label">Категории</legend>
+                <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  @for (category of categories.value(); track category.id) {
+                    <label
+                      class="hover:bg-muted/50 has-data-checked:border-primary/40 has-data-checked:bg-primary/5 flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm transition-colors"
+                    >
+                      <hlm-checkbox [checked]="selectedCategories().has(category.id)" (checkedChange)="toggleCategory(category.id, $event)" />
+                      {{ category.name }}
+                    </label>
+                  }
+                </div>
+              </fieldset>
+            }
+
+            @if (error(); as message) {
+              <app-error-alert [message]="message" />
+            }
+
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+              @if (!isNew()) {
+                <app-confirm-delete
+                  label="Удалить из базы"
+                  [title]="'Удалить «' + form.controls.text.value + '» из общей базы?'"
+                  description="У пользователей, которые добавили это слово, оно останется в личном словаре как своё."
+                  [disabled]="deleting()"
+                  (confirmed)="remove()"
+                />
+              }
+              <button hlmBtn type="submit" class="h-11 w-full sm:ms-auto sm:w-auto" [disabled]="saving() || (!isNew() && form.pristine)">
+                @if (saving()) {
+                  <hlm-spinner aria-label="Сохраняем" />
+                }
+                {{ isNew() ? 'Добавить в базу' : 'Сохранить' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  } @else {
+    <div class="text-muted-foreground flex items-center gap-2"><hlm-spinner aria-label="Загрузка" /> Загружаем…</div>
+  }
+</div>

@@ -1,0 +1,134 @@
+<div class="flex flex-col gap-4">
+  <a hlmBtn variant="ghost" size="sm" [routerLink]="backLink()" class="self-start">
+    <ng-icon name="lucideArrowLeft" />
+    {{ isAdmin() ? 'Слова общей базы' : 'Мой словарь' }}
+  </a>
+
+  <section hlmCard>
+    <div hlmCardHeader>
+      <h1 hlmCardTitle class="text-xl">{{ isAdmin() ? 'Импорт в общую базу' : 'Импорт слов' }}</h1>
+      <p hlmCardDescription>
+        Файл CSV из Excel или Google Таблиц, первая строка — заголовки. Колонки можно называть по-русски или по-английски,
+        несколько переводов в одной ячейке разделяйте знаком «|».
+      </p>
+    </div>
+
+    <div hlmCardContent class="flex flex-col gap-4">
+      @if (result(); as r) {
+        <div hlmAlert>
+          <ng-icon name="lucideCircleCheck" class="text-success!" />
+          <h2 hlmAlertTitle>Загружено: {{ r.added }}</h2>
+          <p hlmAlertDescription>
+            @if (+(r.addedToMyWords ?? 0) > 0) {
+              В вашем словаре: {{ r.addedToMyWords }}.
+            }
+            @if (+r.updated > 0) {
+              Обновлено: {{ r.updated }}.
+            }
+            @if (+r.skipped > 0) {
+              Пропущено, потому что уже есть: {{ r.skipped }}.
+            }
+            @if (r.issues.length === 0) {
+              Ошибок нет.
+            }
+          </p>
+        </div>
+
+        @if (r.issues.length > 0) {
+          <div class="flex flex-col gap-2">
+            <h2 class="text-sm font-medium">Не загрузились или загрузились с замечаниями</h2>
+            <ul class="bg-muted/50 flex max-h-72 flex-col gap-1 overflow-auto rounded-2xl p-3 text-sm">
+              @for (issue of r.issues; track $index) {
+                <li>
+                  @if (issue.line) {
+                    <span class="text-muted-foreground tabular-nums">Строка {{ issue.line }}:</span>
+                  }
+                  {{ issue.message }}
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <a hlmBtn class="h-11" [routerLink]="backLink()">{{ isAdmin() ? 'К списку слов' : 'Открыть словарь' }}</a>
+          <button hlmBtn variant="outline" type="button" class="h-11" (click)="reset()">Загрузить ещё</button>
+        </div>
+      } @else {
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <!-- hlmBtn работает только на button и a, поэтому поле файла скрыто, а открывает его обычная кнопка. -->
+          <input #file type="file" accept=".csv,.tsv,.txt,text/csv,text/plain" class="hidden" (change)="pickFile(file)" />
+          <button hlmBtn variant="outline" type="button" class="h-11" (click)="file.click()">
+            <ng-icon name="lucideFileUp" />
+            Выбрать файл
+          </button>
+          <button hlmBtn variant="ghost" type="button" class="h-11" (click)="downloadSample()">
+            <ng-icon name="lucideDownload" />
+            Скачать пример
+          </button>
+        </div>
+
+        <div hlmField>
+          <label hlmFieldLabel for="csv">{{ fileName() ? 'Файл: ' + fileName() : 'Или вставьте строки сюда' }}</label>
+          <textarea
+            hlmTextarea
+            id="csv"
+            rows="8"
+            class="font-mono text-xs"
+            spellcheck="false"
+            [placeholder]="sample()"
+            [value]="content()"
+            (input)="onPaste($any($event.target).value)"
+          ></textarea>
+          @if (rows() > 0) {
+            <p hlmFieldDescription>Строк с данными: {{ rows() }}</p>
+          }
+        </div>
+
+        <details class="text-muted-foreground text-sm">
+          <summary class="text-foreground cursor-pointer font-medium">Какие колонки понимает импорт</summary>
+          <ul class="mt-2 flex list-disc flex-col gap-1 ps-5">
+            <li><b>слово / text</b> — обязательно;</li>
+            @if (isAdmin()) {
+              <li><b>перевод / translation</b> — обязательно;</li>
+              <li><b>тип / type</b>: слово, фраза, идиома, фразовый глагол; <b>часть речи / part_of_speech</b>;</li>
+              <li><b>уровень / level</b>: A1–C2; <b>транскрипция</b>; <b>пример</b> и <b>перевод примера</b>; <b>аудио</b> — ссылка;</li>
+              <li><b>категории / categories</b> — идентификатор или название категории, несколько через «|».</li>
+            } @else {
+              <li><b>перевод / translation</b> — если пусто, слово возьмётся из общей базы (если оно там есть);</li>
+              <li><b>уровень</b> A1–C2, <b>тип</b>, <b>часть речи</b>, <b>транскрипция</b>, <b>пример</b>, <b>перевод примера</b>, <b>заметка</b> — по желанию.</li>
+            }
+            <li>
+              Тип и часть речи можно не указывать: они определятся по заметке, если она начинается с метки
+              («Глагол; …», «Фразовый глагол», «Устойчивое выражение», «Коллокация»), и по виду фразы (<i>get on</i>, <i>come across</i>).
+              Уровень, если его нет в файле, берётся из общей базы.
+            </li>
+            <li>Слова, которые уже есть, пропускаются.</li>
+          </ul>
+        </details>
+
+        @if (isAdmin()) {
+          <label class="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+            <hlm-checkbox [checked]="addToMyWords()" (checkedChange)="addToMyWords.set($event)" />
+            Сразу добавить загруженные слова в мой словарь
+          </label>
+          <label class="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+            <hlm-checkbox [checked]="updateExisting()" (checkedChange)="updateExisting.set($event)" />
+            Обновлять слова, которые уже есть в базе (то же слово и та же часть речи)
+          </label>
+        }
+
+        @if (error(); as message) {
+          <app-error-alert [message]="message" />
+        }
+
+        <button hlmBtn type="button" class="h-11 w-full sm:w-auto sm:self-start" [disabled]="sending() || !content().trim()" (click)="submit()">
+          @if (sending()) {
+            <hlm-spinner aria-label="Загружаем" />
+          }
+          Загрузить
+        </button>
+      }
+    </div>
+  </section>
+</div>

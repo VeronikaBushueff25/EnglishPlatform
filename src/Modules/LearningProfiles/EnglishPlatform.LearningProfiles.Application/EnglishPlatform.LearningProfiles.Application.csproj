@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.LearningProfiles.Domain/EnglishPlatform.LearningProfiles.Domain.csproj" />
+    <ProjectReference Include="../EnglishPlatform.LearningProfiles.Contracts/EnglishPlatform.LearningProfiles.Contracts.csproj" />
+  </ItemGroup>
+</Project>

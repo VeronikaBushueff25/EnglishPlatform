@@ -1,0 +1,46 @@
+# Запуск всего стека: docker compose -f deploy/docker-compose.yml up --build
+# Пароль базы берётся из deploy/.env (образец: deploy/.env.example).
+name: english-platform
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: english_platform
+      POSTGRES_USER: english_platform
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?задайте POSTGRES_PASSWORD в deploy/.env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U english_platform -d english_platform"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ..
+      dockerfile: src/Host/EnglishPlatform.Host/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Database: Host=postgres;Port=5432;Database=english_platform;Username=english_platform;Password=${POSTGRES_PASSWORD}
+      Database__MigrateOnStartup: "true"
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?задайте JWT_SIGNING_KEY в deploy/.env (не короче 32 символов)}
+      Identity__PublicUrl: ${PUBLIC_URL:-http://localhost:8080}
+      Identity__AdminEmail: ${ADMIN_EMAIL:-}
+      Identity__AdminPassword: ${ADMIN_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ..
+      dockerfile: web/Dockerfile
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres-data:

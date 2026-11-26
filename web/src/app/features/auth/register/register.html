@@ -1,0 +1,51 @@
+<div class="mx-auto w-full max-w-sm sm:pt-6">
+  <section hlmCard>
+    <div hlmCardHeader>
+      <h1 hlmCardTitle class="text-xl">Регистрация</h1>
+      <p hlmCardDescription>Пара минут на настройку — и можно начинать занятия.</p>
+    </div>
+
+    <div hlmCardContent>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div hlmFieldGroup>
+          <div hlmField>
+            <label hlmFieldLabel for="email">Email</label>
+            <input hlmInput id="email" type="email" formControlName="email" autocomplete="email" inputmode="email" class="h-11" />
+            <hlm-field-error>Введите корректный email</hlm-field-error>
+          </div>
+
+          <div hlmField>
+            <label hlmFieldLabel for="password">Пароль</label>
+            <input hlmInput id="password" type="password" formControlName="password" autocomplete="new-password" class="h-11" />
+            <p hlmFieldDescription>{{ passwordHint }}</p>
+            <hlm-field-error>Пароль не подходит под правила</hlm-field-error>
+          </div>
+
+          <div hlmField>
+            <label hlmFieldLabel for="confirm">Пароль ещё раз</label>
+            <input hlmInput id="confirm" type="password" formControlName="confirm" autocomplete="new-password" class="h-11" />
+            @if (form.controls.confirm.touched && form.hasError('passwordsMismatch')) {
+              <hlm-field-error forceShow>Пароли не совпадают</hlm-field-error>
+            }
+          </div>
+
+          @if (error(); as message) {
+            <app-error-alert [message]="message" />
+          }
+
+          <button hlmBtn type="submit" class="h-11 w-full" [disabled]="submitting()">
+            @if (submitting()) {
+              <hlm-spinner aria-label="Создаём аккаунт" />
+            }
+            Зарегистрироваться
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div hlmCardFooter class="justify-center text-sm">
+      <span class="text-muted-foreground">Уже есть аккаунт?&nbsp;</span>
+      <a routerLink="/login" class="text-primary font-medium underline-offset-4 hover:underline">Войти</a>
+    </div>
+  </section>
+</div>

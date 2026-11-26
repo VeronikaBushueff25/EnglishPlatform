@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.Vocabulary.Application/EnglishPlatform.Vocabulary.Application.csproj" />
+    <ProjectReference Include="../../../BuildingBlocks/EnglishPlatform.BuildingBlocks.Infrastructure/EnglishPlatform.BuildingBlocks.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Seed/starter-lexemes.csv" LogicalName="Seed.starter-lexemes.csv" />
+  </ItemGroup>
+</Project>

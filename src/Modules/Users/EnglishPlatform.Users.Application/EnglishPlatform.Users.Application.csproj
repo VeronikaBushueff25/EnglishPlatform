@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.Users.Domain/EnglishPlatform.Users.Domain.csproj" />
+    <ProjectReference Include="../EnglishPlatform.Users.Contracts/EnglishPlatform.Users.Contracts.csproj" />
+    <ProjectReference Include="../../Identity/EnglishPlatform.Identity.Contracts/EnglishPlatform.Identity.Contracts.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+</Project>

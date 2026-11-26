@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <UserSecretsId>english-platform-host</UserSecretsId>
+    <!-- OpenAPI-документ пишется при сборке в /openapi, из него генерируется клиент для Angular. -->
+    <OpenApiDocumentsDirectory>$(MSBuildThisFileDirectory)../../../openapi</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocumentsOptions>--file-name openapi</OpenApiGenerateDocumentsOptions>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../BuildingBlocks/EnglishPlatform.BuildingBlocks.Infrastructure/EnglishPlatform.BuildingBlocks.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Identity/EnglishPlatform.Identity.Infrastructure/EnglishPlatform.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Users/EnglishPlatform.Users.Infrastructure/EnglishPlatform.Users.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/LearningProfiles/EnglishPlatform.LearningProfiles.Infrastructure/EnglishPlatform.LearningProfiles.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Vocabulary/EnglishPlatform.Vocabulary.Infrastructure/EnglishPlatform.Vocabulary.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/LearningSessions/EnglishPlatform.LearningSessions.Infrastructure/EnglishPlatform.LearningSessions.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Exercises/EnglishPlatform.Exercises.Infrastructure/EnglishPlatform.Exercises.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Infrastructure/EnglishPlatform.SpacedRepetition.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Grammar/EnglishPlatform.Grammar.Infrastructure/EnglishPlatform.Grammar.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Ai/EnglishPlatform.Ai.Infrastructure/EnglishPlatform.Ai.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Analytics/EnglishPlatform.Analytics.Infrastructure/EnglishPlatform.Analytics.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

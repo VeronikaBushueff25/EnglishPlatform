@@ -1,0 +1,79 @@
+<div class="flex flex-col gap-4">
+  <app-admin-nav />
+
+  <div class="flex flex-wrap items-baseline justify-between gap-2">
+    <h1 class="text-2xl font-semibold tracking-tight">Пользователи</h1>
+    <span class="text-muted-foreground text-sm">Всего: {{ totalCount() }}</span>
+  </div>
+
+  <div class="relative">
+    <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2" />
+    <input
+      hlmInput
+      type="search"
+      placeholder="Поиск по email"
+      aria-label="Поиск по email"
+      class="h-11 ps-10"
+      [value]="searchText()"
+      (input)="onSearch($any($event.target).value)"
+    />
+  </div>
+
+  @if (loadError(); as message) {
+    <app-error-alert [message]="message" />
+  }
+
+  <ul class="flex flex-col gap-2 transition-opacity" [class.opacity-60]="users.isLoading()">
+    @for (user of items(); track user.id) {
+      <li hlmCard class="gap-0 py-0">
+        <div class="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex min-w-0 flex-col gap-1">
+            <span class="font-medium break-all">{{ user.email }}</span>
+            <div class="text-muted-foreground flex flex-wrap items-center gap-1.5 text-xs">
+              <span>с {{ user.createdAt | date: 'dd.MM.yyyy' }}</span>
+              @if (isSelf(user)) {
+                <span hlmBadge variant="secondary">это вы</span>
+              }
+              @if (user.isLockedOut) {
+                <span hlmBadge variant="destructive">заблокирован после неудачных входов</span>
+              }
+            </div>
+          </div>
+
+          <label class="sr-only" [for]="'role-' + user.id">Роль {{ user.email }}</label>
+          <hlm-native-select
+            #roleSelect="hlmNativeSelect"
+            class="w-full sm:w-48"
+            selectClass="h-11 sm:h-9"
+            [selectId]="'role-' + user.id"
+            [value]="primaryRole(user)"
+            [disabled]="savingId() === user.id || isSelf(user)"
+            (valueChange)="changeRole(user, $event ?? '', roleSelect)"
+          >
+            @for (role of roles; track role) {
+              <option hlmNativeSelectOption [value]="role">{{ roleLabels[role] }}</option>
+            }
+          </hlm-native-select>
+        </div>
+      </li>
+    } @empty {
+      @if (users.isLoading()) {
+        <li class="text-muted-foreground flex items-center gap-2"><hlm-spinner aria-label="Загрузка" /> Загружаем…</li>
+      } @else if (!loadError()) {
+        <li class="text-muted-foreground py-6 text-center">Никого не нашли.</li>
+      }
+    }
+  </ul>
+
+  @if (totalPages() > 1) {
+    <nav class="flex items-center justify-center gap-3" aria-label="Страницы">
+      <button hlmBtn variant="outline" size="icon-lg" type="button" aria-label="Назад" [disabled]="page() <= 1 || users.isLoading()" (click)="page.set(page() - 1)">
+        <ng-icon name="lucideChevronLeft" />
+      </button>
+      <span class="text-sm tabular-nums">{{ page() }} из {{ totalPages() }}</span>
+      <button hlmBtn variant="outline" size="icon-lg" type="button" aria-label="Дальше" [disabled]="page() >= totalPages() || users.isLoading()" (click)="page.set(page() + 1)">
+        <ng-icon name="lucideChevronRight" />
+      </button>
+    </nav>
+  }
+</div>

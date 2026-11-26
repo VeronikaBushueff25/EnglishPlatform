@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.Ai.Domain/EnglishPlatform.Ai.Domain.csproj" />
+    <ProjectReference Include="../EnglishPlatform.Ai.Contracts/EnglishPlatform.Ai.Contracts.csproj" />
+  </ItemGroup>
+</Project>

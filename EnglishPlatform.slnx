@@ -1,0 +1,78 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/EnglishPlatform.BuildingBlocks.Infrastructure/EnglishPlatform.BuildingBlocks.Infrastructure.csproj" />
+    <Project Path="src/BuildingBlocks/EnglishPlatform.BuildingBlocks/EnglishPlatform.BuildingBlocks.csproj" />
+  </Folder>
+  <Folder Name="/src/Host/">
+    <Project Path="src/Host/EnglishPlatform.Host/EnglishPlatform.Host.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Ai/">
+    <Project Path="src/Modules/Ai/EnglishPlatform.Ai.Application/EnglishPlatform.Ai.Application.csproj" />
+    <Project Path="src/Modules/Ai/EnglishPlatform.Ai.Contracts/EnglishPlatform.Ai.Contracts.csproj" />
+    <Project Path="src/Modules/Ai/EnglishPlatform.Ai.Domain/EnglishPlatform.Ai.Domain.csproj" />
+    <Project Path="src/Modules/Ai/EnglishPlatform.Ai.Infrastructure/EnglishPlatform.Ai.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Analytics/">
+    <Project Path="src/Modules/Analytics/EnglishPlatform.Analytics.Application/EnglishPlatform.Analytics.Application.csproj" />
+    <Project Path="src/Modules/Analytics/EnglishPlatform.Analytics.Contracts/EnglishPlatform.Analytics.Contracts.csproj" />
+    <Project Path="src/Modules/Analytics/EnglishPlatform.Analytics.Domain/EnglishPlatform.Analytics.Domain.csproj" />
+    <Project Path="src/Modules/Analytics/EnglishPlatform.Analytics.Infrastructure/EnglishPlatform.Analytics.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Exercises/">
+    <Project Path="src/Modules/Exercises/EnglishPlatform.Exercises.Application/EnglishPlatform.Exercises.Application.csproj" />
+    <Project Path="src/Modules/Exercises/EnglishPlatform.Exercises.Contracts/EnglishPlatform.Exercises.Contracts.csproj" />
+    <Project Path="src/Modules/Exercises/EnglishPlatform.Exercises.Domain/EnglishPlatform.Exercises.Domain.csproj" />
+    <Project Path="src/Modules/Exercises/EnglishPlatform.Exercises.Infrastructure/EnglishPlatform.Exercises.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Grammar/">
+    <Project Path="src/Modules/Grammar/EnglishPlatform.Grammar.Application/EnglishPlatform.Grammar.Application.csproj" />
+    <Project Path="src/Modules/Grammar/EnglishPlatform.Grammar.Contracts/EnglishPlatform.Grammar.Contracts.csproj" />
+    <Project Path="src/Modules/Grammar/EnglishPlatform.Grammar.Domain/EnglishPlatform.Grammar.Domain.csproj" />
+    <Project Path="src/Modules/Grammar/EnglishPlatform.Grammar.Infrastructure/EnglishPlatform.Grammar.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/">
+    <Project Path="src/Modules/Identity/EnglishPlatform.Identity.Application/EnglishPlatform.Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/EnglishPlatform.Identity.Contracts/EnglishPlatform.Identity.Contracts.csproj" />
+    <Project Path="src/Modules/Identity/EnglishPlatform.Identity.Domain/EnglishPlatform.Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/EnglishPlatform.Identity.Infrastructure/EnglishPlatform.Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/LearningProfiles/">
+    <Project Path="src/Modules/LearningProfiles/EnglishPlatform.LearningProfiles.Application/EnglishPlatform.LearningProfiles.Application.csproj" />
+    <Project Path="src/Modules/LearningProfiles/EnglishPlatform.LearningProfiles.Contracts/EnglishPlatform.LearningProfiles.Contracts.csproj" />
+    <Project Path="src/Modules/LearningProfiles/EnglishPlatform.LearningProfiles.Domain/EnglishPlatform.LearningProfiles.Domain.csproj" />
+    <Project Path="src/Modules/LearningProfiles/EnglishPlatform.LearningProfiles.Infrastructure/EnglishPlatform.LearningProfiles.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/LearningSessions/">
+    <Project Path="src/Modules/LearningSessions/EnglishPlatform.LearningSessions.Application/EnglishPlatform.LearningSessions.Application.csproj" />
+    <Project Path="src/Modules/LearningSessions/EnglishPlatform.LearningSessions.Contracts/EnglishPlatform.LearningSessions.Contracts.csproj" />
+    <Project Path="src/Modules/LearningSessions/EnglishPlatform.LearningSessions.Domain/EnglishPlatform.LearningSessions.Domain.csproj" />
+    <Project Path="src/Modules/LearningSessions/EnglishPlatform.LearningSessions.Infrastructure/EnglishPlatform.LearningSessions.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/SpacedRepetition/">
+    <Project Path="src/Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Application/EnglishPlatform.SpacedRepetition.Application.csproj" />
+    <Project Path="src/Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Contracts/EnglishPlatform.SpacedRepetition.Contracts.csproj" />
+    <Project Path="src/Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Domain/EnglishPlatform.SpacedRepetition.Domain.csproj" />
+    <Project Path="src/Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Infrastructure/EnglishPlatform.SpacedRepetition.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Users/">
+    <Project Path="src/Modules/Users/EnglishPlatform.Users.Application/EnglishPlatform.Users.Application.csproj" />
+    <Project Path="src/Modules/Users/EnglishPlatform.Users.Contracts/EnglishPlatform.Users.Contracts.csproj" />
+    <Project Path="src/Modules/Users/EnglishPlatform.Users.Domain/EnglishPlatform.Users.Domain.csproj" />
+    <Project Path="src/Modules/Users/EnglishPlatform.Users.Infrastructure/EnglishPlatform.Users.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Vocabulary/">
+    <Project Path="src/Modules/Vocabulary/EnglishPlatform.Vocabulary.Application/EnglishPlatform.Vocabulary.Application.csproj" />
+    <Project Path="src/Modules/Vocabulary/EnglishPlatform.Vocabulary.Contracts/EnglishPlatform.Vocabulary.Contracts.csproj" />
+    <Project Path="src/Modules/Vocabulary/EnglishPlatform.Vocabulary.Domain/EnglishPlatform.Vocabulary.Domain.csproj" />
+    <Project Path="src/Modules/Vocabulary/EnglishPlatform.Vocabulary.Infrastructure/EnglishPlatform.Vocabulary.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EnglishPlatform.Architecture.Tests/EnglishPlatform.Architecture.Tests.csproj" />
+    <Project Path="tests/EnglishPlatform.Identity.Tests/EnglishPlatform.Identity.Tests.csproj" />
+    <Project Path="tests/EnglishPlatform.Integration.Tests/EnglishPlatform.Integration.Tests.csproj" />
+    <Project Path="tests/EnglishPlatform.Users.Tests/EnglishPlatform.Users.Tests.csproj" />
+    <Project Path="tests/EnglishPlatform.Vocabulary.Tests/EnglishPlatform.Vocabulary.Tests.csproj" />
+  </Folder>
+</Solution>
