@@ -65,6 +65,9 @@ public sealed class UserProfile : Entity<Guid>
 
     public int DailyReviews { get; private set; }
 
+    /// <summary>Свои новые слова закончились — занятие само добавляет слова своего уровня из общей базы.</summary>
+    public bool AutoAddWords { get; private set; } = true;
+
     /// <summary>Часовой пояс IANA: по нему считается, когда начинается новый учебный день.</summary>
     public string TimeZone { get; private set; }
 
@@ -89,8 +92,10 @@ public sealed class UserProfile : Entity<Guid>
         IEnumerable<LearningGoal> goals,
         int dailyNewWords,
         int dailyReviews,
-        DateTimeOffset now)
+        DateTimeOffset now,
+        bool? autoAddWords = null)
     {
+        AutoAddWords = autoAddWords ?? AutoAddWords;
         InterfaceLanguage = language;
         Goals = goals.Distinct().Order().ToList();
         DailyNewWords = Math.Clamp(dailyNewWords, MinDailyNewWords, MaxDailyNewWords);

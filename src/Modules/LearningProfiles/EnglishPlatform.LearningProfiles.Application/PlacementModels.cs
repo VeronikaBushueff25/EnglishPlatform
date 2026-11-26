@@ -9,7 +9,10 @@ public sealed record PlacementProgress(int Answered, int Total);
 /// <summary>Вопрос для клиента: варианты уже перемешаны, правильный ответ не передаётся.</summary>
 public sealed record PlacementQuestionView(Guid QuestionId, Skill Skill, string Prompt, string? Passage, IReadOnlyList<string> Options);
 
-public sealed record PlacementStepDto(Guid AttemptId, bool Finished, PlacementQuestionView? Question, PlacementProgress Progress);
+public sealed record PlacementStepDto(Guid AttemptId, bool Finished, PlacementQuestionView? Question, PlacementProgress Progress, PlacementLength Length = PlacementLength.Short);
+
+/// <summary>Короткий тест (по умолчанию) или длинный — вдвое больше вопросов, точнее.</summary>
+public sealed record StartPlacementRequest(PlacementLength? Length);
 
 /// <summary><c>Option</c> — номер варианта в том порядке, в каком он показан; −1 — «не знаю».</summary>
 public sealed record PlacementAnswerRequest(
@@ -24,7 +27,8 @@ public sealed record PlacementResultDto(
     IReadOnlyList<SkillLevelDto> Levels,
     int Correct,
     int Answered,
-    int StarterWordsAdded);
+    int StarterWordsAdded,
+    PlacementLength Length = PlacementLength.Short);
 
 public sealed record GrammarRecommendationDto(string Slug, string Title, string? Level, string Summary);
 

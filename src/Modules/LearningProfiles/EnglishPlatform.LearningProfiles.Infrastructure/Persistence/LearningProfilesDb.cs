@@ -43,6 +43,7 @@ internal sealed class PlacementAttemptConfiguration : IEntityTypeConfiguration<P
         attempt.HasKey(a => a.Id);
         attempt.Property(a => a.Id).ValueGeneratedNever();
         attempt.Property<string>("AnswersJson").HasColumnName("answers").HasColumnType("jsonb");
+        attempt.Property(a => a.Length).HasConversion<string>().HasMaxLength(8).HasDefaultValue(PlacementLength.Short).HasSentinel((PlacementLength)(-1));
         attempt.Property(a => a.CurrentJson).HasColumnName("current_question").HasColumnType("jsonb");
         attempt.Property(a => a.ResultJson).HasColumnName("result").HasColumnType("jsonb");
         attempt.Ignore(a => a.Answers);

@@ -1,5 +1,9 @@
+using EnglishPlatform.Vocabulary.Application.Dictionary;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.PostgreSql;
 
 namespace EnglishPlatform.Integration.Tests;
@@ -49,6 +53,16 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Jwt:SigningKey", "integration-tests-signing-key-0123456789abcdef");
         builder.UseSetting("Identity:AdminEmail", AdminEmail);
         builder.UseSetting("Identity:AdminPassword", AdminPassword);
+
+        // Внешний словарь в тестах — подделка: без сети и с предсказуемыми статьями.
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<IDictionarySource>();
+            services.AddSingleton<FakeDictionarySource>();
+            services.AddSingleton<IDictionarySource>(sp => sp.GetRequiredService<FakeDictionarySource>());
+            services.RemoveAll<IExampleSource>();
+            services.AddSingleton<IExampleSource, FakeExampleSource>();
+        });
     }
 
     public override async ValueTask DisposeAsync()

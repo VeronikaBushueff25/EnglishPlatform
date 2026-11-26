@@ -7,7 +7,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   imports: [RouterLink, RouterLinkActive],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <nav class="bg-muted grid grid-cols-3 gap-1 rounded-3xl p-1 text-xs font-medium sm:grid-cols-5 sm:rounded-full sm:text-sm" aria-label="Разделы админки">
+    <nav class="bg-muted grid grid-cols-3 gap-1 rounded-3xl p-1 text-xs font-medium sm:grid-cols-6 sm:rounded-full sm:text-sm" aria-label="Разделы админки">
       @for (item of items; track item.link) {
         <a
           [routerLink]="item.link"
@@ -27,5 +27,6 @@ export class AdminNav {
     { link: '/admin/categories', label: 'Категории' },
     { link: '/admin/grammar', label: 'Грамматика' },
     { link: '/admin/placement', label: 'Тест уровня' },
+    { link: '/admin/reading', label: 'Тексты' },
   ];
 }

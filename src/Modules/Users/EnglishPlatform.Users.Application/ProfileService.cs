@@ -40,7 +40,7 @@ public sealed class ProfileService(IUsersDb db, ICurrentUser currentUser, TimePr
     public async Task<MeResponse> UpdateSettingsAsync(UpdateSettingsRequest request, CancellationToken cancellationToken)
     {
         UserProfile profile = await GetOrCreateAsync(currentUser.UserId, cancellationToken);
-        profile.UpdateSettings(request.InterfaceLanguage, request.Goals, request.DailyNewWords, request.DailyReviews, timeProvider.GetUtcNow());
+        profile.UpdateSettings(request.InterfaceLanguage, request.Goals, request.DailyNewWords, request.DailyReviews, timeProvider.GetUtcNow(), request.AutoAddWords);
         await db.SaveChangesAsync(cancellationToken);
         return ToResponse(profile);
     }
@@ -66,7 +66,7 @@ public sealed class ProfileService(IUsersDb db, ICurrentUser currentUser, TimePr
         profile.DisplayName,
         profile.TimeZone,
         profile.Plan,
-        new LearningSettingsDto(profile.InterfaceLanguage, profile.Goals, profile.DailyNewWords, profile.DailyReviews));
+        new LearningSettingsDto(profile.InterfaceLanguage, profile.Goals, profile.DailyNewWords, profile.DailyReviews, profile.AutoAddWords));
 }
 
 /// <summary>Создаёт профиль с настройками по умолчанию сразу после регистрации.</summary>
@@ -94,6 +94,7 @@ public sealed class UserLearningSettingsQuery(IUsersDb db) : IUserLearningSettin
             : new UserLearningSettings(profile.Id, profile.DailyNewWords, profile.DailyReviews, profile.TimeZone)
             {
                 Goals = profile.Goals.Select(g => g.ToString()).ToList(),
+                AutoAddWords = profile.AutoAddWords,
             };
 
         UserProfile defaults = UserProfile.CreateDefault(userId, DateTimeOffset.UnixEpoch);

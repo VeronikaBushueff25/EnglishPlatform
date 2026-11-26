@@ -305,6 +305,11 @@
                 </button>
                 @if (phase() === 'feedback') {
                   <p class="pt-2 text-2xl font-semibold" lang="en">{{ t.audioText }}</p>
+                } @else {
+                  <button hlmBtn variant="ghost" size="sm" type="button" class="text-muted-foreground mx-auto mt-1" [disabled]="busy()" (click)="muteAudio()">
+                    <ng-icon name="lucideVolumeX" />
+                    Не могу слушать
+                  </button>
                 }
               } @else if (t.kind === 'ChooseWord') {
                 <p class="text-muted-foreground text-sm">

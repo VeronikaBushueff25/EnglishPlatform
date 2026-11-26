@@ -7,11 +7,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-title" content="English">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <script>
-    // Тёмная тема по системной настройке. Выполняется до загрузки приложения, чтобы не было белой вспышки.
+    // Оформление до запуска приложения (без белой вспышки): режим — как в системе, светлый или тёмный;
+    // палитра — файл themes/<имя>.css, подключается только выбранная. Выбор хранится в localStorage этого браузера.
+    // Angular меняет его через window.epTheme (см. shared/appearance.ts).
     (function () {
+      var KEY = 'ep-theme';
+      var root = document.documentElement;
       var query = window.matchMedia('(prefers-color-scheme: dark)');
-      var apply = function () { document.documentElement.classList.toggle('dark', query.matches); };
+      var state = {};
+      var link = null;
+      try { state = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state = {}; }
+
+      function apply() {
+        var mode = state.mode || 'system';
+        var palette = state.palette || 'classic';
+        var dark = mode === 'dark' || (mode === 'system' && query.matches);
+        root.classList.toggle('dark', dark);
+        if (palette !== 'classic' && /^[a-z]+$/.test(palette)) {
+          root.setAttribute('data-palette', palette);
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            document.head.appendChild(link);
+          }
+          link.href = 'themes/' + palette + '.css';
+        } else {
+          root.removeAttribute('data-palette');
+          if (link) { link.remove(); link = null; }
+        }
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) { meta.setAttribute('content', dark ? '#0a0a0a' : '#ffffff'); }
+      }
+
+      window.epTheme = {
+        get: function () { return { mode: state.mode || 'system', palette: state.palette || 'classic' }; },
+        set: function (mode, palette) {
+          state = { mode: mode, palette: palette };
+          try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* приватный режим — только на эту вкладку */ }
+          apply();
+        },
+      };
       apply();
       query.addEventListener('change', apply);
     })();

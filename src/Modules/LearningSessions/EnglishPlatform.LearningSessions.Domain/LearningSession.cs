@@ -89,6 +89,24 @@ public sealed class LearningSession : Entity<Guid>
 
     public int Reviews { get; private set; }
 
+    /// <summary>До какого времени не давать заданий на слух («Не могу слушать»).</summary>
+    public DateTimeOffset? NoAudioUntil { get; private set; }
+
+    public bool AudioAllowed(DateTimeOffset now) => NoAudioUntil is not { } until || until <= now;
+
+    /// <summary>
+    /// «Не могу слушать»: задания на слух выключены до <paramref name="until"/>. Текущее задание сбрасывается,
+    /// если оно на слух, — следующий запрос построит для того же слова задание без звука. Ответ не засчитывается.
+    /// </summary>
+    public void MuteAudio(DateTimeOffset until, bool dropCurrentTask, DateTimeOffset now)
+    {
+        NoAudioUntil = until;
+        if (dropCurrentTask)
+        {
+            ClearTask(now);
+        }
+    }
+
     private string QueueJson { get; set; }
 
     private string IntrosJson { get; set; }

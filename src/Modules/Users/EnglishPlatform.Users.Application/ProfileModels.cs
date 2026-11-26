@@ -17,7 +17,8 @@ public sealed record LearningSettingsDto(
     InterfaceLanguage InterfaceLanguage,
     IReadOnlyCollection<LearningGoal> Goals,
     int DailyNewWords,
-    int DailyReviews);
+    int DailyReviews,
+    bool AutoAddWords = true);
 
 public sealed record UpdateMeRequest(
     [property: MaxLength(UserProfile.MaxDisplayNameLength, ErrorMessage = "Имя не длиннее 64 символов")]
@@ -34,7 +35,8 @@ public sealed record UpdateSettingsRequest(
     [property: Range(UserProfile.MinDailyNewWords, UserProfile.MaxDailyNewWords, ErrorMessage = "От 1 до 100 новых слов в день")]
     int DailyNewWords,
     [property: Range(UserProfile.MinDailyReviews, UserProfile.MaxDailyReviews, ErrorMessage = "От 10 до 1000 повторений в день")]
-    int DailyReviews);
+    int DailyReviews,
+    bool? AutoAddWords = null);
 
 public static class ProfileErrors
 {

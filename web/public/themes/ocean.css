@@ -1,0 +1,39 @@
+/* Палитра «ocean». Подключается при выборе в профиле (см. index.html, window.epTheme). */
+:root[data-palette="ocean"] {
+  --background: oklch(0.99 0.006 205);
+  --foreground: oklch(0.19 0.02 205);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.02 205);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.02 205);
+  --primary: oklch(0.52 0.12 205);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.012 205);
+  --secondary-foreground: oklch(0.23 0.02 205);
+  --muted: oklch(0.96 0.012 205);
+  --muted-foreground: oklch(0.52 0.02 205);
+  --accent: oklch(0.95 0.018 205);
+  --accent-foreground: oklch(0.23 0.02 205);
+  --border: oklch(0.91 0.015 205);
+  --input: oklch(0.91 0.015 205);
+  --ring: oklch(0.52 0.12 205);
+  --sidebar-primary: oklch(0.52 0.12 205);
+}
+:root.dark[data-palette="ocean"] {
+  --background: oklch(0.17 0.018 205);
+  --foreground: oklch(0.97 0.006 205);
+  --card: oklch(0.21 0.021 205);
+  --card-foreground: oklch(0.97 0.006 205);
+  --popover: oklch(0.21 0.021 205);
+  --popover-foreground: oklch(0.97 0.006 205);
+  --primary: oklch(0.76 0.12 200);
+  --primary-foreground: oklch(0.17 0.018 205);
+  --secondary: oklch(0.27 0.024 205);
+  --secondary-foreground: oklch(0.97 0.006 205);
+  --muted: oklch(0.27 0.024 205);
+  --muted-foreground: oklch(0.72 0.02 205);
+  --accent: oklch(0.29 0.027 205);
+  --accent-foreground: oklch(0.97 0.006 205);
+  --ring: oklch(0.76 0.12 200);
+  --sidebar-primary: oklch(0.76 0.12 200);
+}

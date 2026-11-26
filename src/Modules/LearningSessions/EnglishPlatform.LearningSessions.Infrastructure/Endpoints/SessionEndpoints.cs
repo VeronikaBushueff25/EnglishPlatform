@@ -41,6 +41,13 @@ internal static class SessionEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
 
+        sessions.MapPost("/{id:guid}/mute-audio", async (Guid id, int? minutes, SessionService service, CancellationToken ct) =>
+                (await service.MuteAudioAsync(id, minutes, ct)).ToHttpResult())
+            .WithName("MuteSessionAudio")
+            .WithSummary("Не могу слушать: задания на слух выключаются на время, текущее заменяется")
+            .Produces<NextStepDto>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
         sessions.MapPost("/{id:guid}/finish", async (Guid id, SessionService service, CancellationToken ct) =>
                 (await service.FinishAsync(id, ct)).ToHttpResult())
             .WithName("FinishSession")

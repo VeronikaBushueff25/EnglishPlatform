@@ -425,6 +425,22 @@
           "Placement"
         ],
         "operationId": "StartPlacement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/StartPlacementRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -604,6 +620,102 @@
         }
       }
     },
+    "/api/v1/dictionary/lookup": {
+      "get": {
+        "tags": [
+          "Dictionary"
+        ],
+        "summary": "Слово по тексту: из общей базы, а если его там нет — из внешнего словаря (и в базу)",
+        "operationId": "LookupWord",
+        "parameters": [
+          {
+            "name": "text",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LookupResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/my-words/texts": {
+      "get": {
+        "tags": [
+          "My words"
+        ],
+        "summary": "Тексты слов личного словаря — подчеркнуть знакомые при чтении",
+        "operationId": "ListMyWordTexts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/practice/words": {
+      "get": {
+        "tags": [
+          "Practice"
+        ],
+        "summary": "Случайные слова личного словаря для игр (расписание повторений не меняется)",
+        "operationId": "GetPracticeWords",
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PracticeWordDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/learning/today": {
       "get": {
         "tags": [
@@ -617,6 +729,30 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TodayDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/my-words/progress": {
+      "get": {
+        "tags": [
+          "My words"
+        ],
+        "summary": "Прогресс каждого слова: этап (новое, учу, узнаю, использую), повторения, ошибки, следующее повторение",
+        "operationId": "ListMyWordProgress",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WordProgress"
+                  }
                 }
               }
             }
@@ -1795,6 +1931,446 @@
         }
       }
     },
+    "/api/v1/my-words/suggestions": {
+      "get": {
+        "tags": [
+          "My words"
+        ],
+        "summary": "Что улучшить в личном словаре: уровень, транскрипция, тип, начальная форма (порциями)",
+        "operationId": "SuggestMyWords",
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionsPageDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/my-words/suggestions/apply": {
+      "post": {
+        "tags": [
+          "My words"
+        ],
+        "operationId": "ApplyMyWordSuggestions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplySuggestionsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplySuggestionsResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/dictionary/import": {
+      "get": {
+        "tags": [
+          "Admin: vocabulary"
+        ],
+        "operationId": "GetCoreImport",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoreImportStatusDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin: vocabulary"
+        ],
+        "summary": "Пополнить общую базу словами списков CEFR выбранных уровней (в фоне)",
+        "operationId": "StartCoreImport",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCoreImportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Accepted"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin: vocabulary"
+        ],
+        "operationId": "CancelCoreImport",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/reading/texts": {
+      "get": {
+        "tags": [
+          "Reading"
+        ],
+        "operationId": "ListReadingTexts",
+        "parameters": [
+          {
+            "name": "level",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/CefrLevel"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfReadingTextSummaryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/reading/texts/{id}": {
+      "get": {
+        "tags": [
+          "Reading"
+        ],
+        "operationId": "GetReadingText",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingTextDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/reading-texts": {
+      "get": {
+        "tags": [
+          "Admin: reading"
+        ],
+        "operationId": "AdminListReadingTexts",
+        "parameters": [
+          {
+            "name": "level",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/CefrLevel"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfReadingTextSummaryDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin: reading"
+        ],
+        "operationId": "AdminCreateReadingText",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveReadingTextRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingTextDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/reading-texts/{id}": {
+      "get": {
+        "tags": [
+          "Admin: reading"
+        ],
+        "operationId": "AdminGetReadingText",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingTextDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin: reading"
+        ],
+        "operationId": "AdminUpdateReadingText",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveReadingTextRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadingTextDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin: reading"
+        ],
+        "operationId": "AdminDeleteReadingText",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/sessions": {
       "post": {
         "tags": [
@@ -1976,6 +2552,60 @@
           },
           "409": {
             "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{id}/mute-audio": {
+      "post": {
+        "tags": [
+          "Learning"
+        ],
+        "summary": "Не могу слушать: задания на слух выключаются на время, текущее заменяется",
+        "operationId": "MuteSessionAudio",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "minutes",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NextStepDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2581,6 +3211,133 @@
           null
         ]
       },
+      "ApplySuggestion": {
+        "required": [
+          "userWordId",
+          "text",
+          "type",
+          "level",
+          "partOfSpeech",
+          "transcription",
+          "example",
+          "translations"
+        ],
+        "type": "object",
+        "properties": {
+          "userWordId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "maxLength": 128,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LexemeType"
+              }
+            ]
+          },
+          "level": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CefrLevel"
+              }
+            ]
+          },
+          "partOfSpeech": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PartOfSpeech"
+              }
+            ]
+          },
+          "transcription": {
+            "maxLength": 128,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "example": {
+            "maxLength": 512,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "translations": {
+            "maxItems": 10,
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "exampleTranslation": {
+            "maxLength": 512,
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ApplySuggestionsRequest": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplySuggestion"
+            }
+          }
+        }
+      },
+      "ApplySuggestionsResult": {
+        "required": [
+          "updated",
+          "skipped"
+        ],
+        "type": "object",
+        "properties": {
+          "updated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "skipped": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "AuthResponse": {
         "required": [
           "accessToken",
@@ -2780,6 +3537,92 @@
           "C2",
           null
         ]
+      },
+      "CoreImportStatusDto": {
+        "required": [
+          "running",
+          "levels",
+          "total",
+          "processed",
+          "added",
+          "missing",
+          "current",
+          "startedAt",
+          "finishedAt",
+          "baseSize"
+        ],
+        "type": "object",
+        "properties": {
+          "running": {
+            "type": "boolean"
+          },
+          "levels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CefrLevel"
+            }
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "processed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "added": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "missing": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "current": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "startedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "baseSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
       },
       "DayStatDto": {
         "required": [
@@ -3316,6 +4159,10 @@
               "string"
             ],
             "format": "int32"
+          },
+          "autoAddWords": {
+            "type": "boolean",
+            "default": true
           }
         }
       },
@@ -3495,6 +4342,43 @@
           "password": {
             "maxLength": 128,
             "type": "string"
+          }
+        }
+      },
+      "LookupResultDto": {
+        "required": [
+          "query",
+          "formOf",
+          "items",
+          "fromDictionary",
+          "myCustomWordId"
+        ],
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "formOf": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LexemeDto"
+            }
+          },
+          "fromDictionary": {
+            "type": "boolean"
+          },
+          "myCustomWordId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           }
         }
       },
@@ -3867,6 +4751,55 @@
           }
         }
       },
+      "PagedResultOfReadingTextSummaryDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadingTextSummaryDto"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "PagedResultOfSessionDto": {
         "required": [
           "items",
@@ -3953,6 +4886,13 @@
             "format": "int32"
           }
         }
+      },
+      "PlacementLength": {
+        "enum": [
+          "Short",
+          "Long"
+        ],
+        "default": "Short"
       },
       "PlacementProgress": {
         "required": [
@@ -4111,6 +5051,9 @@
               "string"
             ],
             "format": "int32"
+          },
+          "length": {
+            "$ref": "#/components/schemas/PlacementLength"
           }
         }
       },
@@ -4142,6 +5085,43 @@
           },
           "progress": {
             "$ref": "#/components/schemas/PlacementProgress"
+          },
+          "length": {
+            "$ref": "#/components/schemas/PlacementLength"
+          }
+        }
+      },
+      "PracticeWordDto": {
+        "required": [
+          "id",
+          "text",
+          "translations",
+          "transcription",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "transcription": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "type": {
+            "$ref": "#/components/schemas/LexemeType"
           }
         }
       },
@@ -4180,6 +5160,99 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "ReadingTextDto": {
+        "required": [
+          "id",
+          "title",
+          "level",
+          "topic",
+          "body",
+          "wordCount",
+          "isPublished",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "level": {
+            "$ref": "#/components/schemas/CefrLevel"
+          },
+          "topic": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "wordCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "isPublished": {
+            "type": "boolean"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReadingTextSummaryDto": {
+        "required": [
+          "id",
+          "title",
+          "level",
+          "topic",
+          "wordCount",
+          "preview",
+          "isPublished"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "level": {
+            "$ref": "#/components/schemas/CefrLevel"
+          },
+          "topic": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "wordCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "preview": {
+            "type": "string"
+          },
+          "isPublished": {
+            "type": "boolean"
           }
         }
       },
@@ -4470,6 +5543,39 @@
           }
         }
       },
+      "SaveReadingTextRequest": {
+        "required": [
+          "title",
+          "level",
+          "topic",
+          "body"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "maxLength": 160,
+            "type": "string"
+          },
+          "level": {
+            "$ref": "#/components/schemas/CefrLevel"
+          },
+          "topic": {
+            "maxLength": 64,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "body": {
+            "maxLength": 20000,
+            "type": "string"
+          },
+          "isPublished": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
       "SessionDto": {
         "required": [
           "id",
@@ -4664,6 +5770,51 @@
           }
         }
       },
+      "StartCoreImportRequest": {
+        "required": [
+          "levels",
+          "limit"
+        ],
+        "type": "object",
+        "properties": {
+          "levels": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CefrLevel"
+            }
+          },
+          "limit": {
+            "maximum": 20000,
+            "minimum": 1,
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "StartPlacementRequest": {
+        "required": [
+          "length"
+        ],
+        "type": "object",
+        "properties": {
+          "length": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PlacementLength"
+              }
+            ]
+          }
+        }
+      },
       "StartSessionRequest": {
         "required": [
           "kind"
@@ -4826,6 +5977,47 @@
           "Free",
           "Premium"
         ]
+      },
+      "SuggestionsPageDto": {
+        "required": [
+          "items",
+          "offset",
+          "checked",
+          "total"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WordSuggestionDto"
+            }
+          },
+          "offset": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "checked": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "total": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
       },
       "TaskView": {
         "required": [
@@ -4996,6 +6188,15 @@
             "format": "uuid"
           },
           "problemWords": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32",
+            "default": 0
+          },
+          "autoAddWords": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",
@@ -5185,6 +6386,12 @@
               "string"
             ],
             "format": "int32"
+          },
+          "autoAddWords": {
+            "type": [
+              "null",
+              "boolean"
+            ]
           }
         }
       },
@@ -5310,6 +6517,174 @@
           }
         }
       },
+      "WordProgress": {
+        "required": [
+          "userWordId",
+          "stage",
+          "reviews",
+          "lapses",
+          "nextReview"
+        ],
+        "type": "object",
+        "properties": {
+          "userWordId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "stage": {
+            "type": "string"
+          },
+          "reviews": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "lapses": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "nextReview": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "WordSuggestionDto": {
+        "required": [
+          "userWordId",
+          "text",
+          "type",
+          "level",
+          "partOfSpeech",
+          "transcription",
+          "translations",
+          "suggestedText",
+          "suggestedType",
+          "suggestedLevel",
+          "suggestedPartOfSpeech",
+          "suggestedTranscription",
+          "suggestedExample",
+          "suggestedTranslations"
+        ],
+        "type": "object",
+        "properties": {
+          "userWordId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "text": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/LexemeType"
+          },
+          "level": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CefrLevel"
+              }
+            ]
+          },
+          "partOfSpeech": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PartOfSpeech"
+              }
+            ]
+          },
+          "transcription": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "suggestedText": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "suggestedType": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LexemeType"
+              }
+            ]
+          },
+          "suggestedLevel": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CefrLevel"
+              }
+            ]
+          },
+          "suggestedPartOfSpeech": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PartOfSpeech"
+              }
+            ]
+          },
+          "suggestedTranscription": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "suggestedExample": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "suggestedTranslations": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "suggestedExampleTranslation": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "WordView": {
         "required": [
           "userWordId",
@@ -5411,6 +6786,15 @@
       "name": "Vocabulary"
     },
     {
+      "name": "Dictionary"
+    },
+    {
+      "name": "My words"
+    },
+    {
+      "name": "Practice"
+    },
+    {
       "name": "Learning"
     },
     {
@@ -5420,10 +6804,13 @@
       "name": "Admin: placement"
     },
     {
-      "name": "My words"
+      "name": "Admin: vocabulary"
     },
     {
-      "name": "Admin: vocabulary"
+      "name": "Reading"
+    },
+    {
+      "name": "Admin: reading"
     },
     {
       "name": "Grammar"

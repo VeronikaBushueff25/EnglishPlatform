@@ -18,6 +18,7 @@ import { BulkBar, BulkChange } from '../../dictionary/bulk-bar';
 import { EMPTY_FILTER, LexemeFilterValue, LexemeFilters, filterQuery } from '../../dictionary/lexeme-filters';
 import { LEXEME_TYPE_LABELS, PART_OF_SPEECH_LABELS, formatTranscription, plural } from '../../dictionary/vocabulary-labels';
 import { AdminNav } from '../admin-nav';
+import { CoreImport } from './core-import';
 
 const PAGE_SIZE = 30;
 
@@ -28,6 +29,7 @@ const PAGE_SIZE = 30;
 @Component({
   selector: 'app-admin-lexemes',
   imports: [
+    CoreImport,
     NgTemplateOutlet,
     RouterLink,
     NgIcon,
@@ -47,6 +49,7 @@ const PAGE_SIZE = 30;
   template: `
     <div class="flex flex-col gap-4">
       <app-admin-nav />
+      <app-core-import />
 
       <div class="flex flex-wrap items-center justify-between gap-2">
         <h1 class="text-2xl font-semibold tracking-tight">Слова общей базы</h1>

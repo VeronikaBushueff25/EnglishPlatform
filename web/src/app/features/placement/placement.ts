@@ -9,6 +9,7 @@ import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { Api } from '../../core/api/api';
 import { answerPlacement, finishPlacement, startPlacement } from '../../core/api/functions';
+import { PlacementLength } from '../../core/api/models/placement-length';
 import { PlacementResultDto } from '../../core/api/models/placement-result-dto';
 import { PlacementStepDto } from '../../core/api/models/placement-step-dto';
 import { problemMessage } from '../../core/http/problem';
@@ -42,13 +43,30 @@ type Phase = 'intro' | 'question' | 'result';
                 <ng-icon name="lucideGauge" class="text-2xl" />
               </span>
               <h1 hlmCardTitle class="text-2xl">Определим ваш уровень</h1>
-              <p hlmCardDescription>Около 18 вопросов: слова, грамматика и короткие тексты.</p>
+              <p hlmCardDescription>Слова, грамматика и короткие тексты.</p>
             </div>
-            <div hlmCardContent class="text-muted-foreground flex flex-col gap-2 text-sm">
-              <p class="flex items-center gap-2"><ng-icon name="lucideClock" /> 5–7 минут</p>
+            <div hlmCardContent class="flex flex-col gap-4">
+              <div class="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Длина теста">
+                @for (mode of modes; track mode.value) {
+                  <button
+                    type="button"
+                    role="radio"
+                    [attr.aria-checked]="length() === mode.value"
+                    class="flex flex-col items-start gap-1 rounded-2xl border p-4 text-start transition-colors"
+                    [class]="length() === mode.value ? 'border-primary bg-primary/5 ring-primary/30 ring-2' : 'hover:border-primary/40'"
+                    (click)="length.set(mode.value)"
+                  >
+                    <span class="font-semibold">{{ mode.title }}</span>
+                    <span class="text-muted-foreground flex items-center gap-1.5 text-sm"><ng-icon name="lucideClock" /> {{ mode.time }}</span>
+                    <span class="text-muted-foreground text-sm">{{ mode.note }}</span>
+                  </button>
+                }
+              </div>
+              <div class="text-muted-foreground flex flex-col gap-2 text-sm">
               <p>Вопросы подстраиваются под ответы: чем увереннее отвечаете, тем сложнее следующий.</p>
               <p>Не знаете ответ — так и нажмите «Не знаю»: угадывание только исказит результат.</p>
               <p>По итогам подберём слова вашего уровня и составим программу.</p>
+              </div>
             </div>
             <div hlmCardFooter>
               <button hlmBtn type="button" class="h-12 w-full text-base" [disabled]="busy()" (click)="start()">
@@ -118,6 +136,9 @@ type Phase = 'intro' | 'question' | 'result';
                 <p class="text-muted-foreground text-sm">Ваш уровень</p>
                 <h1 class="text-5xl font-semibold tracking-tight">{{ r.overall }}</h1>
                 <p class="text-muted-foreground">{{ cefrLabels[r.overall] }} · верных ответов {{ r.correct }} из {{ r.answered }}</p>
+                @if (r.length === 'Short') {
+                  <p class="text-muted-foreground mt-1 text-xs">Быстрый тест может ошибиться на ступень — точный уточнит.</p>
+                }
               </div>
               <div hlmCardContent class="flex flex-col gap-3">
                 @for (level of r.levels; track level.skill) {
@@ -166,8 +187,14 @@ export class Placement {
   });
   protected readonly passage = computed(() => paragraphs(this.step()?.question?.passage));
 
+  protected readonly modes: { value: PlacementLength; title: string; time: string; note: string }[] = [
+    { value: 'Short', title: 'Быстрый', time: '18 вопросов · 5–7 минут', note: 'Чтобы начать заниматься. Может ошибиться на ступень.' },
+    { value: 'Long', title: 'Точный', time: '36 вопросов · 12–15 минут', note: 'Вдвое больше вопросов — уровень почти всегда точный.' },
+  ];
+  protected readonly length = signal<PlacementLength>('Short');
+
   protected async start(): Promise<void> {
-    await this.run(async () => this.show(await this.api.invoke(startPlacement)));
+    await this.run(async () => this.show(await this.api.invoke(startPlacement, { body: { length: this.length() } })));
   }
 
   protected async answer(option: number): Promise<void> {

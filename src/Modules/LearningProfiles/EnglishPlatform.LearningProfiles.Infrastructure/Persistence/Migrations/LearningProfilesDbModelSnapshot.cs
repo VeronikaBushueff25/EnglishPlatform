@@ -43,6 +43,14 @@ namespace EnglishPlatform.LearningProfiles.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("finished_at");
 
+                    b.Property<string>("Length")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)")
+                        .HasDefaultValue("Short")
+                        .HasColumnName("length");
+
                     b.Property<string>("ResultJson")
                         .HasColumnType("jsonb")
                         .HasColumnName("result");

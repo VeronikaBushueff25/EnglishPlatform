@@ -14,6 +14,8 @@ public interface IVocabularyDb
 
     DbSet<UserWord> UserWords { get; }
 
+    DbSet<ReadingText> ReadingTexts { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 

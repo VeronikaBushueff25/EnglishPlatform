@@ -24,6 +24,15 @@ public enum PartOfSpeech
     Numeral,
 }
 
+/// <summary>Откуда слово в общей базе: вручную администратором, стартовый набор, импорт файла, внешний словарь.</summary>
+public enum LexemeSource
+{
+    Manual,
+    Seed,
+    Import,
+    Dictionary,
+}
+
 public enum CefrLevel
 {
     A1,
@@ -116,6 +125,11 @@ public sealed class Lexeme : Entity<Guid>
 
     public DateTimeOffset UpdatedAt { get; private set; }
 
+    public LexemeSource Source { get; private set; }
+
+    /// <summary>Добавлено автоматически (из внешнего словаря) и ещё не проверено администратором.</summary>
+    public bool NeedsReview { get; private set; }
+
     public static Lexeme Create(LexemeData data, DateTimeOffset now)
     {
         var lexeme = new Lexeme(Guid.CreateVersion7(), now);
@@ -123,7 +137,84 @@ public sealed class Lexeme : Entity<Guid>
         return lexeme;
     }
 
-    public void Update(LexemeData data, DateTimeOffset now) => Apply(data, now);
+    /// <summary>Слово из внешнего словаря: попадает в базу сразу, но помечается для проверки.</summary>
+    public static Lexeme FromDictionary(LexemeData data, DateTimeOffset now)
+    {
+        Lexeme lexeme = Create(data, now);
+        lexeme.Source = LexemeSource.Dictionary;
+        lexeme.NeedsReview = true;
+        return lexeme;
+    }
+
+    /// <summary>Правка администратором — это и есть проверка.</summary>
+    public void Update(LexemeData data, DateTimeOffset now)
+    {
+        Apply(data, now);
+        NeedsReview = false;
+    }
+
+    /// <summary>
+    /// Дозаполнение из внешнего словаря: только пустые поля (транскрипция, часть речи, примеры), заполненное не трогаем.
+    /// Возвращает, изменилось ли что-нибудь.
+    /// </summary>
+    public bool FillGaps(
+        string? transcription,
+        PartOfSpeech? partOfSpeech,
+        IEnumerable<string> examples,
+        DateTimeOffset now,
+        CefrLevel? level = null,
+        LexemeExample? translatedExample = null)
+    {
+        bool changed = false;
+        if (Level is null && level is not null)
+        {
+            Level = level;
+            changed = true;
+        }
+
+        // Пример с переводом — первым: его видит ученик в карточке и в заданиях с пропуском.
+        if (translatedExample is { Translation.Length: > 0 } && !Examples.Any(e => e.Translation is not null))
+        {
+            Examples = [translatedExample, .. Examples.Where(e => e.Text != translatedExample.Text).Take(MaxExamples - 1).Select(e => new LexemeExample(e.Text, e.Translation))];
+            changed = true;
+        }
+
+        if (Transcription is null && TextNormalizer.CleanTranscription(transcription) is { } ipa)
+        {
+            Transcription = ipa;
+            changed = true;
+        }
+
+        if (PartOfSpeech is null && partOfSpeech is not null)
+        {
+            PartOfSpeech = partOfSpeech;
+            changed = true;
+        }
+
+        if (Examples.Count == 0)
+        {
+            List<LexemeExample> added = examples.Select(TextNormalizer.Clean).Where(e => e.Length > 0).Take(MaxExamples)
+                .Select(e => new LexemeExample(e, null)).ToList();
+            if (added.Count > 0)
+            {
+                Examples = added;
+                changed = true;
+            }
+        }
+
+        if (changed)
+        {
+            UpdatedAt = now;
+        }
+
+        return changed;
+    }
+
+    public void MarkReviewed(DateTimeOffset now)
+    {
+        NeedsReview = false;
+        UpdatedAt = now;
+    }
 
     /// <summary>Перевод на язык пользователя; если его нет — на язык по умолчанию.</summary>
     public IReadOnlyList<string> TranslationsFor(string language)

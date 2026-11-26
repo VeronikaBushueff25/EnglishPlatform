@@ -37,6 +37,11 @@ internal static class ApiExtensions
             options.AddPolicy(RateLimitPolicies.Auth, context => RateLimitPartition.GetFixedWindowLimiter(
                 context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                 _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1) }));
+            options.AddPolicy(RateLimitPolicies.Dictionary, context => RateLimitPartition.GetSlidingWindowLimiter(
+                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                    ?? context.User.FindFirst("sub")?.Value
+                    ?? context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new SlidingWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), SegmentsPerWindow = 6 }));
         });
 
         return services;

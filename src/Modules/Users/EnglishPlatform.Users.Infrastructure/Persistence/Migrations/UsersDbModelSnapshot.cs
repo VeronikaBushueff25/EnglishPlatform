@@ -29,6 +29,10 @@ namespace EnglishPlatform.Users.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
+                    b.Property<bool>("AutoAddWords")
+                        .HasColumnType("boolean")
+                        .HasColumnName("auto_add_words");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");

@@ -2,7 +2,10 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using EnglishPlatform.BuildingBlocks.Events;
+using EnglishPlatform.LearningSessions.Contracts;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 
 namespace EnglishPlatform.Integration.Tests;
@@ -68,6 +71,48 @@ public sealed class StatsFlowTests(ApiFactory factory) : IClassFixture<ApiFactor
         JsonElement lastDay = summary.GetProperty("days")[29];
         lastDay.GetProperty("reviews").GetInt32().ShouldBe(6);
         lastDay.GetProperty("successful").GetInt32().ShouldBe(6);
+    }
+
+    [Fact]
+    public async Task Starting_with_nothing_to_study_reuses_one_empty_session()
+    {
+        factory.SkipIfUnavailable();
+        HttpClient client = await UserClientAsync();
+        // Автопополнение выключено: проверяем именно пустой словарь.
+        (await client.PutAsJsonAsync("/api/v1/me/settings", new { interfaceLanguage = "Ru", goals = Array.Empty<string>(), dailyNewWords = 10, dailyReviews = 100, autoAddWords = false }, Ct))
+            .EnsureSuccessStatusCode();
+
+        JsonElement first = await PostJsonAsync(client, "/api/v1/sessions", new { });
+        JsonElement second = await PostJsonAsync(client, "/api/v1/sessions", new { });
+
+        second.GetProperty("id").GetGuid().ShouldBe(first.GetProperty("id").GetGuid());
+        (await GetJsonAsync(client, $"/api/v1/sessions/{first.GetProperty("id").GetGuid()}/next")).GetProperty("finished").GetBoolean().ShouldBeTrue();
+        (await GetJsonAsync(client, "/api/v1/sessions")).GetProperty("totalCount").GetInt64().ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task Concurrent_answers_are_all_counted()
+    {
+        factory.SkipIfUnavailable();
+        HttpClient client = await UserClientAsync();
+        Guid userId = (await GetJsonAsync(client, "/api/v1/me")).GetProperty("id").GetGuid();
+        Guid wordId = Guid.NewGuid();
+
+        // Как при нагрузке: много ответов одного пользователя одновременно, каждый в своём запросе (scope).
+        await Task.WhenAll(Enumerable.Range(0, 30).Select(async i =>
+        {
+            await using AsyncServiceScope scope = factory.Services.CreateAsyncScope();
+            IEventBus bus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+            await bus.PublishAsync(
+                new AnswerChecked(userId, wordId, Guid.NewGuid(), "Recognition", "ChooseTranslation",
+                    i % 3 == 0 ? "Wrong" : "Correct", i % 3 == 0 ? "WrongWord" : "None", false, 2000, DateTimeOffset.UtcNow),
+                Ct);
+        }));
+
+        JsonElement weak = await GetJsonAsync(client, "/api/v1/stats/weak-spots");
+        weak.GetProperty("totalAnswers").GetInt32().ShouldBe(30);
+        weak.GetProperty("tags").EnumerateArray().First(t => t.GetProperty("code").GetString() == "WrongWord")
+            .GetProperty("count").GetInt32().ShouldBe(10);
     }
 
     private static async Task<JsonElement> GetJsonAsync(HttpClient client, string url)

@@ -13,12 +13,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Fixtures/**/*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
     <ProjectReference Include="../../src/Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Domain/EnglishPlatform.SpacedRepetition.Domain.csproj" />
     <ProjectReference Include="../../src/Modules/Exercises/EnglishPlatform.Exercises.Application/EnglishPlatform.Exercises.Application.csproj" />
     <ProjectReference Include="../../src/Modules/LearningSessions/EnglishPlatform.LearningSessions.Application/EnglishPlatform.LearningSessions.Application.csproj" />
     <ProjectReference Include="../../src/Modules/LearningProfiles/EnglishPlatform.LearningProfiles.Application/EnglishPlatform.LearningProfiles.Application.csproj" />
     <ProjectReference Include="../../src/Modules/Analytics/EnglishPlatform.Analytics.Application/EnglishPlatform.Analytics.Application.csproj" />
+    <ProjectReference Include="../../src/Modules/Vocabulary/EnglishPlatform.Vocabulary.Application/EnglishPlatform.Vocabulary.Application.csproj" />
   </ItemGroup>
 
 </Project>

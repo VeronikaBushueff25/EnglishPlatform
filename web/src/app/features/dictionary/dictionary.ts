@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSign
 import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCheck, lucideFileUp, lucideListChecks, lucidePlus } from '@ng-icons/lucide';
+import { lucideCheck, lucideFileUp, lucideListChecks, lucidePlus, lucideWandSparkles } from '@ng-icons/lucide';
 import { toast } from '@spartan-ng/brain/sonner';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
@@ -15,6 +15,7 @@ import { problemMessage } from '../../core/http/problem';
 import { ErrorAlert } from '../../shared/error-alert';
 import { Pager } from '../../shared/pager';
 import { SpeakButton } from '../../shared/pronunciation';
+import { WordLookup, looksEnglish } from '../../shared/word-lookup';
 import { BulkBar, BulkChange } from './bulk-bar';
 import { EMPTY_FILTER, LexemeFilterValue, LexemeFilters, filterQuery } from './lexeme-filters';
 import { LEXEME_TYPE_LABELS, formatTranscription, fromBase, plural } from './vocabulary-labels';
@@ -27,6 +28,7 @@ type Tab = 'mine' | 'base';
 @Component({
   selector: 'app-dictionary',
   imports: [
+    WordLookup,
     NgTemplateOutlet,
     RouterLink,
     NgIcon,
@@ -40,7 +42,7 @@ type Tab = 'mine' | 'base';
     HlmSpinnerImports,
     BulkBar,
   ],
-  providers: [provideIcons({ lucideCheck, lucideFileUp, lucideListChecks, lucidePlus })],
+  providers: [provideIcons({ lucideCheck, lucideFileUp, lucideListChecks, lucidePlus, lucideWandSparkles })],
   templateUrl: './dictionary.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -82,6 +84,12 @@ export class Dictionary {
   protected readonly loadError = computed(() => {
     const error = this.tab() === 'mine' ? this.myWords.error() : this.lexemes.error();
     return error ? problemMessage(error, 'Не удалось загрузить слова.') : null;
+  });
+  /** В общей базе ничего — английское слово ищем во внешнем словаре (только поиск, без других фильтров). */
+  protected readonly dictionaryQuery = computed(() => {
+    const f = this.filter();
+    const q = f.search.trim();
+    return !f.type && !f.level && !f.categoryId && looksEnglish(q) && q.length >= 2 ? q : null;
   });
   protected readonly filtered = computed(() => {
     const f = this.filter();

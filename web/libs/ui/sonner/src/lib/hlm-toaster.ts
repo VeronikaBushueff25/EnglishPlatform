@@ -8,13 +8,15 @@ import {
   numberAttribute,
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
+// Свои копии иконок, а не @ng-icons/lucide: уведомления грузятся сразу, и импорт пакета тянул бы в начальную
+// загрузку все иконки ленивых страниц (см. src/app/core/header-icons.ts).
 import {
   lucideCircleCheck,
   lucideInfo,
   lucideLoader2,
   lucideOctagonX,
   lucideTriangleAlert,
-} from '@ng-icons/lucide';
+} from './toaster-icons';
 import { BrnSonnerImports, type ToasterProps } from '@spartan-ng/brain/sonner';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { hlm } from '@spartan-ng/helm/utils';

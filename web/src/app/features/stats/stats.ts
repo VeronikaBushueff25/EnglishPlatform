@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, resource } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, resource, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideBookMarked, lucideFlame, lucideGauge, lucidePlay } from '@ng-icons/lucide';
@@ -6,11 +7,12 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { Api } from '../../core/api/api';
+import { listSessions } from '../../core/api/fn/learning/list-sessions';
 import { getStatsSummary } from '../../core/api/fn/statistics/get-stats-summary';
 import { getWeakSpots } from '../../core/api/fn/statistics/get-weak-spots';
 import { StatsSummaryDto } from '../../core/api/models/stats-summary-dto';
 import { ErrorAlert } from '../../shared/error-alert';
-import { pluralRu } from '../learn/learn-format';
+import { formatDuration, pluralRu } from '../learn/learn-format';
 import { SKILL_LABELS, levelPercent } from '../placement/placement-labels';
 import { StatsChart } from './stats-chart';
 
@@ -37,7 +39,7 @@ export function vocabularySegments(s: Pick<StatsSummaryDto, 'notStarted' | 'lear
 /** Статистика (/stats): серия дней, неделя в цифрах, путь слов «учу → узнаю → использую», ответы за месяц, уровни, слабые места. */
 @Component({
   selector: 'app-stats',
-  imports: [RouterLink, NgIcon, ErrorAlert, StatsChart, HlmButtonImports, HlmCardImports, HlmSpinnerImports],
+  imports: [DatePipe, RouterLink, NgIcon, ErrorAlert, StatsChart, HlmButtonImports, HlmCardImports, HlmSpinnerImports],
   providers: [provideIcons({ lucideBookMarked, lucideFlame, lucideGauge, lucidePlay })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -186,11 +188,50 @@ export function vocabularySegments(s: Pick<StatsSummaryDto, 'notStarted' | 'lear
           </div>
         </section>
 
+        <section hlmCard>
+          <div hlmCardHeader>
+            <h2 hlmCardTitle>История занятий</h2>
+          </div>
+          <div hlmCardContent>
+            <ul class="flex flex-col">
+              @for (session of sessions.value()?.items ?? []; track session.id) {
+                <li class="flex items-center gap-3 border-t py-3 first:border-t-0 first:pt-0">
+                  <div class="min-w-0 flex-1">
+                    <p class="font-medium">
+                      {{ session.startedAt | date: 'dd.MM, HH:mm' }}
+                      @if (session.kind === 'Mistakes') {
+                        <span class="text-muted-foreground text-sm font-normal">· работа над ошибками</span>
+                      }
+                    </p>
+                    <p class="text-muted-foreground text-sm">
+                      {{ session.stats.answered }} {{ answers(+session.stats.answered) }}
+                      @if (+session.stats.newWords > 0) {
+                        · новых слов {{ session.stats.newWords }}
+                      }
+                      @if (+session.stats.durationSeconds > 0) {
+                        · {{ duration(+session.stats.durationSeconds) }}
+                      }
+                    </p>
+                  </div>
+                  <span class="text-sm font-semibold tabular-nums" [attr.aria-label]="'Верно ' + accuracy(session.stats) + '%'">{{ accuracy(session.stats) }}%</span>
+                </li>
+              } @empty {
+                @if (!sessions.isLoading()) {
+                  <li class="text-muted-foreground text-sm">Занятий пока не было.</li>
+                }
+              }
+            </ul>
+            @if (hasMoreSessions()) {
+              <button hlmBtn variant="ghost" size="sm" type="button" class="mt-2" [disabled]="sessions.isLoading()" (click)="historySize.set(historySize() + 10)">Показать ещё</button>
+            }
+          </div>
+        </section>
+
         @if (weakTags().length > 0) {
           <section hlmCard>
             <div hlmCardHeader>
               <h2 hlmCardTitle>Слабые места</h2>
-              <p hlmCardDescription>Типы ошибок за последние недели — доля от всех ответов с ошибкой.</p>
+              <p hlmCardDescription>Какие ошибки вы делаете чаще всего за последние недели — сколько раз.</p>
             </div>
             <div hlmCardContent>
               <ul class="flex flex-col gap-3">
@@ -226,6 +267,15 @@ export class Stats {
   protected readonly levelPercent = levelPercent;
   protected readonly summary = resource({ loader: () => this.api.invoke(getStatsSummary) });
   private readonly weak = resource({ loader: () => this.api.invoke(getWeakSpots) });
+  protected readonly historySize = signal(10);
+  protected readonly sessions = resource({
+    params: () => ({ page: 1, pageSize: this.historySize() }),
+    loader: ({ params }) => this.api.invoke(listSessions, params),
+  });
+  protected readonly hasMoreSessions = computed(() => {
+    const v = this.sessions.value();
+    return !!v && Number(v.totalCount) > v.items.length;
+  });
 
   protected readonly segments = computed(() => (this.summary.hasValue() ? vocabularySegments(this.summary.value()) : []));
   protected readonly segmentsLabel = computed(() =>
@@ -255,6 +305,19 @@ export class Stats {
 
   protected days(n: number): string {
     return pluralRu(n, 'день', 'дня', 'дней');
+  }
+
+  protected accuracy(stats: { answered: number | string; correct: number | string; almost: number | string }): number {
+    const answered = Number(stats.answered);
+    return answered > 0 ? Math.round(((Number(stats.correct) + Number(stats.almost) * 0.5) / answered) * 100) : 0;
+  }
+
+  protected answers(n: number): string {
+    return pluralRu(n, 'ответ', 'ответа', 'ответов');
+  }
+
+  protected duration(seconds: number): string {
+    return formatDuration(seconds);
   }
 
   protected words(n: number): string {

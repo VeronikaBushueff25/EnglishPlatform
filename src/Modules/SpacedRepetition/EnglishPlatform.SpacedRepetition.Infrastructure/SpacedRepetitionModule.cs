@@ -6,6 +6,9 @@ using EnglishPlatform.SpacedRepetition.Contracts;
 using EnglishPlatform.SpacedRepetition.Domain;
 using EnglishPlatform.SpacedRepetition.Infrastructure.Persistence;
 using EnglishPlatform.Vocabulary.Contracts;
+using EnglishPlatform.BuildingBlocks.Security;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,5 +36,11 @@ public sealed class SpacedRepetitionModule : IModule
 
     public void MapEndpoints(IEndpointRouteBuilder api)
     {
+        api.MapGet("/my-words/progress", async (IReviewStats stats, ICurrentUser user, IConfiguration configuration, CancellationToken ct) =>
+                TypedResults.Ok(await stats.GetWordProgressAsync(user.UserId, configuration.GetValue("Statistics:ActiveStabilityDays", 21.0), ct)))
+            .WithTags("My words")
+            .RequireAuthorization()
+            .WithName("ListMyWordProgress")
+            .WithSummary("Прогресс каждого слова: этап (новое, учу, узнаю, использую), повторения, ошибки, следующее повторение");
     }
 }

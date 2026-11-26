@@ -47,6 +47,25 @@ export const routes: Routes = [
     loadComponent: () => import('./features/learn/learn').then((m) => m.Learn),
   },
   {
+    path: 'practice',
+    canActivate: [authGuard],
+    children: [
+      { path: '', title: 'Практика', loadComponent: () => import('./features/practice/practice').then((m) => m.Practice) },
+      { path: 'match', title: 'Пары', loadComponent: () => import('./features/practice/games').then((m) => m.MatchGame) },
+      { path: 'blitz', title: 'Блиц', loadComponent: () => import('./features/practice/games').then((m) => m.BlitzGame) },
+      { path: 'scramble', title: 'Собери слово', loadComponent: () => import('./features/practice/games').then((m) => m.ScrambleGame) },
+    ],
+  },
+  {
+    path: 'reading',
+    canActivate: [authGuard],
+    children: [
+      { path: '', title: 'Чтение', loadComponent: () => import('./features/reading/reading-pages').then((m) => m.ReadingList) },
+      { path: 'own', title: 'Свой текст', loadComponent: () => import('./features/reading/reading-pages').then((m) => m.ReadingOwn) },
+      { path: ':id', title: 'Чтение', loadComponent: () => import('./features/reading/reading-pages').then((m) => m.ReadingTextPage) },
+    ],
+  },
+  {
     path: 'stats',
     title: 'Статистика',
     canActivate: [authGuard],
@@ -80,6 +99,11 @@ export const routes: Routes = [
         path: '',
         title: 'Словарь',
         loadComponent: () => import('./features/dictionary/dictionary').then((m) => m.Dictionary),
+      },
+      {
+        path: 'improve',
+        title: 'Улучшить словарь',
+        loadComponent: () => import('./features/dictionary/improve-words').then((m) => m.ImproveWords),
       },
       {
         path: 'import',
@@ -138,6 +162,15 @@ export const routes: Routes = [
       { path: '', title: 'Тест уровня', loadComponent: () => import('./features/admin/placement/admin-placement').then((m) => m.AdminPlacement) },
       { path: 'new', title: 'Новый вопрос', loadComponent: () => import('./features/admin/placement/admin-placement').then((m) => m.AdminPlacementForm) },
       { path: ':id', title: 'Вопрос теста', loadComponent: () => import('./features/admin/placement/admin-placement').then((m) => m.AdminPlacementForm) },
+    ],
+  },
+  {
+    path: 'admin/reading',
+    canActivate: [adminGuard],
+    children: [
+      { path: '', title: 'Тексты', loadComponent: () => import('./features/admin/reading/admin-reading').then((m) => m.AdminReading) },
+      { path: 'new', title: 'Новый текст', loadComponent: () => import('./features/admin/reading/admin-reading').then((m) => m.AdminReadingForm) },
+      { path: ':id', title: 'Текст', loadComponent: () => import('./features/admin/reading/admin-reading').then((m) => m.AdminReadingForm) },
     ],
   },
   {

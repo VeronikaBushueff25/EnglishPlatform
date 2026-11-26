@@ -1,0 +1,39 @@
+/* Палитра «sunset». Подключается при выборе в профиле (см. index.html, window.epTheme). */
+:root[data-palette="sunset"] {
+  --background: oklch(0.99 0.008 50);
+  --foreground: oklch(0.19 0.02 50);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.02 50);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.02 50);
+  --primary: oklch(0.56 0.17 42);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.016 50);
+  --secondary-foreground: oklch(0.23 0.02 50);
+  --muted: oklch(0.96 0.016 50);
+  --muted-foreground: oklch(0.52 0.02 50);
+  --accent: oklch(0.95 0.024 50);
+  --accent-foreground: oklch(0.23 0.02 50);
+  --border: oklch(0.91 0.02 50);
+  --input: oklch(0.91 0.02 50);
+  --ring: oklch(0.56 0.17 42);
+  --sidebar-primary: oklch(0.56 0.17 42);
+}
+:root.dark[data-palette="sunset"] {
+  --background: oklch(0.17 0.024 50);
+  --foreground: oklch(0.97 0.008 50);
+  --card: oklch(0.21 0.028 50);
+  --card-foreground: oklch(0.97 0.008 50);
+  --popover: oklch(0.21 0.028 50);
+  --popover-foreground: oklch(0.97 0.008 50);
+  --primary: oklch(0.76 0.15 52);
+  --primary-foreground: oklch(0.17 0.024 50);
+  --secondary: oklch(0.27 0.032 50);
+  --secondary-foreground: oklch(0.97 0.008 50);
+  --muted: oklch(0.27 0.032 50);
+  --muted-foreground: oklch(0.72 0.02 50);
+  --accent: oklch(0.29 0.036 50);
+  --accent-foreground: oklch(0.97 0.008 50);
+  --ring: oklch(0.76 0.15 52);
+  --sidebar-primary: oklch(0.76 0.15 52);
+}

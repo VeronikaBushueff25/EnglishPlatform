@@ -21,11 +21,7 @@ public sealed class PlacementFlowTests(ApiFactory factory) : IClassFixture<ApiFa
         HttpClient admin = await AdminClientAsync();
         HttpClient user = await UserClientAsync();
 
-        // Ответы знает только админка: правильный вариант и уровень каждого вопроса.
-        JsonElement bank = await GetJsonAsync(admin, "/api/v1/admin/placement-questions?pageSize=100");
-        Dictionary<Guid, (string Correct, int Level)> answers = bank.GetProperty("items").EnumerateArray().ToDictionary(
-            q => q.GetProperty("id").GetGuid(),
-            q => (q.GetProperty("options")[q.GetProperty("correctOption").GetInt32()].GetString()!, Array.IndexOf(Levels, q.GetProperty("level").GetString())));
+        Dictionary<Guid, (string Correct, int Level)> answers = await BankAsync(admin);
 
         (await user.PutAsJsonAsync("/api/v1/me/settings", new { interfaceLanguage = "Ru", goals = new[] { "Travel" }, dailyNewWords = 10, dailyReviews = 100 }, Ct))
             .StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -87,6 +83,38 @@ public sealed class PlacementFlowTests(ApiFactory factory) : IClassFixture<ApiFa
     }
 
     [Fact]
+    public async Task Long_placement_asks_36_different_questions_and_finds_b2()
+    {
+        factory.SkipIfUnavailable();
+        HttpClient admin = await AdminClientAsync();
+        HttpClient user = await UserClientAsync();
+        Dictionary<Guid, (string Correct, int Level)> answers = await BankAsync(admin);
+
+        JsonElement step = await PostJsonAsync(user, "/api/v1/placement/start", new { length = "Long" });
+        step.GetProperty("length").GetString().ShouldBe("Long");
+        step.GetProperty("progress").GetProperty("total").GetInt32().ShouldBe(36);
+        Guid attemptId = step.GetProperty("attemptId").GetGuid();
+
+        var asked = new HashSet<Guid>();
+        while (!step.GetProperty("finished").GetBoolean())
+        {
+            JsonElement question = step.GetProperty("question");
+            Guid questionId = question.GetProperty("questionId").GetGuid();
+            asked.Add(questionId).ShouldBeTrue("вопрос повторился");
+            (string correct, int level) = answers[questionId];
+            List<string> options = question.GetProperty("options").EnumerateArray().Select(o => o.GetString()!).ToList();
+            // Ученик уровня B2: знает всё до B2, выше честно жмёт «Не знаю».
+            int option = level <= 3 ? options.IndexOf(correct) : -1;
+            step = await PostJsonAsync(user, $"/api/v1/placement/{attemptId}/answers", new { questionId, option });
+        }
+
+        asked.Count.ShouldBe(36);
+        JsonElement result = await PostJsonAsync(user, $"/api/v1/placement/{attemptId}/finish", new { });
+        result.GetProperty("overall").GetString().ShouldBe("B2");
+        result.GetProperty("length").GetString().ShouldBe("Long");
+    }
+
+    [Fact]
     public async Task Admin_manages_question_bank_and_users_cannot()
     {
         factory.SkipIfUnavailable();
@@ -116,6 +144,26 @@ public sealed class PlacementFlowTests(ApiFactory factory) : IClassFixture<ApiFa
         Guid id = created.GetProperty("id").GetGuid();
         (await GetJsonAsync(admin, $"/api/v1/admin/placement-questions/{id}")).GetProperty("isActive").GetBoolean().ShouldBeFalse();
         (await admin.DeleteAsync($"/api/v1/admin/placement-questions/{id}", Ct)).StatusCode.ShouldBe(HttpStatusCode.NoContent);
+    }
+
+    /// <summary>Ответы знает только админка: правильный вариант и уровень каждого вопроса (все страницы банка).</summary>
+    private static async Task<Dictionary<Guid, (string Correct, int Level)>> BankAsync(HttpClient admin)
+    {
+        var answers = new Dictionary<Guid, (string Correct, int Level)>();
+        for (int page = 1; ; page++)
+        {
+            JsonElement bank = await GetJsonAsync(admin, $"/api/v1/admin/placement-questions?page={page}&pageSize=100");
+            foreach (JsonElement q in bank.GetProperty("items").EnumerateArray())
+            {
+                answers[q.GetProperty("id").GetGuid()] =
+                    (q.GetProperty("options")[q.GetProperty("correctOption").GetInt32()].GetString()!, Array.IndexOf(Levels, q.GetProperty("level").GetString()));
+            }
+
+            if (answers.Count >= bank.GetProperty("totalCount").GetInt32() || bank.GetProperty("items").GetArrayLength() == 0)
+            {
+                return answers;
+            }
+        }
     }
 
     private static async Task<JsonElement> GetJsonAsync(HttpClient client, string url)

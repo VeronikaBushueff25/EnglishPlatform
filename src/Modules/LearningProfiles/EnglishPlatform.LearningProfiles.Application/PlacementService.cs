@@ -43,19 +43,14 @@ public sealed class PlacementService(
 {
     private const string PlacementSource = "Placement";
 
-    /// <summary>Какие категории словаря ближе к цели обучения из профиля.</summary>
-    private static readonly Dictionary<string, string[]> GoalCategories = new()
-    {
-        ["Conversation"] = ["communication", "people", "everyday"],
-        ["Travel"] = ["travel", "food", "shopping"],
-        ["Work"] = ["work", "communication"],
-        ["Exams"] = ["everyday", "communication", "time"],
-        ["Reading"] = ["everyday", "emotions"],
-        ["MoviesAndSeries"] = ["emotions", "people", "communication"],
-        ["Writing"] = ["communication", "work"],
-    };
 
-    public async Task<Result<PlacementStepDto>> StartAsync(CancellationToken cancellationToken)
+    public Task<Result<PlacementStepDto>> StartAsync(CancellationToken cancellationToken) => StartAsync(null, cancellationToken);
+
+    /// <summary>
+    /// Начать тест или продолжить незаконченный (в течение суток). Если просят другой режим, чем у незаконченного,
+    /// начинаем заново в нужном режиме.
+    /// </summary>
+    public async Task<Result<PlacementStepDto>> StartAsync(PlacementLength? length, CancellationToken cancellationToken)
     {
         Guid userId = currentUser.UserId;
         DateTimeOffset now = time.GetUtcNow();
@@ -66,7 +61,13 @@ public sealed class PlacementService(
             .OrderByDescending(a => a.StartedAt)
             .FirstOrDefaultAsync(cancellationToken);
 
-        PlacementPlan plan = await PlanAsync(cancellationToken);
+        if (attempt is not null && length is { } wanted && attempt.Length != wanted)
+        {
+            attempt = null;
+        }
+
+        PlacementLength mode = attempt?.Length ?? length ?? PlacementLength.Short;
+        PlacementPlan plan = await PlanAsync(mode, cancellationToken);
         if (plan.TotalQuestions == 0)
         {
             return PlacementErrors.EmptyBank;
@@ -74,7 +75,7 @@ public sealed class PlacementService(
 
         if (attempt is null)
         {
-            attempt = PlacementAttempt.Start(userId, plan.TotalQuestions, now);
+            attempt = PlacementAttempt.Start(userId, mode, plan.TotalQuestions, now);
             db.Attempts.Add(attempt);
         }
 
@@ -96,7 +97,7 @@ public sealed class PlacementService(
             return PlacementErrors.Finished;
         }
 
-        PlacementPlan plan = await PlanAsync(cancellationToken);
+        PlacementPlan plan = await PlanAsync(attempt.Length, cancellationToken);
 
         // Повторная отправка ответа на уже отвеченный вопрос (обрыв связи) — просто отдаём текущий шаг.
         if (attempt.Answers.Any(a => a.QuestionId == request.QuestionId))
@@ -118,7 +119,7 @@ public sealed class PlacementService(
         }
 
         int chosen = request.Option >= 0 && request.Option < current.Order.Count ? current.Order[request.Option] : -1;
-        attempt.Answer(new PlacementAnswer(question.Id, question.Skill, question.Level, chosen, chosen == question.CorrectOption, time.GetUtcNow()));
+        attempt.Answer(new PlacementAnswer(question.Id, question.Skill, question.Level, chosen, chosen == question.CorrectOption, time.GetUtcNow(), question.Options.Count));
 
         PlacementStepDto step = await StepAsync(attempt, plan, cancellationToken);
         await db.SaveChangesAsync(cancellationToken);
@@ -144,9 +145,10 @@ public sealed class PlacementService(
 
         if (!attempt.IsFinished)
         {
-            IReadOnlyDictionary<Skill, Cefr> result = attempt.Finish(Enum.GetValues<Skill>(), now);
-            foreach ((Skill skill, Cefr level) in result)
+            IReadOnlyDictionary<Skill, double> result = attempt.Finish(Enum.GetValues<Skill>(), now);
+            foreach ((Skill skill, double theta) in result)
             {
+                Cefr level = PlacementEngine.ToLevel(theta);
                 SkillLevel? row = levels.FirstOrDefault(l => l.Skill == skill);
                 if (row is null)
                 {
@@ -166,18 +168,24 @@ public sealed class PlacementService(
         {
             Cefr vocabulary = levels.FirstOrDefault(l => l.Skill == Skill.Vocabulary)?.Level ?? PlacementEngine.Overall(levels.Select(l => l.Level));
             UserLearningSettings s = await settings.GetAsync(userId, cancellationToken);
-            IReadOnlyList<string> categories = s.Goals.SelectMany(g => GoalCategories.GetValueOrDefault(g, [])).Distinct().ToList();
+            IReadOnlyList<string> categories = GoalCategories.For(s.Goals);
             StarterWordsResult starter = await starterWords.AddAsync(userId, WordLevels(vocabulary), categories, options.StarterWords, cancellationToken);
             added = starter.Added;
         }
 
+        // Общий уровень — по точным оценкам этой попытки (взвешенно по числу ответов), а не по округлённым уровням навыков.
+        Dictionary<Skill, double> abilities = attempt.Answers.GroupBy(a => a.Skill).ToDictionary(g => g.Key, g => PlacementEngine.Ability(g));
+        Dictionary<Skill, int> weights = attempt.Answers.GroupBy(a => a.Skill).ToDictionary(g => g.Key, g => g.Count());
+        Cefr overall = abilities.Count > 0 ? PlacementEngine.Overall(abilities, weights) : PlacementEngine.Overall(levels.Select(l => l.Level));
+
         return new PlacementResultDto(
             attempt.Id,
-            PlacementEngine.Overall(levels.Select(l => l.Level)),
+            overall,
             levels.OrderBy(l => (int)l.Skill).Select(ToDto).ToList(),
             attempt.Answers.Count(a => a.Correct),
             attempt.Answers.Count,
-            added);
+            added,
+            attempt.Length);
     }
 
     public async Task<LearningPlanDto> GetPlanAsync(CancellationToken cancellationToken)
@@ -224,7 +232,7 @@ public sealed class PlacementService(
     public static IReadOnlyList<string> WordLevels(Cefr level) =>
         level == Cefr.C2 ? [Cefr.C1.ToString(), Cefr.C2.ToString()] : [level.ToString(), ((Cefr)((int)level + 1)).ToString()];
 
-    private async Task<PlacementPlan> PlanAsync(CancellationToken cancellationToken)
+    private async Task<PlacementPlan> PlanAsync(PlacementLength length, CancellationToken cancellationToken)
     {
         Dictionary<Skill, int> available = await db.Questions.AsNoTracking()
             .Where(q => q.IsActive)
@@ -233,7 +241,7 @@ public sealed class PlacementService(
             .ToDictionaryAsync(g => g.Key, g => g.Count, cancellationToken);
 
         // Навык без вопросов пропускается; вопросов меньше, чем задумано, — задаём сколько есть.
-        PlacementPlan plan = PlacementPlan.Default;
+        PlacementPlan plan = PlacementPlan.For(length);
         return plan with
         {
             Skills = plan.Skills
@@ -251,12 +259,12 @@ public sealed class PlacementService(
         if (attempt.Current is { } current
             && await db.Questions.AsNoTracking().SingleOrDefaultAsync(q => q.Id == current.QuestionId, cancellationToken) is { } asked)
         {
-            return new PlacementStepDto(attempt.Id, false, View(asked, current.Order), progress);
+            return new PlacementStepDto(attempt.Id, false, View(asked, current.Order), progress, attempt.Length);
         }
 
         if (PlacementEngine.NextStep(attempt.Answers, plan) is not (var skill, var level))
         {
-            return new PlacementStepDto(attempt.Id, true, null, progress);
+            return new PlacementStepDto(attempt.Id, true, null, progress, attempt.Length);
         }
 
         HashSet<Guid> used = attempt.Answers.Select(a => a.QuestionId).ToHashSet();
@@ -285,7 +293,7 @@ public sealed class PlacementService(
 
         List<int> order = Enumerable.Range(0, question.Options.Count).OrderBy(_ => Random.Shared.Next()).ToList();
         attempt.Ask(new PlacementCurrent(question.Id, order));
-        return new PlacementStepDto(attempt.Id, false, View(question, order), progress);
+        return new PlacementStepDto(attempt.Id, false, View(question, order), progress, attempt.Length);
     }
 
     private static PlacementQuestionView View(PlacementQuestion question, IReadOnlyList<int> order) =>

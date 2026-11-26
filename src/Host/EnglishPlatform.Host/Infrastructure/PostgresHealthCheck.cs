@@ -11,7 +11,7 @@ internal sealed class PostgresHealthCheck(IConfiguration configuration) : IHealt
     {
         try
         {
-            await using var connection = new NpgsqlConnection(configuration.GetConnectionString(PersistenceExtensions.ConnectionStringName));
+            await using var connection = new NpgsqlConnection(PersistenceExtensions.ConnectionString(configuration));
             await connection.OpenAsync(cancellationToken);
             await using var command = new NpgsqlCommand("SELECT 1", connection);
             await command.ExecuteScalarAsync(cancellationToken);

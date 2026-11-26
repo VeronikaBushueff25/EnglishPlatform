@@ -7,5 +7,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Seed/starter-lexemes.csv" LogicalName="Seed.starter-lexemes.csv" />
+    <EmbeddedResource Include="Seed/cefr-levels.csv" LogicalName="Seed.cefr-levels.csv" />
   </ItemGroup>
 </Project>

@@ -74,6 +74,10 @@ namespace EnglishPlatform.LearningSessions.Infrastructure.Persistence.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("new_words");
 
+                    b.Property<DateTimeOffset?>("NoAudioUntil")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("no_audio_until");
+
                     b.Property<int>("Position")
                         .HasColumnType("integer")
                         .HasColumnName("position");

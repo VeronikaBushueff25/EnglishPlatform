@@ -5,6 +5,9 @@ namespace EnglishPlatform.Users.Contracts;
 public sealed record UserLearningSettings(Guid UserId, int DailyNewWords, int DailyReviews, string TimeZone)
 {
     public IReadOnlyList<string> Goals { get; init; } = [];
+
+    /// <summary>Добавлять слова своего уровня из общей базы, когда свои новые слова закончились.</summary>
+    public bool AutoAddWords { get; init; } = true;
 }
 
 public interface IUserLearningSettings

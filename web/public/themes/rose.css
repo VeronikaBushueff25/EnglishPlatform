@@ -1,0 +1,39 @@
+/* Палитра «rose». Подключается при выборе в профиле (см. index.html, window.epTheme). */
+:root[data-palette="rose"] {
+  --background: oklch(0.99 0.006 8);
+  --foreground: oklch(0.19 0.025 8);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.025 8);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.025 8);
+  --primary: oklch(0.55 0.2 8);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.012 8);
+  --secondary-foreground: oklch(0.23 0.025 8);
+  --muted: oklch(0.96 0.012 8);
+  --muted-foreground: oklch(0.52 0.025 8);
+  --accent: oklch(0.95 0.018 8);
+  --accent-foreground: oklch(0.23 0.025 8);
+  --border: oklch(0.91 0.015 8);
+  --input: oklch(0.91 0.015 8);
+  --ring: oklch(0.55 0.2 8);
+  --sidebar-primary: oklch(0.55 0.2 8);
+}
+:root.dark[data-palette="rose"] {
+  --background: oklch(0.17 0.018 8);
+  --foreground: oklch(0.97 0.006 8);
+  --card: oklch(0.21 0.021 8);
+  --card-foreground: oklch(0.97 0.006 8);
+  --popover: oklch(0.21 0.021 8);
+  --popover-foreground: oklch(0.97 0.006 8);
+  --primary: oklch(0.75 0.15 5);
+  --primary-foreground: oklch(0.17 0.018 8);
+  --secondary: oklch(0.27 0.024 8);
+  --secondary-foreground: oklch(0.97 0.006 8);
+  --muted: oklch(0.27 0.024 8);
+  --muted-foreground: oklch(0.72 0.025 8);
+  --accent: oklch(0.29 0.027 8);
+  --accent-foreground: oklch(0.97 0.006 8);
+  --ring: oklch(0.75 0.15 5);
+  --sidebar-primary: oklch(0.75 0.15 5);
+}

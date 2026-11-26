@@ -57,6 +57,32 @@ namespace EnglishPlatform.Vocabulary.Infrastructure.Persistence.Migrations
                     b.ToTable("categories", "vocabulary");
                 });
 
+            modelBuilder.Entity("EnglishPlatform.Vocabulary.Domain.DictionaryCacheEntry", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("word");
+
+                    b.Property<DateTimeOffset>("FetchedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("fetched_at");
+
+                    b.Property<bool>("Found")
+                        .HasColumnType("boolean")
+                        .HasColumnName("found");
+
+                    b.Property<string>("Payload")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("payload");
+
+                    b.HasKey("Id")
+                        .HasName("pk_dictionary_cache");
+
+                    b.ToTable("dictionary_cache", "vocabulary");
+                });
+
             modelBuilder.Entity("EnglishPlatform.Vocabulary.Domain.Lexeme", b =>
                 {
                     b.Property<Guid>("Id")
@@ -82,6 +108,10 @@ namespace EnglishPlatform.Vocabulary.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(2)")
                         .HasColumnName("level");
 
+                    b.Property<bool>("NeedsReview")
+                        .HasColumnType("boolean")
+                        .HasColumnName("needs_review");
+
                     b.Property<string>("NormalizedText")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -97,6 +127,14 @@ namespace EnglishPlatform.Vocabulary.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("search_text");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)")
+                        .HasDefaultValue("Manual")
+                        .HasColumnName("source");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -130,6 +168,10 @@ namespace EnglishPlatform.Vocabulary.Infrastructure.Persistence.Migrations
                     b.HasIndex("Level")
                         .HasDatabaseName("ix_lexemes_level");
 
+                    b.HasIndex("NeedsReview")
+                        .HasDatabaseName("ix_lexemes_needs_review")
+                        .HasFilter("needs_review");
+
                     b.HasIndex("NormalizedText", "PartOfSpeech")
                         .IsUnique()
                         .HasDatabaseName("ix_lexemes_normalized_text_part_of_speech");
@@ -137,6 +179,55 @@ namespace EnglishPlatform.Vocabulary.Infrastructure.Persistence.Migrations
                     NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("NormalizedText", "PartOfSpeech"), false);
 
                     b.ToTable("lexemes", "vocabulary");
+                });
+
+            modelBuilder.Entity("EnglishPlatform.Vocabulary.Domain.ReadingText", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("body");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_published");
+
+                    b.Property<string>("Level")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)")
+                        .HasColumnName("level");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Topic")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("topic");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("WordCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("word_count");
+
+                    b.HasKey("Id")
+                        .HasName("pk_reading_texts");
+
+                    b.HasIndex("IsPublished", "Level")
+                        .HasDatabaseName("ix_reading_texts_is_published_level");
+
+                    b.ToTable("reading_texts", "vocabulary");
                 });
 
             modelBuilder.Entity("EnglishPlatform.Vocabulary.Domain.UserWord", b =>

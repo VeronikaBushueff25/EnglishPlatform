@@ -15,8 +15,8 @@ internal static class PlacementEndpoints
     {
         RouteGroupBuilder placement = api.MapGroup("/placement").WithTags("Placement").RequireAuthorization();
 
-        placement.MapPost("/start", async (PlacementService service, CancellationToken ct) =>
-                (await service.StartAsync(ct)).ToHttpResult())
+        placement.MapPost("/start", async (StartPlacementRequest? request, PlacementService service, CancellationToken ct) =>
+                (await service.StartAsync(request?.Length, ct)).ToHttpResult())
             .WithName("StartPlacement")
             .Produces<PlacementStepDto>()
             .ProducesProblem(StatusCodes.Status409Conflict);

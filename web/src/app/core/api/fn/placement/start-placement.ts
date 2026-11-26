@@ -8,13 +8,16 @@ import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
 import { PlacementStepDto } from '../../models/placement-step-dto';
+import { StartPlacementRequest } from '../../models/start-placement-request';
 
 export interface StartPlacement$Params {
+      body?: (null | StartPlacementRequest)
 }
 
 export function startPlacement(http: HttpClient, rootUrl: string, params?: StartPlacement$Params, context?: HttpContext): Observable<StrictHttpResponse<PlacementStepDto>> {
   const rb = new RequestBuilder(rootUrl, startPlacement.PATH, 'post');
   if (params) {
+    rb.body(params.body, 'application/json');
   }
 
   return http.request(

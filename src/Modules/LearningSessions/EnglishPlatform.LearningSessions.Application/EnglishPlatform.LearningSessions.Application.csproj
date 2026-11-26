@@ -9,6 +9,7 @@
     <ProjectReference Include="../../Users/EnglishPlatform.Users.Contracts/EnglishPlatform.Users.Contracts.csproj" />
     <ProjectReference Include="../../Analytics/EnglishPlatform.Analytics.Contracts/EnglishPlatform.Analytics.Contracts.csproj" />
     <ProjectReference Include="../../Grammar/EnglishPlatform.Grammar.Contracts/EnglishPlatform.Grammar.Contracts.csproj" />
+    <ProjectReference Include="../../LearningProfiles/EnglishPlatform.LearningProfiles.Contracts/EnglishPlatform.LearningProfiles.Contracts.csproj" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 </Project>

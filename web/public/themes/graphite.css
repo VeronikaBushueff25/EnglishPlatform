@@ -1,0 +1,13 @@
+/* Палитра «graphite». Подключается при выборе в профиле (см. index.html, window.epTheme). */
+:root[data-palette="graphite"] {
+  --primary: oklch(0.21 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.55 0 0);
+  --sidebar-primary: oklch(0.21 0 0);
+}
+:root.dark[data-palette="graphite"] {
+  --primary: oklch(0.93 0 0);
+  --primary-foreground: oklch(0.2 0 0);
+  --ring: oklch(0.6 0 0);
+  --sidebar-primary: oklch(0.93 0 0);
+}

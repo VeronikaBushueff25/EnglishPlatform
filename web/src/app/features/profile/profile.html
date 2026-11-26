@@ -102,6 +102,14 @@
               </div>
             </div>
 
+            <label class="flex items-start gap-3 text-sm">
+              <hlm-checkbox class="mt-0.5" [checked]="settingsForm.controls.autoAddWords.value" (checkedChange)="settingsForm.controls.autoAddWords.setValue($event); settingsForm.markAsDirty()" />
+              <span>
+                Добавлять новые слова автоматически
+                <span class="text-muted-foreground block">Когда свои невыученные слова закончатся, занятие возьмёт слова вашего уровня из общей базы — сначала по вашим целям.</span>
+              </span>
+            </label>
+
             <div hlmField>
               <label hlmFieldLabel for="interfaceLanguage">Язык интерфейса</label>
               <hlm-native-select selectId="interfaceLanguage" formControlName="interfaceLanguage" selectClass="h-11">
@@ -121,6 +129,8 @@
         </form>
       </div>
     </section>
+
+    <app-appearance />
   } @else {
     <div class="text-muted-foreground flex items-center gap-2">
       <hlm-spinner aria-label="Загрузка" />

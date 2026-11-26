@@ -13,7 +13,16 @@ public interface IAnalyticsDb
     DbSet<ErrorStat> ErrorStats { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Атомарно прибавляет ответ к счётчикам (создаёт недостающие). Один запрос INSERT … ON CONFLICT DO UPDATE:
+    /// одновременные ответы одного пользователя не теряют приращения и не падают на уникальном индексе.
+    /// </summary>
+    Task IncrementErrorStatsAsync(Guid userId, IReadOnlyList<ErrorStatIncrement> increments, DateTimeOffset at, CancellationToken cancellationToken);
 }
+
+/// <summary>Приращение счётчика: +1 ответ, +Errors ошибок, +Almost «почти».</summary>
+public sealed record ErrorStatIncrement(StatDimension Dimension, string Key, int Errors, int Almost);
 
 /// <summary>Пороги проблемного слова: хотя бы две неудачи, не меньше трети ответов неудачные, ошибка была недавно.</summary>
 public sealed class WeaknessOptions
@@ -48,32 +57,14 @@ public sealed class CountAnswerChecked(IAnalyticsDb db) : IIntegrationEventHandl
             keys.Add((StatDimension.Tag, e.ErrorTag));
         }
 
-        List<string> keyValues = keys.Select(k => k.Key).ToList();
-        List<ErrorStat> existing = await db.ErrorStats
-            .Where(s => s.UserId == e.UserId && keyValues.Contains(s.Key))
-            .ToListAsync(cancellationToken);
+        // Для тега считаем не ответы, а случаи этой ошибки: его доля — случаи / все ответы.
+        List<ErrorStatIncrement> increments = keys
+            .Select(k => k.Dimension == StatDimension.Tag
+                ? new ErrorStatIncrement(k.Dimension, k.Key, 1, 0)
+                : new ErrorStatIncrement(k.Dimension, k.Key, wrong ? 1 : 0, almost ? 1 : 0))
+            .ToList();
 
-        foreach ((StatDimension dimension, string key) in keys)
-        {
-            ErrorStat? stat = existing.FirstOrDefault(s => s.Dimension == dimension && s.Key == key);
-            if (stat is null)
-            {
-                stat = ErrorStat.Create(e.UserId, dimension, key);
-                db.ErrorStats.Add(stat);
-            }
-
-            // Для тега считаем не ответы, а случаи этой ошибки: его доля — случаи / все ответы.
-            if (dimension == StatDimension.Tag)
-            {
-                stat.Count(wrong: true, almost: false, e.OccurredAt);
-            }
-            else
-            {
-                stat.Count(wrong, almost, e.OccurredAt);
-            }
-        }
-
-        await db.SaveChangesAsync(cancellationToken);
+        await db.IncrementErrorStatsAsync(e.UserId, increments, e.OccurredAt, cancellationToken);
     }
 }
 

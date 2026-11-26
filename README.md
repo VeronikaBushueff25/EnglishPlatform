@@ -15,6 +15,10 @@ deploy/                      docker-compose, nginx.conf
 openapi/openapi.json         генерируется при сборке Host
 docs/decisions.md            журнал архитектурных решений
 docs/progress.md             что сделано и что осталось по этапам
+docs/roadmap.md              план, статус этапов, идеи на будущее
+docs/deploy.md               выпуск и эксплуатация
+web/e2e/                     сквозные тесты Playwright
+tests/load/                  нагрузочный скрипт
 ```
 
 Модуль видит у других модулей только `*.Contracts`, это проверяют архитектурные тесты.
@@ -43,4 +47,7 @@ docker compose -f deploy/docker-compose.yml up --build
 
 Сборка решения: `dotnet build EnglishPlatform.slnx -m:1`.
 Тесты: `dotnet test --solution EnglishPlatform.slnx`, фронтенд `cd web && npm run test:ci`.
+Сквозной тест в браузере (Edge/Chrome, приложение запущено): `cd web && npm run e2e` (`E2E_BASE_URL` — другой адрес).
+Нагрузка на API (тестовая база): `node tests/load/load.mjs http://localhost:5080 100 60`.
+Выпуск на сервер, HTTPS, резервные копии, мониторинг: [docs/deploy.md](docs/deploy.md).
 После изменения эндпоинтов: собрать Host, затем `cd web && npm run api:generate`.

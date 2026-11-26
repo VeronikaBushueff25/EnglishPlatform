@@ -28,12 +28,14 @@ import { InterfaceLanguage } from '../../core/api/models/interface-language';
 import { LearningGoal } from '../../core/api/models/learning-goal';
 import { MeResponse } from '../../core/api/models/me-response';
 import { problemMessage } from '../../core/http/problem';
+import { Appearance } from '../../shared/appearance';
 import { ErrorAlert } from '../../shared/error-alert';
 import { GOAL_LABELS, LANGUAGE_LABELS, PLAN_LABELS, allTimeZones, browserTimeZone } from './profile-labels';
 
 @Component({
   selector: 'app-profile',
   imports: [
+    Appearance,
     ReactiveFormsModule,
     NgIcon,
     ErrorAlert,
@@ -83,6 +85,7 @@ export class Profile {
     goals: this.fb.control<LearningGoal[]>([]),
     dailyNewWords: [10, [Validators.required, Validators.min(1), Validators.max(100)]],
     dailyReviews: [100, [Validators.required, Validators.min(10), Validators.max(1000)]],
+    autoAddWords: [true],
   });
   protected readonly settingsSaving = signal(false);
 
@@ -148,6 +151,7 @@ export class Profile {
             goals: value.goals,
             dailyNewWords: Number(value.dailyNewWords),
             dailyReviews: Number(value.dailyReviews),
+            autoAddWords: value.autoAddWords,
           },
         }),
       );
@@ -166,6 +170,7 @@ export class Profile {
       goals: [...me.settings.goals],
       dailyNewWords: Number(me.settings.dailyNewWords),
       dailyReviews: Number(me.settings.dailyReviews),
+      autoAddWords: me.settings.autoAddWords ?? true,
     });
   }
 }

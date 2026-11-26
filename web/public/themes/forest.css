@@ -1,0 +1,39 @@
+/* Палитра «forest». Подключается при выборе в профиле (см. index.html, window.epTheme). */
+:root[data-palette="forest"] {
+  --background: oklch(0.99 0.006 150);
+  --foreground: oklch(0.19 0.02 150);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.02 150);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.02 150);
+  --primary: oklch(0.5 0.13 152);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.012 150);
+  --secondary-foreground: oklch(0.23 0.02 150);
+  --muted: oklch(0.96 0.012 150);
+  --muted-foreground: oklch(0.52 0.02 150);
+  --accent: oklch(0.95 0.018 150);
+  --accent-foreground: oklch(0.23 0.02 150);
+  --border: oklch(0.91 0.015 150);
+  --input: oklch(0.91 0.015 150);
+  --ring: oklch(0.5 0.13 152);
+  --sidebar-primary: oklch(0.5 0.13 152);
+}
+:root.dark[data-palette="forest"] {
+  --background: oklch(0.17 0.018 150);
+  --foreground: oklch(0.97 0.006 150);
+  --card: oklch(0.21 0.021 150);
+  --card-foreground: oklch(0.97 0.006 150);
+  --popover: oklch(0.21 0.021 150);
+  --popover-foreground: oklch(0.97 0.006 150);
+  --primary: oklch(0.77 0.15 150);
+  --primary-foreground: oklch(0.17 0.018 150);
+  --secondary: oklch(0.27 0.024 150);
+  --secondary-foreground: oklch(0.97 0.006 150);
+  --muted: oklch(0.27 0.024 150);
+  --muted-foreground: oklch(0.72 0.02 150);
+  --accent: oklch(0.29 0.027 150);
+  --accent-foreground: oklch(0.97 0.006 150);
+  --ring: oklch(0.77 0.15 150);
+  --sidebar-primary: oklch(0.77 0.15 150);
+}

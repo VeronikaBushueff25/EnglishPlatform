@@ -34,6 +34,11 @@ public sealed class AnalyticsModule : IModule
         services.AddSingleton(stats);
         services.AddScoped<StatsService>();
         services.AddScoped<IIntegrationEventHandler<AnswerChecked>, CountAnswerChecked>();
+
+        services.AddSingleton<ProductMetrics>();
+        services.AddScoped<IIntegrationEventHandler<AnswerChecked>, MeterAnswerChecked>();
+        services.AddScoped<IIntegrationEventHandler<EnglishPlatform.Identity.Contracts.UserRegistered>, MeterUserRegistered>();
+        services.AddScoped<IIntegrationEventHandler<EnglishPlatform.Vocabulary.Contracts.UserWordAdded>, MeterUserWordAdded>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder api)

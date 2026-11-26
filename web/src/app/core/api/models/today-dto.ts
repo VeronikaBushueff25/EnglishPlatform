@@ -3,6 +3,7 @@
 
 export interface TodayDto {
   activeSessionId: (string | null);
+  autoAddWords?: (number | string);
   newAvailable: (number | string);
   newDoneToday: (number | string);
   newLimit: (number | string);

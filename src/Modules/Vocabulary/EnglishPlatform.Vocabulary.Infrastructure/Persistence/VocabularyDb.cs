@@ -17,6 +17,35 @@ public sealed class VocabularyDb(DbContextOptions<VocabularyDb> options) : Modul
     public DbSet<Category> Categories => Set<Category>();
 
     public DbSet<UserWord> UserWords => Set<UserWord>();
+
+    public DbSet<DictionaryCacheEntry> DictionaryCache => Set<DictionaryCacheEntry>();
+
+    public DbSet<ReadingText> ReadingTexts => Set<ReadingText>();
+}
+
+internal sealed class ReadingTextConfiguration : IEntityTypeConfiguration<ReadingText>
+{
+    public void Configure(EntityTypeBuilder<ReadingText> text)
+    {
+        text.ToTable("reading_texts");
+        text.HasKey(t => t.Id);
+        text.Property(t => t.Id).ValueGeneratedNever();
+        text.Property(t => t.Title).HasMaxLength(ReadingText.MaxTitleLength);
+        text.Property(t => t.Topic).HasMaxLength(ReadingText.MaxTopicLength);
+        text.Property(t => t.Level).HasConversion<string>().HasMaxLength(2);
+        text.HasIndex(t => new { t.IsPublished, t.Level });
+    }
+}
+
+internal sealed class DictionaryCacheConfiguration : IEntityTypeConfiguration<DictionaryCacheEntry>
+{
+    public void Configure(EntityTypeBuilder<DictionaryCacheEntry> entry)
+    {
+        entry.ToTable("dictionary_cache");
+        entry.HasKey(e => e.Id);
+        entry.Property(e => e.Id).HasColumnName("word").HasMaxLength(DictionaryCacheEntry.MaxKeyLength);
+        entry.Property(e => e.Payload);
+    }
 }
 
 internal sealed class LexemeConfiguration : IEntityTypeConfiguration<Lexeme>
@@ -44,6 +73,8 @@ internal sealed class LexemeConfiguration : IEntityTypeConfiguration<Lexeme>
         lexeme.HasIndex(l => new { l.NormalizedText, l.PartOfSpeech }).IsUnique().AreNullsDistinct(false);
         lexeme.HasIndex(l => l.CategoryIds).HasMethod("gin");
         lexeme.HasIndex(l => l.Level);
+        lexeme.Property(l => l.Source).HasConversion<string>().HasMaxLength(16).HasDefaultValue(LexemeSource.Manual).HasSentinel((LexemeSource)(-1));
+        lexeme.HasIndex(l => l.NeedsReview).HasFilter("needs_review");
     }
 }
 

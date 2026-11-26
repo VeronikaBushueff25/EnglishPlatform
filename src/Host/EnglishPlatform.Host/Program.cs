@@ -38,6 +38,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
+    // Сколько прокси стоит перед API: 1 — только nginx из compose; 2 — ещё Caddy/балансировщик с HTTPS перед ним.
+    // Берём адрес клиента ровно на столько шагов назад, чтобы его нельзя было подделать своим заголовком.
+    options.ForwardLimit = builder.Configuration.GetValue("ForwardedHeaders:ForwardLimit", 1);
 });
 
 WebApplication app = builder.Build();

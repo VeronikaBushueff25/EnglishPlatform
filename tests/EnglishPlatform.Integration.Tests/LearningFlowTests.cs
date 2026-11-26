@@ -132,6 +132,9 @@ public sealed class LearningFlowTests(ApiFactory factory) : IClassFixture<ApiFac
     {
         factory.SkipIfUnavailable();
         HttpClient client = await UserClientAsync();
+        // Автопополнение выключено: проверяем именно пустой словарь.
+        (await client.PutAsJsonAsync("/api/v1/me/settings", new { interfaceLanguage = "Ru", goals = Array.Empty<string>(), dailyNewWords = 10, dailyReviews = 100, autoAddWords = false }, Ct))
+            .EnsureSuccessStatusCode();
 
         JsonElement session = await PostJsonAsync(client, "/api/v1/sessions", new { });
         session.GetProperty("finishedAt").ValueKind.ShouldNotBe(JsonValueKind.Null);

@@ -7,6 +7,7 @@ using EnglishPlatform.BuildingBlocks.Results;
 using EnglishPlatform.BuildingBlocks.Security;
 using EnglishPlatform.Exercises.Contracts;
 using EnglishPlatform.Grammar.Contracts;
+using EnglishPlatform.LearningProfiles.Contracts;
 using EnglishPlatform.LearningSessions.Contracts;
 using EnglishPlatform.LearningSessions.Domain;
 using EnglishPlatform.SpacedRepetition.Contracts;
@@ -51,6 +52,8 @@ public sealed class SessionService(
     IUserLearningSettings settings,
     IWeaknessReader weaknesses,
     IGrammarHints hints,
+    IStarterWords starterWords,
+    ISkillLevelsReader skillLevels,
     IEventBus eventBus,
     ICurrentUser currentUser,
     SessionOptions options,
@@ -77,6 +80,7 @@ public sealed class SessionService(
         IReadOnlyList<QueuedCard> mistakes = await scheduler.BuildMistakesQueueAsync(userId, weakness.ProblemWordIds, options.MistakesSessionSize, cancellationToken);
         LearningSession? active = await FindActiveAsync(userId, DayStart(now, s.TimeZone), SessionKinds.Daily, cancellationToken);
 
+        int autoAdd = AutoAddCount(s, queue);
         return new TodayDto(
             queue.ReviewsDue,
             queue.NewAvailable,
@@ -86,7 +90,8 @@ public sealed class SessionService(
             queue.NewDoneToday,
             queue.Reviews.Count + queue.NewCards.Count,
             active?.Id,
-            mistakes.Count);
+            mistakes.Count,
+            autoAdd);
     }
 
     /// <summary>Начинает занятие. Если сегодня уже есть незавершённое того же типа — продолжаем его.</summary>
@@ -118,6 +123,13 @@ public sealed class SessionService(
         {
             DailyQueue queue = await scheduler.BuildQueueAsync(
                 userId, s.DailyNewWords, s.DailyReviews, dayStart, now, weakness.ProblemWordIds, cancellationToken);
+            if (AutoAddCount(s, queue) is > 0 and var count && await AddWordsAsync(userId, s, count, cancellationToken) > 0)
+            {
+                // Новые слова получили карточки (событие UserWordAdded обрабатывается сразу) — собираем очередь заново.
+                queue = await scheduler.BuildQueueAsync(
+                    userId, s.DailyNewWords, s.DailyReviews, dayStart, now, weakness.ProblemWordIds, cancellationToken);
+            }
+
             cards = queue.Reviews.Concat(queue.NewCards);
         }
 
@@ -125,8 +137,29 @@ public sealed class SessionService(
             new SessionItem(c.CardId, c.UserWordId, c.Mode.ToString(), c.IsNew, Introduced: !c.IsNew, Repeats: 0, IsProblem: c.IsProblem));
 
         var session = LearningSession.Start(userId, kind, items, now);
+
+        // «Не могу слушать» действует час, а не одно занятие: переносим из последнего занятия.
+        DateTimeOffset? noAudio = await db.Sessions
+            .Where(x => x.UserId == userId && x.NoAudioUntil > now)
+            .MaxAsync(x => x.NoAudioUntil, cancellationToken);
+        if (noAudio is { } until)
+        {
+            session.MuteAudio(until, dropCurrentTask: false, now);
+        }
         if (session.Remaining == 0)
         {
+            // Учить нечего. Отдаём уже созданное сегодня пустое занятие, чтобы повторные нажатия
+            // (или два устройства) не плодили пустые записи: клиенту нужен id, чтобы спросить /next и увидеть «всё сделано».
+            LearningSession? empty = await db.Sessions
+                .Where(x => x.UserId == userId && x.Kind == kind && x.StartedAt >= dayStart && x.Total == 0)
+                .OrderByDescending(x => x.StartedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (empty is not null)
+            {
+                await db.SaveChangesAsync(cancellationToken);
+                return ToDto(empty);
+            }
+
             session.Finish(now);
         }
 
@@ -180,7 +213,13 @@ public sealed class SessionService(
                 IReadOnlyList<string> distractors = mode == ExerciseMode.Recognition
                     ? await words.GetDistractorsAsync(session.UserId, word.Id, Distractors, cancellationToken)
                     : [];
-                task = exercises.Build(exerciseWord, mode, distractors, Preferences(weakness));
+                ExercisePreferences preferences = Preferences(weakness);
+                if (!session.AudioAllowed(now))
+                {
+                    preferences = preferences with { ListenShare = 0 };
+                }
+
+                task = exercises.Build(exerciseWord, mode, distractors, preferences);
             }
 
             session.SetTask(task.TaskId, JsonSerializer.Serialize(task, Json), now);
@@ -389,6 +428,41 @@ public sealed class SessionService(
         eventBus.PublishAsync(
             new AnswerChecked(userId, item.UserWordId, item.CardId, item.Mode, task.Kind.ToString(), check.Verdict.ToString(), check.ErrorTag.ToString(), isWarmUp, elapsedMs, now),
             cancellationToken);
+
+    /// <summary>
+    /// Сколько слов занятие добавит само: свои невыученные слова закончились, а дневная норма новых не выбрана.
+    /// </summary>
+    public static int AutoAddCount(UserLearningSettings s, DailyQueue queue) =>
+        s.AutoAddWords && queue.NewAvailable == 0 ? Math.Max(0, s.DailyNewWords - queue.NewDoneToday) : 0;
+
+    /// <summary>Слова своего уровня (по тесту, иначе A2–B1) и следующего, сначала по темам целей из профиля.</summary>
+    private async Task<int> AddWordsAsync(Guid userId, UserLearningSettings s, int count, CancellationToken cancellationToken)
+    {
+        IReadOnlyList<SkillLevelInfo> levels = await skillLevels.GetAsync(userId, cancellationToken);
+        string? vocabulary = levels.FirstOrDefault(l => l.Skill == "Vocabulary")?.Level;
+        IReadOnlyList<string> wordLevels = vocabulary is null ? ["A2", "B1"] : GoalCategories.WordLevels(vocabulary);
+        StarterWordsResult result = await starterWords.AddAsync(userId, wordLevels, GoalCategories.For(s.Goals), count, cancellationToken);
+        return result.Added;
+    }
+
+    /// <summary>
+    /// «Не могу слушать»: на <paramref name="minutes"/> минут (1–240, по умолчанию 60) без заданий на слух.
+    /// Если сейчас задание на слух, оно заменяется другим по тому же слову — без ответа и без штрафа.
+    /// </summary>
+    public async Task<Result<NextStepDto>> MuteAudioAsync(Guid sessionId, int? minutes, CancellationToken cancellationToken)
+    {
+        LearningSession? session = await FindAsync(sessionId, cancellationToken);
+        if (session is null)
+        {
+            return SessionErrors.NotFound;
+        }
+
+        DateTimeOffset now = time.GetUtcNow();
+        bool listening = session.CurrentTaskJson is { } json && Deserialize(json).Kind == ExerciseKind.ListenChoose;
+        session.MuteAudio(now.AddMinutes(Math.Clamp(minutes ?? 60, 1, 240)), listening, now);
+        await db.SaveChangesAsync(cancellationToken);
+        return await NextAsync(sessionId, cancellationToken);
+    }
 
     private Task<LearningSession?> FindAsync(Guid sessionId, CancellationToken cancellationToken)
     {

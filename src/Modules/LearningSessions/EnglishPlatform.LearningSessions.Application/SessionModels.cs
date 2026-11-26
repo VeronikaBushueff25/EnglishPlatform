@@ -14,7 +14,8 @@ public sealed record TodayDto(
     int NewDoneToday,
     int ToStudyNow,
     Guid? ActiveSessionId,
-    int ProblemWords = 0);
+    int ProblemWords = 0,
+    int AutoAddWords = 0);
 
 /// <summary>Тип занятия: Daily (по умолчанию) или Mistakes — работа над ошибками.</summary>
 public sealed record StartSessionRequest(

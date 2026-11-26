@@ -82,8 +82,11 @@ public sealed record PlacementQuestionData(
     int CorrectOption,
     bool IsActive);
 
-/// <summary>Ответ в тесте: вопрос, на каком уровне он был, верно ли. <c>Chosen</c> = −1 — «не знаю».</summary>
-public sealed record PlacementAnswer(Guid QuestionId, Skill Skill, Cefr Level, int Chosen, bool Correct, DateTimeOffset AnsweredAt);
+/// <summary>
+/// Ответ в тесте: вопрос, на каком уровне он был, верно ли. <c>Chosen</c> = −1 — «не знаю».
+/// <c>Options</c> — сколько было вариантов (для поправки на угадывание); 0 в старых попытках — считаем 4.
+/// </summary>
+public sealed record PlacementAnswer(Guid QuestionId, Skill Skill, Cefr Level, int Chosen, bool Correct, DateTimeOffset AnsweredAt, int Options = 0);
 
 /// <summary>Текущий вопрос с порядком вариантов, в котором их увидел пользователь (варианты перемешиваются).</summary>
 public sealed record PlacementCurrent(Guid QuestionId, IReadOnlyList<int> Order);

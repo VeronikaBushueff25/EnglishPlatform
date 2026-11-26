@@ -4,6 +4,7 @@
 import { InterfaceLanguage } from '../models/interface-language';
 import { LearningGoal } from '../models/learning-goal';
 export interface UpdateSettingsRequest {
+  autoAddWords?: (boolean | null);
   dailyNewWords: (number | string);
   dailyReviews: (number | string);
   goals: Array<LearningGoal>;

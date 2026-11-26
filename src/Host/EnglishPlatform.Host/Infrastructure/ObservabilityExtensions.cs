@@ -33,7 +33,8 @@ internal static class ObservabilityExtensions
                 metrics
                     .AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentationIfAvailable();
+                    .AddRuntimeInstrumentationIfAvailable()
+                    .AddMeter("EnglishPlatform"); // продуктовые метрики модуля Analytics (ProductMetrics)
 
                 if (exportEnabled)
                 {

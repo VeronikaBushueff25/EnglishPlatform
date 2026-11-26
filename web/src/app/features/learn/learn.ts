@@ -25,6 +25,7 @@ import {
   lucidePlay,
   lucideSparkles,
   lucideVolume2,
+  lucideVolumeX,
   lucideX,
 } from '@ng-icons/lucide';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
@@ -33,7 +34,8 @@ import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmSpinnerImports } from '@spartan-ng/helm/spinner';
 import { Api } from '../../core/api/api';
-import { answerTask, finishSession, getLearningToday, getNextTask, getWeakSpots, startSession } from '../../core/api/functions';
+import { answerTask, finishSession, getLearningToday, getNextTask, getWeakSpots, muteSessionAudio, startSession } from '../../core/api/functions';
+import { toast } from '@spartan-ng/brain/sonner';
 import { AnswerRequest } from '../../core/api/models/answer-request';
 import { AnswerResultDto } from '../../core/api/models/answer-result-dto';
 import { SessionProgress } from '../../core/api/models/session-progress';
@@ -83,6 +85,7 @@ const RETRIES = 2;
       lucidePlay,
       lucideSparkles,
       lucideVolume2,
+      lucideVolumeX,
       lucideX,
     }),
   ],
@@ -142,10 +145,14 @@ export class Learn {
     const answered = Number(s?.answered ?? 0);
     return answered > 0 ? Math.round(((Number(s!.correct) + Number(s!.almost)) / answered) * 100) : 0;
   });
-  protected readonly todayCount = computed(() => Number(this.today()?.toStudyNow ?? 0));
+  /** Сколько слов занятие добавит само (свои новые закончились, автопополнение включено). */
+  protected readonly autoAdd = computed(() => Number(this.today()?.autoAddWords ?? 0));
+  protected readonly todayCount = computed(() => Number(this.today()?.toStudyNow ?? 0) + this.autoAdd());
   protected readonly todayLabel = computed(() => {
-    const n = this.todayCount();
-    return `${n} ${pluralRu(n, 'карточка', 'карточки', 'карточек')}`;
+    const n = Number(this.today()?.toStudyNow ?? 0);
+    const cards = n > 0 ? `${n} ${pluralRu(n, 'карточка', 'карточки', 'карточек')}` : '';
+    const added = this.autoAdd() > 0 ? `${this.autoAdd()} ${pluralRu(this.autoAdd(), 'новое слово', 'новых слова', 'новых слов')} вашего уровня добавится автоматически` : '';
+    return [cards, added].filter((x) => x).join(', ');
   });
 
   constructor() {
@@ -200,6 +207,31 @@ export class Learn {
       this.showTask(step.task);
     } catch (e) {
       this.error.set(problemMessage(e, 'Не удалось загрузить задание.'));
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  /** «Не могу слушать»: на час без заданий на слух, текущее заменяется другим по тому же слову — без штрафа. */
+  protected async muteAudio(): Promise<void> {
+    const id = this.sessionId();
+    if (!id || this.busy()) {
+      return;
+    }
+    this.busy.set(true);
+    try {
+      const step = await this.api.invoke(muteSessionAudio, { id, minutes: 60 });
+      toast.info('Час без заданий на слух', { description: 'Слово останется в занятии — в другом формате.' });
+      this.progress.set(step.progress);
+      this.stats.set(step.stats);
+      if (step.finished || !step.task) {
+        this.task.set(null);
+        this.phase.set('finished');
+      } else {
+        this.showTask(step.task);
+      }
+    } catch (e) {
+      this.error.set(problemMessage(e, 'Не удалось переключить задание.'));
     } finally {
       this.busy.set(false);
     }

@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
 import { DayStatDto } from '../../core/api/models/day-stat-dto';
 
@@ -26,7 +25,6 @@ export function dayLabel(iso: string): string {
  */
 @Component({
   selector: 'app-stats-chart',
-  imports: [DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -70,7 +68,7 @@ export function dayLabel(iso: string): string {
                    [style.left.%]="h.left" role="status">
                 <p class="font-medium">{{ dayLabel(h.day.day) }}</p>
                 @if (+h.day.reviews > 0) {
-                  <p class="tabular-nums">Ответов: {{ h.day.reviews }} · верно {{ (+h.day.successful / +h.day.reviews) * 100 | number: '1.0-0' }}%</p>
+                  <p class="tabular-nums">Ответов: {{ h.day.reviews }} · верно {{ pct(h.day) }}%</p>
                   <p class="text-muted-foreground tabular-nums">Новых слов: {{ h.day.newWords }}</p>
                 } @else {
                   <p class="text-muted-foreground">Без занятий</p>
@@ -99,7 +97,7 @@ export function dayLabel(iso: string): string {
                 <tr class="border-t">
                   <td class="py-1">{{ dayLabel(d.day) }}</td>
                   <td class="text-end">{{ d.reviews }}</td>
-                  <td class="text-end">{{ (+d.successful / +d.reviews) * 100 | number: '1.0-0' }}%</td>
+                  <td class="text-end">{{ pct(d) }}%</td>
                   <td class="text-end">{{ d.newWords }}</td>
                 </tr>
               } @empty {
@@ -128,6 +126,10 @@ export class StatsChart {
     const left = Math.min(80, Math.max(20, ((i + 0.5) / days.length) * 100));
     return { day: days[i], left };
   });
+
+  protected pct(d: DayStatDto): number {
+    return Number(d.reviews) > 0 ? Math.round((Number(d.successful) / Number(d.reviews)) * 100) : 0;
+  }
 
   protected short(iso: string | undefined): string {
     if (!iso) return '';

@@ -1,0 +1,39 @@
+/* Палитра «lavender». Подключается при выборе в профиле (см. index.html, window.epTheme). */
+:root[data-palette="lavender"] {
+  --background: oklch(0.99 0.007 298);
+  --foreground: oklch(0.19 0.03 298);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.19 0.03 298);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.19 0.03 298);
+  --primary: oklch(0.52 0.2 295);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.014 298);
+  --secondary-foreground: oklch(0.23 0.03 298);
+  --muted: oklch(0.96 0.014 298);
+  --muted-foreground: oklch(0.52 0.03 298);
+  --accent: oklch(0.95 0.021 298);
+  --accent-foreground: oklch(0.23 0.03 298);
+  --border: oklch(0.91 0.0175 298);
+  --input: oklch(0.91 0.0175 298);
+  --ring: oklch(0.52 0.2 295);
+  --sidebar-primary: oklch(0.52 0.2 295);
+}
+:root.dark[data-palette="lavender"] {
+  --background: oklch(0.17 0.021 298);
+  --foreground: oklch(0.97 0.007 298);
+  --card: oklch(0.21 0.0245 298);
+  --card-foreground: oklch(0.97 0.007 298);
+  --popover: oklch(0.21 0.0245 298);
+  --popover-foreground: oklch(0.97 0.007 298);
+  --primary: oklch(0.75 0.15 300);
+  --primary-foreground: oklch(0.17 0.021 298);
+  --secondary: oklch(0.27 0.028 298);
+  --secondary-foreground: oklch(0.97 0.007 298);
+  --muted: oklch(0.27 0.028 298);
+  --muted-foreground: oklch(0.72 0.03 298);
+  --accent: oklch(0.29 0.0315 298);
+  --accent-foreground: oklch(0.97 0.007 298);
+  --ring: oklch(0.75 0.15 300);
+  --sidebar-primary: oklch(0.75 0.15 300);
+}
