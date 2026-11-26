@@ -1,0 +1,434 @@
+<div class="mx-auto flex w-full max-w-lg flex-col gap-4">
+  @if (phase() === 'task' || phase() === 'feedback') {
+    <div class="flex items-center gap-3">
+      <button hlmBtn variant="ghost" size="icon" type="button" aria-label="Завершить занятие" [disabled]="busy()" (click)="finish()">
+        <ng-icon name="lucideX" />
+      </button>
+      <div
+        class="bg-muted h-2.5 flex-1 overflow-hidden rounded-full"
+        role="progressbar"
+        aria-label="Прогресс занятия"
+        [attr.aria-valuenow]="progress().done"
+        [attr.aria-valuemax]="progress().total"
+      >
+        <div class="bg-primary h-full rounded-full transition-[width] duration-300" [style.width.%]="percent()"></div>
+      </div>
+      <span class="text-muted-foreground w-14 text-end text-sm tabular-nums">{{ progress().done }}/{{ progress().total }}</span>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <app-error-alert [message]="message" />
+  }
+
+  @switch (phase()) {
+    @case ('loading') {
+      <div class="text-muted-foreground flex items-center gap-2 py-10"><hlm-spinner aria-label="Загрузка" /> Готовим занятие…</div>
+    }
+
+    @case ('start') {
+      <section hlmCard>
+        <div hlmCardHeader>
+          <h1 hlmCardTitle class="text-2xl">Занятие</h1>
+          @if (today(); as t) {
+            <p hlmCardDescription>
+              @if (todayCount() > 0) {
+                Сейчас в занятии: {{ todayLabel() }}.
+              } @else if (+t.newAvailable === 0 && +t.reviewsDue === 0) {
+                Слов для занятий пока нет — добавьте их в словарь.
+              } @else {
+                На сегодня всё: дневной лимит выполнен. Возвращайтесь завтра.
+              }
+            </p>
+          }
+        </div>
+        @if (today(); as t) {
+          <div hlmCardContent>
+            <dl class="grid grid-cols-2 gap-3">
+              <div class="bg-muted/60 rounded-2xl p-4">
+                <dt class="text-muted-foreground text-sm">К повторению</dt>
+                <dd class="text-2xl font-semibold tabular-nums">{{ t.reviewsDue }}</dd>
+              </div>
+              <div class="bg-muted/60 rounded-2xl p-4">
+                <dt class="text-muted-foreground text-sm">Новые сегодня</dt>
+                <dd class="text-2xl font-semibold tabular-nums">{{ t.newDoneToday }} <span class="text-muted-foreground text-base font-normal">/ {{ t.newLimit }}</span></dd>
+              </div>
+            </dl>
+          </div>
+          <div hlmCardFooter class="flex flex-col gap-2 sm:flex-row">
+            @if (todayCount() > 0) {
+              <button hlmBtn type="button" class="h-12 w-full text-base sm:w-auto" [disabled]="busy()" (click)="start()">
+                @if (busy()) {
+                  <hlm-spinner aria-label="Начинаем" />
+                } @else {
+                  <ng-icon name="lucidePlay" />
+                }
+                {{ t.activeSessionId ? 'Продолжить занятие' : 'Начать занятие' }}
+              </button>
+            } @else {
+              <a hlmBtn class="h-12 w-full sm:w-auto" routerLink="/dictionary" [queryParams]="{ tab: 'base' }">Добавить слова</a>
+            }
+            <a hlmBtn variant="ghost" class="h-12 w-full sm:w-auto" routerLink="/plan">Моя программа</a>
+          </div>
+        }
+      </section>
+
+      @if (problemWords() > 0 || weakTags().length > 0) {
+        <section hlmCard>
+          <div hlmCardHeader>
+            <h2 hlmCardTitle class="flex items-center gap-2"><ng-icon name="lucideFlame" class="text-amber-500" /> Работа над ошибками</h2>
+            <p hlmCardDescription>
+              @if (problemWords() > 0) {
+                Слова, в которых вы часто ошибаетесь: {{ problemWords() }}. Сначала разминка полегче, потом — как обычно.
+              } @else {
+                Проблемных слов пока нет — так держать.
+              }
+            </p>
+          </div>
+          @if (weakTags().length > 0) {
+            <div hlmCardContent>
+              <h3 class="text-muted-foreground mb-2 text-sm font-medium">Чаще всего</h3>
+              <ul class="flex flex-col gap-2">
+                @for (tag of weakTags(); track tag.code) {
+                  <li class="flex items-center gap-3">
+                    <span class="w-28 shrink-0 text-sm">{{ tag.title }}</span>
+                    <div class="bg-muted h-2 flex-1 overflow-hidden rounded-full">
+                      <div class="h-full rounded-full bg-amber-500" [style.width.%]="Math.min(100, +tag.share * 100 * 3)"></div>
+                    </div>
+                    <span class="text-muted-foreground w-10 text-end text-sm tabular-nums">{{ tag.count }}</span>
+                    @if (tag.topicSlug) {
+                      <a hlmBtn variant="ghost" size="sm" [routerLink]="['/grammar', tag.topicSlug]" [attr.aria-label]="'Правило: ' + tag.topicTitle">
+                        <ng-icon name="lucideBookMarked" />
+                      </a>
+                    } @else {
+                      <span class="size-8"></span>
+                    }
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+          <div hlmCardFooter class="flex flex-col gap-2 sm:flex-row">
+            @if (problemWords() > 0) {
+              <button hlmBtn variant="outline" type="button" class="h-12 w-full sm:w-auto" [disabled]="busy()" (click)="start('Mistakes')">
+                <ng-icon name="lucideFlame" />
+                Разобрать ошибки ({{ problemWords() }})
+              </button>
+            }
+            <a hlmBtn variant="ghost" class="h-12 w-full sm:w-auto" routerLink="/grammar">Все правила</a>
+          </div>
+        </section>
+      }
+    }
+
+    @case ('finished') {
+      <section hlmCard>
+        <div hlmCardHeader class="items-center text-center">
+          <span class="bg-primary/10 text-primary mx-auto flex size-14 items-center justify-center rounded-full">
+            <ng-icon name="lucideSparkles" class="text-2xl" />
+          </span>
+          <h1 hlmCardTitle class="text-2xl">{{ kind() === 'Mistakes' ? 'Ошибки разобраны' : 'Занятие завершено' }}</h1>
+          @if (+(stats()?.answered ?? 0) === 0) {
+            <p hlmCardDescription>Сейчас заниматься нечем — все слова ждут своего часа.</p>
+          }
+        </div>
+        @if (stats(); as s) {
+          @if (+s.answered > 0) {
+            <div hlmCardContent>
+              <dl class="grid grid-cols-2 gap-3">
+                <div class="bg-muted/60 rounded-2xl p-4">
+                  <dt class="text-muted-foreground text-sm">Верно</dt>
+                  <dd class="text-2xl font-semibold tabular-nums">{{ accuracy() }}%</dd>
+                </div>
+                <div class="bg-muted/60 rounded-2xl p-4">
+                  <dt class="text-muted-foreground text-sm">Ответов</dt>
+                  <dd class="text-2xl font-semibold tabular-nums">{{ s.answered }}</dd>
+                </div>
+                <div class="bg-muted/60 rounded-2xl p-4">
+                  <dt class="text-muted-foreground text-sm">Новых слов</dt>
+                  <dd class="text-2xl font-semibold tabular-nums">{{ s.newWords }}</dd>
+                </div>
+                <div class="bg-muted/60 rounded-2xl p-4">
+                  <dt class="text-muted-foreground text-sm">Время</dt>
+                  <dd class="text-2xl font-semibold tabular-nums">{{ duration(+s.durationSeconds) }}</dd>
+                </div>
+              </dl>
+            </div>
+          }
+        }
+        <div hlmCardFooter class="flex flex-col gap-2 sm:flex-row">
+          <button hlmBtn type="button" class="h-12 w-full sm:w-auto" (click)="again()">Проверить, есть ли ещё</button>
+          <a hlmBtn variant="ghost" class="h-12 w-full sm:w-auto" routerLink="/dictionary">Мой словарь</a>
+        </div>
+      </section>
+    }
+
+    @default {
+      @if (task(); as t) {
+        @switch (t.kind) {
+          @case ('Introduce') {
+            @if (t.word; as w) {
+              <section hlmCard>
+                <div hlmCardHeader>
+                  <div class="flex items-center gap-2">
+                    @if (t.isWarmUp) {
+                      <span hlmBadge variant="secondary"><ng-icon name="lucideFlame" /> Повторим это слово</span>
+                    } @else {
+                      <span hlmBadge variant="secondary"><ng-icon name="lucideSparkles" /> Новое слово</span>
+                    }
+                    @if (w.level) {
+                      <span hlmBadge variant="outline">{{ w.level }}</span>
+                    }
+                    @if (t.promptNote) {
+                      <span hlmBadge variant="outline">{{ t.promptNote }}</span>
+                    }
+                  </div>
+                  <div class="flex items-start gap-2 pt-3">
+                    <div class="flex-1">
+                      <h1 class="text-4xl font-semibold tracking-tight break-words" lang="en">{{ w.text }}</h1>
+                      <span class="text-muted-foreground font-mono">{{ transcription(w.transcription) }}</span>
+                    </div>
+                    <app-speak-button [text]="w.text" [audioUrl]="w.audioUrl" />
+                  </div>
+                </div>
+                <div hlmCardContent class="flex flex-col gap-4">
+                  <p class="text-xl">{{ w.translations.join(', ') }}</p>
+                  @if (w.example) {
+                    <div class="border-primary/30 border-s-2 ps-3">
+                      <div class="flex items-start gap-1">
+                        <p class="flex-1 italic" lang="en">{{ w.example }}</p>
+                        <app-speak-button [text]="w.example" />
+                      </div>
+                      @if (w.exampleTranslation) {
+                        <p class="text-muted-foreground text-sm">{{ w.exampleTranslation }}</p>
+                      }
+                    </div>
+                  }
+                </div>
+                <div hlmCardFooter>
+                  <button hlmBtn type="button" class="h-12 w-full text-base" [disabled]="busy()" (click)="continueIntro()">
+                    {{ t.isWarmUp ? 'Помню, дальше' : 'Запомнил, проверить' }}
+                    <ng-icon name="lucideArrowRight" />
+                  </button>
+                </div>
+              </section>
+            }
+          }
+
+          @case ('ChooseTranslation') {
+            <ng-container *ngTemplateOutlet="choice" />
+          }
+
+          @case ('ListenChoose') {
+            <ng-container *ngTemplateOutlet="choice" />
+          }
+
+          @case ('ChooseWord') {
+            <ng-container *ngTemplateOutlet="choice" />
+          }
+
+          @default {
+            <section hlmCard>
+              <div hlmCardHeader>
+                <p class="text-muted-foreground text-sm">
+                  @if (t.isProblem) {
+                    <span class="text-amber-600 dark:text-amber-400">Трудное слово ·</span>
+                  }
+                  {{ t.kind === 'FillGap' ? 'Вставьте слово в предложение' : 'Напишите по-английски' }}
+                  @if (t.promptNote) {
+                    · {{ t.promptNote }}
+                  }
+                </p>
+                <h1 class="pt-1 text-2xl font-semibold">{{ t.prompt }}</h1>
+              </div>
+              <div hlmCardContent class="flex flex-col gap-4">
+                @if (t.sentence) {
+                  <div>
+                    <p class="text-lg leading-relaxed" lang="en">{{ t.sentence }}</p>
+                    @if (t.sentenceTranslation) {
+                      <p class="text-muted-foreground text-sm">{{ t.sentenceTranslation }}</p>
+                    }
+                  </div>
+                }
+                <input
+                  #answerInput
+                  hlmInput
+                  class="h-12 text-lg"
+                  lang="en"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  autocorrect="off"
+                  spellcheck="false"
+                  aria-label="Ваш ответ"
+                  [placeholder]="hintShown() && t.hint ? t.hint : 'Ваш ответ'"
+                  [ngModel]="typed()"
+                  (ngModelChange)="typed.set($event)"
+                  [disabled]="phase() === 'feedback'"
+                  (keydown.enter)="phase() === 'task' ? check() : null"
+                />
+                @if (phase() === 'task') {
+                  <!-- На телефоне «Проверить» на всю ширину сверху, подсказка и «Не знаю» — строкой ниже. -->
+                  <div class="flex flex-col gap-2 sm:flex-row-reverse sm:items-center">
+                    <button hlmBtn type="button" class="h-12 w-full text-base sm:w-auto sm:px-8" [disabled]="busy() || !typed().trim()" (click)="check()">
+                      Проверить
+                    </button>
+                    <div class="flex gap-2 sm:me-auto">
+                      @if (t.hint && !hintShown()) {
+                        <button hlmBtn variant="ghost" type="button" class="h-11 flex-1 sm:flex-none" (click)="showHint()">
+                          <ng-icon name="lucideLightbulb" />
+                          Подсказка
+                        </button>
+                      }
+                      <button hlmBtn variant="ghost" type="button" class="h-11 flex-1 sm:flex-none" [disabled]="busy()" (click)="dontKnow()">Не знаю</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          }
+        }
+
+        <ng-template #choice>
+          <section hlmCard>
+            <div hlmCardHeader class="items-center text-center">
+              @if (t.kind === 'ListenChoose') {
+                <p class="text-muted-foreground text-sm">Послушайте и выберите перевод</p>
+                <button
+                  hlmBtn
+                  variant="outline"
+                  type="button"
+                  class="mx-auto mt-2 size-20 rounded-full"
+                  aria-label="Послушать ещё раз"
+                  (click)="speak(t.audioText, t.audioUrl)"
+                >
+                  <ng-icon name="lucideVolume2" class="text-3xl" />
+                </button>
+                @if (phase() === 'feedback') {
+                  <p class="pt-2 text-2xl font-semibold" lang="en">{{ t.audioText }}</p>
+                }
+              } @else if (t.kind === 'ChooseWord') {
+                <p class="text-muted-foreground text-sm">
+                  @if (t.isWarmUp) {
+                    <span class="text-amber-600 dark:text-amber-400">Разминка ·</span>
+                  }
+                  Выберите английское слово
+                  @if (t.promptNote) {
+                    · {{ t.promptNote }}
+                  }
+                </p>
+                <h1 class="pt-1 text-2xl font-semibold">{{ t.prompt }}</h1>
+              } @else {
+                <p class="text-muted-foreground text-sm">
+                  Выберите перевод
+                  @if (t.promptNote) {
+                    · {{ t.promptNote }}
+                  }
+                </p>
+                <div class="flex items-center justify-center gap-1 pt-1">
+                  <h1 class="text-3xl font-semibold tracking-tight break-words" lang="en">{{ t.prompt }}</h1>
+                  <app-speak-button [text]="t.prompt" />
+                </div>
+              }
+            </div>
+            <div hlmCardContent>
+              <div class="grid gap-2">
+                @for (option of t.options; track $index; let i = $index) {
+                  <button
+                    type="button"
+                    class="flex min-h-14 items-center gap-3 rounded-2xl border px-4 py-3 text-start text-base transition-colors disabled:cursor-default"
+                    [class]="
+                      phase() === 'feedback'
+                        ? i === correctOption()
+                          ? 'border-success bg-success/10'
+                          : i === chosen()
+                            ? 'border-destructive bg-destructive/10'
+                            : 'opacity-60'
+                        : 'hover:border-primary/50 hover:bg-primary/5 active:scale-[0.99]'
+                    "
+                    [disabled]="phase() === 'feedback' || busy()"
+                    (click)="choose(i)"
+                  >
+                    <span class="text-muted-foreground bg-muted flex size-7 shrink-0 items-center justify-center rounded-lg text-sm tabular-nums">{{ i + 1 }}</span>
+                    <span class="flex-1" [attr.lang]="t.kind === 'ChooseWord' ? 'en' : null">{{ option }}</span>
+                    @if (phase() === 'feedback' && i === correctOption()) {
+                      <ng-icon name="lucideCircleCheck" class="text-success text-xl" />
+                    } @else if (phase() === 'feedback' && i === chosen()) {
+                      <ng-icon name="lucideCircleX" class="text-destructive text-xl" />
+                    } @else if (busy() && i === chosen()) {
+                      <hlm-spinner />
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          </section>
+        </ng-template>
+      }
+
+      @if (phase() === 'feedback') {
+        @if (result(); as r) {
+          <section
+            class="bg-background sticky bottom-2 flex flex-col gap-3 rounded-3xl border-2 p-4 shadow-xl"
+            [class]="r.verdict === 'Correct' ? 'border-success/60' : r.verdict === 'Almost' ? 'border-amber-500/60' : 'border-destructive/60'"
+            aria-live="polite"
+          >
+            <div class="flex items-start gap-2 font-semibold">
+              @if (r.verdict === 'Correct') {
+                <ng-icon name="lucideCircleCheck" class="text-success mt-0.5 shrink-0 text-xl" />
+              } @else if (r.verdict === 'Almost') {
+                <ng-icon name="lucideCircleAlert" class="mt-0.5 shrink-0 text-xl text-amber-600 dark:text-amber-400" />
+              } @else {
+                <ng-icon name="lucideCircleX" class="text-destructive mt-0.5 shrink-0 text-xl" />
+              }
+              <span>{{ r.explanation }}</span>
+            </div>
+
+            <div class="bg-muted/60 flex items-start gap-2 rounded-2xl p-3">
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-baseline gap-x-2">
+                  <span class="font-semibold" lang="en">{{ r.word.text }}</span>
+                  <span class="text-muted-foreground font-mono text-sm">{{ transcription(r.word.transcription) }}</span>
+                </div>
+                <p class="text-sm">{{ r.word.translations.join(', ') }}</p>
+                @if (r.isWarmUp) {
+                  <p class="text-muted-foreground pt-1 text-xs">Это была разминка, сейчас — основное задание.</p>
+                } @else if (r.nextReviewAt) {
+                  <p class="text-muted-foreground pt-1 text-xs">Повторим {{ nextReview(r.nextReviewAt) }}</p>
+                }
+                @if (r.recallUnlocked) {
+                  <p class="text-primary pt-1 text-xs font-medium">Слово узнаётся уверенно — дальше будем учиться вспоминать его самому.</p>
+                }
+              </div>
+              <app-speak-button [text]="r.word.text" [audioUrl]="r.word.audioUrl" />
+            </div>
+
+            @if (r.rule; as rule) {
+              @if (rule.text) {
+                <div class="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
+                  <p class="mb-1 flex items-center gap-1.5 font-medium">
+                    <ng-icon name="lucideBookMarked" class="text-amber-600 dark:text-amber-400" />
+                    {{ rule.topicTitle ?? rule.tagTitle }}
+                  </p>
+                  <p class="text-muted-foreground">{{ rule.text }}</p>
+                  @if (rule.topicSlug) {
+                    <a [routerLink]="['/grammar', rule.topicSlug]" target="_blank" class="text-primary mt-1 inline-block font-medium underline-offset-4 hover:underline">
+                      Подробнее о правиле
+                    </a>
+                  }
+                </div>
+              }
+            }
+
+            <button #nextButton hlmBtn type="button" class="h-12 w-full text-base" [disabled]="busy()" (click)="loadNext()">
+              @if (busy()) {
+                <hlm-spinner aria-label="Загрузка" />
+              }
+              Дальше
+              <ng-icon name="lucideArrowRight" />
+            </button>
+          </section>
+        }
+      }
+    }
+  }
+</div>

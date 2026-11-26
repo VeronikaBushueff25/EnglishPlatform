@@ -3,5 +3,9 @@
   <ItemGroup>
     <ProjectReference Include="../EnglishPlatform.LearningProfiles.Domain/EnglishPlatform.LearningProfiles.Domain.csproj" />
     <ProjectReference Include="../EnglishPlatform.LearningProfiles.Contracts/EnglishPlatform.LearningProfiles.Contracts.csproj" />
+    <ProjectReference Include="../../Users/EnglishPlatform.Users.Contracts/EnglishPlatform.Users.Contracts.csproj" />
+    <ProjectReference Include="../../Vocabulary/EnglishPlatform.Vocabulary.Contracts/EnglishPlatform.Vocabulary.Contracts.csproj" />
+    <ProjectReference Include="../../Grammar/EnglishPlatform.Grammar.Contracts/EnglishPlatform.Grammar.Contracts.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 </Project>

@@ -3,5 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="../EnglishPlatform.Grammar.Domain/EnglishPlatform.Grammar.Domain.csproj" />
     <ProjectReference Include="../EnglishPlatform.Grammar.Contracts/EnglishPlatform.Grammar.Contracts.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 </Project>

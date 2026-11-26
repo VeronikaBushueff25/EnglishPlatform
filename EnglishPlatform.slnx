@@ -72,6 +72,7 @@
     <Project Path="tests/EnglishPlatform.Architecture.Tests/EnglishPlatform.Architecture.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Identity.Tests/EnglishPlatform.Identity.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Integration.Tests/EnglishPlatform.Integration.Tests.csproj" />
+    <Project Path="tests/EnglishPlatform.Learning.Tests/EnglishPlatform.Learning.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Users.Tests/EnglishPlatform.Users.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Vocabulary.Tests/EnglishPlatform.Vocabulary.Tests.csproj" />
   </Folder>

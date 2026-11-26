@@ -4,14 +4,22 @@
       <span class="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-xl">
         <ng-icon name="lucideGraduationCap" class="text-lg" />
       </span>
-      English Platform
+      <span class="max-[430px]:sr-only">English Platform</span>
     </a>
 
     <nav class="nav flex items-center gap-1">
       @if (auth.isAuthenticated()) {
+        <a hlmBtn variant="ghost" size="sm" routerLink="/learn" routerLinkActive="text-primary" aria-label="Занятие">
+          <ng-icon name="lucidePlay" />
+          <span class="hidden sm:inline">Занятие</span>
+        </a>
         <a hlmBtn variant="ghost" size="sm" routerLink="/dictionary" routerLinkActive="text-primary" aria-label="Словарь">
           <ng-icon name="lucideBookOpen" />
           <span class="hidden sm:inline">Словарь</span>
+        </a>
+        <a hlmBtn variant="ghost" size="sm" routerLink="/stats" routerLinkActive="text-primary" aria-label="Статистика">
+          <ng-icon name="lucideChartColumn" />
+          <span class="hidden sm:inline">Статистика</span>
         </a>
         @if (auth.isAdmin()) {
           <a hlmBtn variant="ghost" size="sm" routerLink="/admin" routerLinkActive="text-primary" [routerLinkActiveOptions]="adminMatch" aria-label="Админка">

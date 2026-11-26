@@ -1,7 +1,11 @@
 namespace EnglishPlatform.Users.Contracts;
 
 /// <summary>Настройки, которые нужны другим модулям при сборке занятия.</summary>
-public sealed record UserLearningSettings(Guid UserId, int DailyNewWords, int DailyReviews, string TimeZone);
+/// <summary><c>Goals</c> — цели обучения строками (Conversation, Travel, Work…), нужны для подбора стартовых слов.</summary>
+public sealed record UserLearningSettings(Guid UserId, int DailyNewWords, int DailyReviews, string TimeZone)
+{
+    public IReadOnlyList<string> Goals { get; init; } = [];
+}
 
 public interface IUserLearningSettings
 {

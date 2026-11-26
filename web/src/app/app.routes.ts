@@ -41,6 +41,38 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
   },
   {
+    path: 'learn',
+    title: 'Занятие',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/learn/learn').then((m) => m.Learn),
+  },
+  {
+    path: 'stats',
+    title: 'Статистика',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/stats/stats').then((m) => m.Stats),
+  },
+  {
+    path: 'placement',
+    title: 'Тест уровня',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/placement/placement').then((m) => m.Placement),
+  },
+  {
+    path: 'plan',
+    title: 'Моя программа',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/placement/plan').then((m) => m.Plan),
+  },
+  {
+    path: 'grammar',
+    canActivate: [authGuard],
+    children: [
+      { path: '', title: 'Грамматика', loadComponent: () => import('./features/grammar/grammar-pages').then((m) => m.GrammarList) },
+      { path: ':slug', title: 'Правило', loadComponent: () => import('./features/grammar/grammar-pages').then((m) => m.GrammarTopicPage) },
+    ],
+  },
+  {
     path: 'dictionary',
     canActivate: [authGuard],
     children: [
@@ -97,6 +129,24 @@ export const routes: Routes = [
         title: 'Слово общей базы',
         loadComponent: () => import('./features/admin/lexemes/admin-lexeme-form').then((m) => m.AdminLexemeForm),
       },
+    ],
+  },
+  {
+    path: 'admin/placement',
+    canActivate: [adminGuard],
+    children: [
+      { path: '', title: 'Тест уровня', loadComponent: () => import('./features/admin/placement/admin-placement').then((m) => m.AdminPlacement) },
+      { path: 'new', title: 'Новый вопрос', loadComponent: () => import('./features/admin/placement/admin-placement').then((m) => m.AdminPlacementForm) },
+      { path: ':id', title: 'Вопрос теста', loadComponent: () => import('./features/admin/placement/admin-placement').then((m) => m.AdminPlacementForm) },
+    ],
+  },
+  {
+    path: 'admin/grammar',
+    canActivate: [adminGuard],
+    children: [
+      { path: '', title: 'Грамматика', loadComponent: () => import('./features/admin/grammar/admin-grammar').then((m) => m.AdminGrammar) },
+      { path: 'new', title: 'Новая тема', loadComponent: () => import('./features/admin/grammar/admin-grammar-form').then((m) => m.AdminGrammarForm) },
+      { path: ':id', title: 'Тема', loadComponent: () => import('./features/admin/grammar/admin-grammar-form').then((m) => m.AdminGrammarForm) },
     ],
   },
   {

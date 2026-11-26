@@ -2,7 +2,11 @@ import { HttpContext, HttpContextToken } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Api } from '../api/api';
-import { login, logout, refresh, register } from '../api/functions';
+// Функции API импортируются по отдельности, а не из общего functions.ts: иначе в начальный бандл попадают все эндпоинты.
+import { login } from '../api/fn/auth/login';
+import { logout } from '../api/fn/auth/logout';
+import { refresh } from '../api/fn/auth/refresh';
+import { register } from '../api/fn/auth/register';
 import { AuthResponse } from '../api/models/auth-response';
 import { LoginRequest } from '../api/models/login-request';
 import { RegisterRequest } from '../api/models/register-request';

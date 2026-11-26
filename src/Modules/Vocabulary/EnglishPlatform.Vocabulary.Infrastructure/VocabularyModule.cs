@@ -1,6 +1,7 @@
 using EnglishPlatform.BuildingBlocks.Infrastructure.Modules;
 using EnglishPlatform.BuildingBlocks.Infrastructure.Persistence;
 using EnglishPlatform.Vocabulary.Application;
+using EnglishPlatform.Vocabulary.Contracts;
 using EnglishPlatform.Vocabulary.Infrastructure.Endpoints;
 using EnglishPlatform.Vocabulary.Infrastructure.Persistence;
 using EnglishPlatform.Vocabulary.Infrastructure.Seed;
@@ -22,6 +23,8 @@ public sealed class VocabularyModule : IModule
         services.AddScoped<LexemeCatalog>();
         services.AddScoped<MyWordsService>();
         services.AddScoped<VocabularyAdminService>();
+        services.AddScoped<IUserWordsReader, UserWordsReader>();
+        services.AddScoped<IStarterWords, StarterWords>();
         services.AddScoped<IModuleInitializer, VocabularyInitializer>();
     }
 

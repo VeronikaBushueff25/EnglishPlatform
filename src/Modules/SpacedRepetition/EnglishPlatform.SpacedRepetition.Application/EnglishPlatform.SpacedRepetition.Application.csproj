@@ -3,5 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="../EnglishPlatform.SpacedRepetition.Domain/EnglishPlatform.SpacedRepetition.Domain.csproj" />
     <ProjectReference Include="../EnglishPlatform.SpacedRepetition.Contracts/EnglishPlatform.SpacedRepetition.Contracts.csproj" />
+    <ProjectReference Include="../../Vocabulary/EnglishPlatform.Vocabulary.Contracts/EnglishPlatform.Vocabulary.Contracts.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 </Project>

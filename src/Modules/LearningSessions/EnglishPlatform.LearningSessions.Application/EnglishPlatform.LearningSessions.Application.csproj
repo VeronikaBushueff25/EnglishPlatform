@@ -3,5 +3,12 @@
   <ItemGroup>
     <ProjectReference Include="../EnglishPlatform.LearningSessions.Domain/EnglishPlatform.LearningSessions.Domain.csproj" />
     <ProjectReference Include="../EnglishPlatform.LearningSessions.Contracts/EnglishPlatform.LearningSessions.Contracts.csproj" />
+    <ProjectReference Include="../../Exercises/EnglishPlatform.Exercises.Contracts/EnglishPlatform.Exercises.Contracts.csproj" />
+    <ProjectReference Include="../../SpacedRepetition/EnglishPlatform.SpacedRepetition.Contracts/EnglishPlatform.SpacedRepetition.Contracts.csproj" />
+    <ProjectReference Include="../../Vocabulary/EnglishPlatform.Vocabulary.Contracts/EnglishPlatform.Vocabulary.Contracts.csproj" />
+    <ProjectReference Include="../../Users/EnglishPlatform.Users.Contracts/EnglishPlatform.Users.Contracts.csproj" />
+    <ProjectReference Include="../../Analytics/EnglishPlatform.Analytics.Contracts/EnglishPlatform.Analytics.Contracts.csproj" />
+    <ProjectReference Include="../../Grammar/EnglishPlatform.Grammar.Contracts/EnglishPlatform.Grammar.Contracts.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
   </ItemGroup>
 </Project>

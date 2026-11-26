@@ -483,3 +483,4 @@ $RECYCLE.BIN/
 
 # Локальные секреты деплоя
 deploy/.env
+docs/

@@ -88,10 +88,13 @@ public sealed class UserLearningSettingsQuery(IUsersDb db) : IUserLearningSettin
 {
     public async Task<UserLearningSettings> GetAsync(Guid userId, CancellationToken cancellationToken)
     {
-        UserLearningSettings? settings = await db.Profiles.AsNoTracking()
-            .Where(p => p.Id == userId)
-            .Select(p => new UserLearningSettings(p.Id, p.DailyNewWords, p.DailyReviews, p.TimeZone))
-            .SingleOrDefaultAsync(cancellationToken);
+        UserProfile? profile = await db.Profiles.AsNoTracking().SingleOrDefaultAsync(p => p.Id == userId, cancellationToken);
+        UserLearningSettings? settings = profile is null
+            ? null
+            : new UserLearningSettings(profile.Id, profile.DailyNewWords, profile.DailyReviews, profile.TimeZone)
+            {
+                Goals = profile.Goals.Select(g => g.ToString()).ToList(),
+            };
 
         UserProfile defaults = UserProfile.CreateDefault(userId, DateTimeOffset.UnixEpoch);
         return settings ?? new UserLearningSettings(userId, defaults.DailyNewWords, defaults.DailyReviews, defaults.TimeZone);
