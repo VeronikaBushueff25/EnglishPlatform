@@ -94,5 +94,6 @@ export type { UpdateSettingsRequest } from './models/update-settings-request';
 export type { WeakFormatDto } from './models/weak-format-dto';
 export type { WeakSpotsDto } from './models/weak-spots-dto';
 export type { WeakTagDto } from './models/weak-tag-dto';
+export type { WordProgress } from './models/word-progress';
 export type { WordSuggestionDto } from './models/word-suggestion-dto';
 export type { WordView } from './models/word-view';

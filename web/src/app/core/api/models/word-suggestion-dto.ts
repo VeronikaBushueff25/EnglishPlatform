@@ -8,6 +8,7 @@ export interface WordSuggestionDto {
   level: (null | CefrLevel);
   partOfSpeech: (null | PartOfSpeech);
   suggestedExample: (string | null);
+  suggestedExampleTranslation?: (string | null);
   suggestedLevel: (null | CefrLevel);
   suggestedPartOfSpeech: (null | PartOfSpeech);
   suggestedText: (string | null);

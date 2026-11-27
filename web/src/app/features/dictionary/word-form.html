@@ -145,6 +145,9 @@
         </form>
       </div>
     </section>
+    @if (!isNew() && id(); as wordId) {
+      <app-word-progress [wordId]="wordId" />
+    }
   } @else {
     <div class="text-muted-foreground flex items-center gap-2"><hlm-spinner aria-label="Загрузка" /> Загружаем…</div>
   }

@@ -16,7 +16,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.brand')?.textContent).toContain('English Platform');
+    expect(compiled.querySelector('.brand')?.textContent).toContain('Owlish');
   });
 
   it('shows login and register links to a guest', async () => {

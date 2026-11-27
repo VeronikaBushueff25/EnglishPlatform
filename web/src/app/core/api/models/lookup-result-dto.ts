@@ -3,6 +3,7 @@
 
 import { LexemeDto } from '../models/lexeme-dto';
 export interface LookupResultDto {
+  dictionaryUnavailable?: boolean;
   formOf: (string | null);
   fromDictionary: boolean;
   items: Array<LexemeDto>;

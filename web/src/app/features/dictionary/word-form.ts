@@ -18,6 +18,7 @@ import { LexemeType } from '../../core/api/models/lexeme-type';
 import { MyWordDto } from '../../core/api/models/my-word-dto';
 import { problemMessage } from '../../core/http/problem';
 import { ConfirmDelete } from '../../shared/confirm-delete';
+import { WordProgressCard } from '../../shared/word-progress';
 import { ErrorAlert } from '../../shared/error-alert';
 import { SpeakButton } from '../../shared/pronunciation';
 import {
@@ -36,6 +37,7 @@ const MAX_TRANSLATIONS = 10;
 @Component({
   selector: 'app-word-form',
   imports: [
+    WordProgressCard,
     ReactiveFormsModule,
     RouterLink,
     NgIcon,

@@ -41,6 +41,8 @@ export type { LookupWord$Params as LookupWord$Params } from './fn/dictionary/loo
 export { lookupWord as lookupWord } from './fn/dictionary/lookup-word';
 export type { ListMyWordTexts$Params as ListMyWordTexts$Params } from './fn/my-words/list-my-word-texts';
 export { listMyWordTexts as listMyWordTexts } from './fn/my-words/list-my-word-texts';
+export type { ListMyWordProgress$Params as ListMyWordProgress$Params } from './fn/my-words/list-my-word-progress';
+export { listMyWordProgress as listMyWordProgress } from './fn/my-words/list-my-word-progress';
 export type { ListMyWords$Params as ListMyWords$Params } from './fn/my-words/list-my-words';
 export { listMyWords as listMyWords } from './fn/my-words/list-my-words';
 export type { AddMyWord$Params as AddMyWord$Params } from './fn/my-words/add-my-word';

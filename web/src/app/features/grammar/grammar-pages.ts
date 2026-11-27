@@ -101,7 +101,7 @@ export class GrammarList {
                       <div class="min-w-0 flex-1">
                         <p lang="en" [class.line-through]="example.isWrong" [class.text-muted-foreground]="example.isWrong">{{ example.text }}</p>
                         @if (example.translation) {
-                          <p class="text-muted-foreground text-sm">{{ example.translation }}</p>
+                          <p translate="no" class="text-muted-foreground text-sm">{{ example.translation }}</p>
                         }
                       </div>
                       @if (!example.isWrong) {

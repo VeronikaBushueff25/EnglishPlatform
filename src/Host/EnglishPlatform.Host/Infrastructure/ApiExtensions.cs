@@ -15,7 +15,7 @@ internal static class ApiExtensions
 
         services.AddOpenApi("v1", options => options.AddDocumentTransformer((document, _, _) =>
         {
-            document.Info.Title = "English Platform API";
+            document.Info.Title = "Owlish API";
             document.Components ??= new OpenApiComponents();
             document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
             document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme

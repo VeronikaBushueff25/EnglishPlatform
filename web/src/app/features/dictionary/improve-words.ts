@@ -48,7 +48,8 @@ export function changesOf(s: WordSuggestionDto): Change[] {
     changes.push({ field: 'transcription', label: 'Транскрипция', from: '—', to: formatTranscription(s.suggestedTranscription) });
   }
   if (s.suggestedExample) {
-    changes.push({ field: 'example', label: 'Пример', from: '—', to: s.suggestedExample });
+    const translation = s.suggestedExampleTranslation ? ` — ${s.suggestedExampleTranslation}` : '';
+    changes.push({ field: 'example', label: 'Пример', from: '—', to: s.suggestedExample + translation });
   }
   return changes;
 }
@@ -64,6 +65,7 @@ export function toApply(s: WordSuggestionDto, picked: ReadonlySet<Field>): Apply
     partOfSpeech: picked.has('partOfSpeech') ? s.suggestedPartOfSpeech : null,
     transcription: picked.has('transcription') ? s.suggestedTranscription : null,
     example: picked.has('example') ? s.suggestedExample : null,
+    exampleTranslation: picked.has('example') ? (s.suggestedExampleTranslation ?? null) : null,
   };
 }
 
@@ -145,7 +147,7 @@ export function toApply(s: WordSuggestionDto, picked: ReadonlySet<Field>): Apply
             <li hlmCard class="gap-2 py-4">
               <div class="flex flex-wrap items-baseline gap-2 px-5">
                 <span class="text-lg font-semibold" lang="en">{{ s.text }}</span>
-                <span class="text-muted-foreground text-sm">{{ s.translations.join(', ') }}</span>
+                <span translate="no" class="text-muted-foreground text-sm">{{ s.translations.join(', ') }}</span>
               </div>
               <ul class="flex flex-col gap-1 px-5">
                 @for (c of changes(s); track c.field) {

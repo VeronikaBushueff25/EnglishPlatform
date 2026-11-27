@@ -15,7 +15,7 @@ test('new user goes from registration to statistics', async ({ page }) => {
     await page.locator('button[type=submit]').click();
     // После регистрации — профиль: цели и нагрузка.
     await expect(page.getByRole('heading', { name: 'Аккаунт создан' })).toBeVisible();
-    await page.getByRole('link', { name: 'English Platform' }).click();
+    await page.getByRole('link', { name: 'Owlish' }).click();
     await expect(page.getByText('Определите свой уровень')).toBeVisible();
   });
 

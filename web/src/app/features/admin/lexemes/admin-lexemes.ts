@@ -114,7 +114,7 @@ const PAGE_SIZE = 30;
                       <span class="font-semibold break-words">{{ lexeme.text }}</span>
                       <span class="text-muted-foreground font-mono text-sm">{{ transcription(lexeme.transcription) }}</span>
                     </div>
-                    <span class="text-sm break-words">{{ lexeme.translations.join(', ') }}</span>
+                    <span translate="no" class="text-sm break-words">{{ lexeme.translations.join(', ') }}</span>
                     <div class="flex flex-wrap gap-1.5 pt-1">
                       @if (lexeme.level) {
                         <span hlmBadge variant="secondary">{{ lexeme.level }}</span>

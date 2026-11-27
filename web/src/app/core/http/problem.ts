@@ -1,4 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { tr } from '../i18n/tr';
 
 interface ProblemBody {
   title?: string | null;
@@ -8,9 +9,13 @@ interface ProblemBody {
 
 /**
  * Текст ошибки для пользователя из ответа API (ProblemDetails / ValidationProblemDetails).
- * Сообщения сервера уже на русском, поэтому показываем их как есть.
+ * Сообщения сервера на русском; в английском интерфейсе каждое переводится по словарю (tr).
  */
 export function problemMessage(error: unknown, fallback = 'Что-то пошло не так. Попробуйте ещё раз.'): string {
+  return tr(rawProblemMessage(error, fallback));
+}
+
+function rawProblemMessage(error: unknown, fallback: string): string {
   if (!(error instanceof HttpErrorResponse)) {
     return fallback;
   }
@@ -24,7 +29,7 @@ export function problemMessage(error: unknown, fallback = 'Что-то пошл�
   const body = parseBody(error.error);
   const fieldErrors = Object.values(body?.errors ?? {}).flat();
   if (fieldErrors.length > 0) {
-    return [body?.detail, ...fieldErrors].filter(Boolean).join(' ');
+    return [body?.detail, ...fieldErrors].filter((m): m is string => !!m).map(tr).join(' ');
   }
   return body?.detail || body?.title || fallback;
 }

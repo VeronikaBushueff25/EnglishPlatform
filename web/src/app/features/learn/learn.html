@@ -192,7 +192,7 @@
                   </div>
                 </div>
                 <div hlmCardContent class="flex flex-col gap-4">
-                  <p class="text-xl">{{ w.translations.join(', ') }}</p>
+                  <p translate="no" class="text-xl">{{ w.translations.join(', ') }}</p>
                   @if (w.example) {
                     <div class="border-primary/30 border-s-2 ps-3">
                       <div class="flex items-start gap-1">
@@ -200,7 +200,7 @@
                         <app-speak-button [text]="w.example" />
                       </div>
                       @if (w.exampleTranslation) {
-                        <p class="text-muted-foreground text-sm">{{ w.exampleTranslation }}</p>
+                        <p translate="no" class="text-muted-foreground text-sm">{{ w.exampleTranslation }}</p>
                       }
                     </div>
                   }
@@ -239,7 +239,7 @@
                     · {{ t.promptNote }}
                   }
                 </p>
-                <h1 class="pt-1 text-2xl font-semibold">{{ t.prompt }}</h1>
+                <h1 translate="no" class="pt-1 text-2xl font-semibold">{{ t.prompt }}</h1>
               </div>
               <div hlmCardContent class="flex flex-col gap-4">
                 @if (t.sentence) {
@@ -321,7 +321,7 @@
                     · {{ t.promptNote }}
                   }
                 </p>
-                <h1 class="pt-1 text-2xl font-semibold">{{ t.prompt }}</h1>
+                <h1 translate="no" class="pt-1 text-2xl font-semibold">{{ t.prompt }}</h1>
               } @else {
                 <p class="text-muted-foreground text-sm">
                   Выберите перевод
@@ -354,7 +354,7 @@
                     (click)="choose(i)"
                   >
                     <span class="text-muted-foreground bg-muted flex size-7 shrink-0 items-center justify-center rounded-lg text-sm tabular-nums">{{ i + 1 }}</span>
-                    <span class="flex-1" [attr.lang]="t.kind === 'ChooseWord' ? 'en' : null">{{ option }}</span>
+                    <span translate="no" class="flex-1" [attr.lang]="t.kind === 'ChooseWord' ? 'en' : null">{{ option }}</span>
                     @if (phase() === 'feedback' && i === correctOption()) {
                       <ng-icon name="lucideCircleCheck" class="text-success text-xl" />
                     } @else if (phase() === 'feedback' && i === chosen()) {
@@ -394,7 +394,7 @@
                   <span class="font-semibold" lang="en">{{ r.word.text }}</span>
                   <span class="text-muted-foreground font-mono text-sm">{{ transcription(r.word.transcription) }}</span>
                 </div>
-                <p class="text-sm">{{ r.word.translations.join(', ') }}</p>
+                <p translate="no" class="text-sm">{{ r.word.translations.join(', ') }}</p>
                 @if (r.isWarmUp) {
                   <p class="text-muted-foreground pt-1 text-xs">Это была разминка, сейчас — основное задание.</p>
                 } @else if (r.nextReviewAt) {

@@ -16,6 +16,8 @@ import { ErrorAlert } from '../../shared/error-alert';
 import { Pager } from '../../shared/pager';
 import { SpeakButton } from '../../shared/pronunciation';
 import { WordLookup, looksEnglish } from '../../shared/word-lookup';
+import { STAGES, stageOf } from '../../shared/word-progress';
+import { listMyWordProgress } from '../../core/api/fn/my-words/list-my-word-progress';
 import { BulkBar, BulkChange } from './bulk-bar';
 import { EMPTY_FILTER, LexemeFilterValue, LexemeFilters, filterQuery } from './lexeme-filters';
 import { LEXEME_TYPE_LABELS, formatTranscription, fromBase, plural } from './vocabulary-labels';
@@ -69,6 +71,14 @@ export class Dictionary {
     params: () => (this.tab() === 'mine' ? this.query() : undefined),
     loader: ({ params }) => this.api.invoke(listMyWords, params),
   });
+
+  /** Этап каждого слова (новое, учу, узнаю, использую) — одним запросом на весь словарь. */
+  private readonly progress = resource({
+    params: () => (this.tab() === 'mine' ? {} : undefined),
+    loader: () => this.api.invoke(listMyWordProgress),
+  });
+  protected readonly stages = STAGES;
+  protected readonly stageById = computed(() => new Map((this.progress.value() ?? []).map((p) => [p.userWordId, stageOf(p)])));
 
   protected readonly lexemes = resource({
     params: () => (this.tab() === 'base' ? this.query() : undefined),

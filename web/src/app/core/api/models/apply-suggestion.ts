@@ -6,6 +6,7 @@ import { LexemeType } from '../models/lexeme-type';
 import { PartOfSpeech } from '../models/part-of-speech';
 export interface ApplySuggestion {
   example: (string | null);
+  exampleTranslation?: (string | null);
   level: (null | CefrLevel);
   partOfSpeech: (null | PartOfSpeech);
   text: (string | null);

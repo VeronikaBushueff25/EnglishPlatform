@@ -8,7 +8,7 @@ import { adminGuard, authGuard, guestGuard } from './core/auth/auth.guards';
 export const routes: Routes = [
   {
     path: '',
-    title: 'English Platform',
+    title: 'Owlish',
     loadComponent: () => import('./features/home/home').then((m) => m.Home),
   },
   {

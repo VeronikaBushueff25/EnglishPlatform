@@ -14,7 +14,8 @@ public sealed record LookupResultDto(
     string? FormOf,
     IReadOnlyList<LexemeDto> Items,
     bool FromDictionary,
-    Guid? MyCustomWordId);
+    Guid? MyCustomWordId,
+    bool DictionaryUnavailable = false);
 
 /// <summary>
 /// Поиск слова для пользователя: сначала общая база (и простые формы: cats → cat, stopped → stop),
@@ -79,7 +80,17 @@ public sealed class DictionaryLookup(
 
         if (found.Count == 0)
         {
-            (found, string? lemma) = await ImportAsync(text, depth: 0, cancellationToken);
+            (List<Lexeme> imported, string? lemma) result;
+            try
+            {
+                result = await ImportAsync(text, depth: 0, cancellationToken);
+            }
+            catch (DictionaryUnavailableException)
+            {
+                return (await ToResultAsync(text, null, [], false, cancellationToken)) with { DictionaryUnavailable = true };
+            }
+
+            (found, string? lemma) = result;
             fromDictionary = found.Count > 0;
             if (lemma is not null && !string.Equals(lemma, normalized, StringComparison.OrdinalIgnoreCase))
             {
@@ -106,7 +117,19 @@ public sealed class DictionaryLookup(
     {
         string normalized = TextNormalizer.Normalize(CleanQuery(text));
         List<Lexeme> found = await FindAsync([normalized], cancellationToken);
-        return found.Count > 0 ? (found, null) : await ImportAsync(normalized, 0, cancellationToken);
+        if (found.Count > 0)
+        {
+            return (found, null);
+        }
+
+        try
+        {
+            return await ImportAsync(normalized, 0, cancellationToken);
+        }
+        catch (DictionaryUnavailableException)
+        {
+            return ([], null); // проверим в следующий раз — ответ «недоступен» не кешируется
+        }
     }
 
     /// <summary>
@@ -125,7 +148,16 @@ public sealed class DictionaryLookup(
         DictionaryEntry? entry = null;
         if (needsDictionary)
         {
-            IReadOnlyList<DictionaryEntry> entries = await source.LookupAsync(lexeme.Text, cancellationToken);
+            IReadOnlyList<DictionaryEntry> entries;
+            try
+            {
+                entries = await source.LookupAsync(lexeme.Text, cancellationToken);
+            }
+            catch (DictionaryUnavailableException)
+            {
+                entries = [];
+            }
+
             entry = entries.FirstOrDefault(e => lexeme.PartOfSpeech is not null && e.PartOfSpeech == lexeme.PartOfSpeech && e.Translations.Count > 0)
                 ?? entries.FirstOrDefault(e => e.Translations.Count > 0);
         }

@@ -93,6 +93,7 @@ interface Card {
                   [class.shake]="wrong() === card.id"
                   [class.border-destructive]="wrong() === card.id"
                   [attr.lang]="card.lang"
+                  translate="no"
                   [disabled]="card.done"
                   (click)="pick(card)"
                 >
@@ -210,7 +211,7 @@ export class MatchGame {
         </div>
         <section hlmCard class="items-center gap-2 py-10 text-center" [class.border-success]="flash() === 'ok'" [class.border-destructive]="flash() === 'bad'">
           <p class="text-3xl font-semibold" lang="en">{{ r.word.text }}</p>
-          <p class="text-muted-foreground text-xl">{{ r.shown }}</p>
+          <p translate="no" class="text-muted-foreground text-xl">{{ r.shown }}</p>
         </section>
         <div class="grid grid-cols-2 gap-3">
           <button hlmBtn variant="outline" type="button" class="h-14 text-base" (click)="answer(false)"><ng-icon name="lucideX" /> Неверно</button>
@@ -326,7 +327,7 @@ export class BlitzGame {
       } @else if (word(); as w) {
         <p class="text-muted-foreground text-sm tabular-nums">{{ index() + 1 }} / {{ words().length }}</p>
         <section hlmCard class="items-center gap-4 py-8 text-center" [class.border-success]="status() === 'ok'" [class.border-destructive]="status() === 'bad'">
-          <p class="text-2xl font-semibold">{{ translation() }}</p>
+          <p translate="no" class="text-2xl font-semibold">{{ translation() }}</p>
           <div class="flex min-h-12 flex-wrap justify-center gap-1.5" lang="en" aria-live="polite">
             @for (slot of slots(); track $index) {
               <span class="bg-muted flex size-10 items-center justify-center rounded-xl text-xl font-semibold uppercase" [class.bg-primary/15]="slot">{{ slot }}</span>

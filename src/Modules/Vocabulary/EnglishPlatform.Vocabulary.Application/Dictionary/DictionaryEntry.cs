@@ -15,7 +15,13 @@ public sealed record DictionaryEntry(
     IReadOnlyList<string> Examples,
     string? LemmaOf);
 
-/// <summary>Внешний словарь (Викисловарь через kaikki.org). Пустой список — слова нет или источник недоступен.</summary>
+/// <summary>Внешний словарь не ответил (сеть, таймаут) — это не «слова нет», пользователю стоит попробовать позже.</summary>
+public sealed class DictionaryUnavailableException(string message, Exception? inner = null) : Exception(message, inner);
+
+/// <summary>
+/// Внешний словарь (Викисловарь через kaikki.org). Пустой список — слова нет;
+/// <see cref="DictionaryUnavailableException"/> — источник не ответил.
+/// </summary>
 public interface IDictionarySource
 {
     Task<IReadOnlyList<DictionaryEntry>> LookupAsync(string text, CancellationToken cancellationToken);

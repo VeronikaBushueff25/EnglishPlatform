@@ -17,7 +17,7 @@ public sealed class DictionaryOptions
     /// <summary>Статьи английского Викисловаря в формате kaikki.org: {BaseUrl}{p}/{pu}/{put off}.jsonl.</summary>
     public string BaseUrl { get; set; } = "https://kaikki.org/dictionary/English/meaning/";
 
-    public int TimeoutSeconds { get; set; } = 10;
+    public int TimeoutSeconds { get; set; } = 20;
 
     /// <summary>Поиск примеров с переводом (Tatoeba).</summary>
     public string TatoebaUrl { get; set; } = "https://tatoeba.org/en/api_v0/search";
@@ -54,11 +54,8 @@ public sealed class WiktionaryDictionarySource(
             return cached.Found ? WiktionaryParser.Parse(word, cached.Payload) : [];
         }
 
-        string? payload = await FetchAsync(word, cancellationToken);
-        if (payload is null)
-        {
-            return [];
-        }
+        string payload = await FetchAsync(word, cancellationToken)
+            ?? throw new DictionaryUnavailableException($"Словарь не ответил на «{word}»");
 
         IReadOnlyList<DictionaryEntry> entries = WiktionaryParser.Parse(word, payload);
         bool found = payload.Length > 0;

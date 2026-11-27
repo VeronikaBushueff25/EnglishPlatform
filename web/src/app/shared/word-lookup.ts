@@ -37,7 +37,12 @@ export function looksEnglish(text: string): boolean {
     } @else if (result.error()) {
       <p class="text-muted-foreground py-3 text-sm">Словарь сейчас недоступен. Попробуйте позже.</p>
     } @else if (view(); as r) {
-      @if (r.items.length === 0) {
+      @if (r.items.length === 0 && r.dictionaryUnavailable) {
+        <div class="text-muted-foreground flex flex-wrap items-center gap-2 py-3 text-sm">
+          <p>Словарь сейчас не ответил — «{{ text() }}» поищем ещё раз.</p>
+          <button hlmBtn variant="outline" size="sm" type="button" (click)="result.reload()">Повторить</button>
+        </div>
+      } @else if (r.items.length === 0) {
         <div class="text-muted-foreground flex flex-col gap-1 py-3 text-sm">
           <p>Не нашли «{{ text() }}» ни в базе, ни в словаре.</p>
           @if (showOwnWordLink()) {
@@ -86,9 +91,14 @@ export function looksEnglish(text: string): boolean {
                   </button>
                 }
               </div>
-              <p class="text-base">{{ translations(item) }}</p>
+              <p translate="no" class="text-base">{{ translations(item) }}</p>
               @if (item.examples[0]; as example) {
-                <p class="text-muted-foreground text-sm italic" lang="en">{{ example.text }}</p>
+                <p class="text-sm">
+                  <span class="italic" lang="en">{{ example.text }}</span>
+                  @if (example.translation) {
+                    <span translate="no" class="text-muted-foreground block">{{ example.translation }}</span>
+                  }
+                </p>
               }
             </article>
           }

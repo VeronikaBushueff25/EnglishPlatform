@@ -30,6 +30,7 @@ import { MeResponse } from '../../core/api/models/me-response';
 import { problemMessage } from '../../core/http/problem';
 import { Appearance } from '../../shared/appearance';
 import { ErrorAlert } from '../../shared/error-alert';
+import { I18n } from '../../core/i18n/i18n';
 import { GOAL_LABELS, LANGUAGE_LABELS, PLAN_LABELS, allTimeZones, browserTimeZone } from './profile-labels';
 
 @Component({
@@ -69,6 +70,7 @@ export class Profile {
   protected readonly browserZone = browserTimeZone();
 
   /** Профиль с сервера; после сохранения подменяется ответом PUT, без повторной загрузки. */
+  private readonly i18n = inject(I18n);
   protected readonly me = resource({ loader: () => this.api.invoke(getMe) });
   protected readonly loadError = computed(() =>
     this.me.error() ? problemMessage(this.me.error(), 'Не удалось загрузить профиль.') : null,
@@ -155,6 +157,7 @@ export class Profile {
           },
         }),
       );
+      await this.i18n.use(value.interfaceLanguage);
       toast.success('Настройки сохранены');
     } catch (e) {
       toast.error(problemMessage(e));

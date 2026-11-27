@@ -55,7 +55,7 @@ import { LEXEME_TYPE_LABELS, PART_OF_SPEECH_LABELS, formatTranscription, fromBas
           <div hlmCardContent class="flex flex-col gap-5">
             <div>
               <h2 class="text-muted-foreground mb-1 text-sm font-medium">Перевод</h2>
-              <p class="text-lg">{{ translations() }}</p>
+              <p translate="no" class="text-lg">{{ translations() }}</p>
             </div>
 
             @if (l.examples.length > 0) {
@@ -69,7 +69,7 @@ import { LEXEME_TYPE_LABELS, PART_OF_SPEECH_LABELS, formatTranscription, fromBas
                         <app-speak-button [text]="example.text" />
                       </div>
                       @if (example.translation) {
-                        <p class="text-muted-foreground text-sm">{{ example.translation }}</p>
+                        <p translate="no" class="text-muted-foreground text-sm">{{ example.translation }}</p>
                       }
                     </li>
                   }

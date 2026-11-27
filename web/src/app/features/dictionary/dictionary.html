@@ -88,8 +88,10 @@
                     <span class="text-base font-semibold break-words">{{ word.text }}</span>
                     <span class="text-muted-foreground font-mono text-sm">{{ transcription(word.transcription) }}</span>
                   </div>
-                  <span class="text-sm break-words">{{ word.translations.join(', ') }}</span>
+                  <span translate="no" class="text-sm break-words">{{ word.translations.join(', ') }}</span>
                   <div class="flex flex-wrap gap-1.5 pt-1">
+                    @let stage = stages[stageById().get(word.id) ?? 'New'];
+                    <span hlmBadge variant="outline" class="gap-1.5" [title]="stage.hint"><span class="size-2 rounded-full" [class]="stage.dot"></span>{{ stage.label }}</span>
                     @if (word.level) {
                       <span hlmBadge variant="secondary">{{ word.level }}</span>
                     }
@@ -152,7 +154,7 @@
                     <span class="text-base font-semibold break-words">{{ lexeme.text }}</span>
                     <span class="text-muted-foreground font-mono text-sm">{{ transcription(lexeme.transcription) }}</span>
                   </div>
-                  <span class="text-sm break-words">{{ lexeme.translations.join(', ') }}</span>
+                  <span translate="no" class="text-sm break-words">{{ lexeme.translations.join(', ') }}</span>
                   <div class="flex flex-wrap gap-1.5 pt-1">
                     @if (lexeme.level) {
                       <span hlmBadge variant="secondary">{{ lexeme.level }}</span>

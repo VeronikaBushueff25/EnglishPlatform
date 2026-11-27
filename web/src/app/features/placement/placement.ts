@@ -113,7 +113,7 @@ type Phase = 'intro' | 'question' | 'result';
                       (click)="answer(i)"
                     >
                       <span class="text-muted-foreground bg-muted flex size-7 shrink-0 items-center justify-center rounded-lg text-sm tabular-nums">{{ i + 1 }}</span>
-                      <span class="flex-1" [attr.lang]="q.skill === 'Vocabulary' ? null : 'en'">{{ option }}</span>
+                      <span translate="no" class="flex-1" [attr.lang]="q.skill === 'Vocabulary' ? null : 'en'">{{ option }}</span>
                       @if (busy() && chosen() === i) {
                         <hlm-spinner />
                       }
