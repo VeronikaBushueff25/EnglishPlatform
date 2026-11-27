@@ -2956,6 +2956,205 @@
           }
         }
       }
+    },
+    "/api/v1/pet": {
+      "get": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Питомец текущего пользователя (pet = null, если ещё не заведён)",
+        "operationId": "GetMyPet",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPetResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Pet"
+        ],
+        "operationId": "AdoptPet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdoptPetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Pet"
+        ],
+        "operationId": "UpdatePet",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pet/feed": {
+      "post": {
+        "tags": [
+          "Pet"
+        ],
+        "operationId": "FeedPet",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pet/pat": {
+      "post": {
+        "tags": [
+          "Pet"
+        ],
+        "operationId": "PatPet",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pet/activity": {
+      "post": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Сыграл в игру или дочитал текст — засчитать в просьбы питомца и достижения",
+        "operationId": "RecordPetActivity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PetActivityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetProgressDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pet/quiz": {
+      "post": {
+        "tags": [
+          "Pet"
+        ],
+        "summary": "Ответ на вопрос питомца о слове",
+        "operationId": "AnswerPetQuiz",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PetQuizAnswerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetProgressDto"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3086,6 +3285,27 @@
           },
           "isLockedOut": {
             "type": "boolean"
+          }
+        }
+      },
+      "AdoptPetRequest": {
+        "required": [
+          "species",
+          "palette",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "species": {
+            "$ref": "#/components/schemas/PetSpecies"
+          },
+          "palette": {
+            "maxLength": 16,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 24,
+            "type": "string"
           }
         }
       },
@@ -4428,6 +4648,24 @@
           }
         }
       },
+      "MyPetResponse": {
+        "required": [
+          "pet"
+        ],
+        "type": "object",
+        "properties": {
+          "pet": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PetDto"
+              }
+            ]
+          }
+        }
+      },
       "MyWordDto": {
         "required": [
           "id",
@@ -4866,6 +5104,379 @@
           "Interjection",
           "Numeral",
           null
+        ]
+      },
+      "PetActivity": {
+        "enum": [
+          "Lesson",
+          "MistakesLesson",
+          "Match",
+          "Blitz",
+          "Scramble",
+          "Reading",
+          "AddWords",
+          "Quiz"
+        ]
+      },
+      "PetActivityRequest": {
+        "required": [
+          "activity"
+        ],
+        "type": "object",
+        "properties": {
+          "activity": {
+            "$ref": "#/components/schemas/PetActivity"
+          }
+        }
+      },
+      "PetDecorDto": {
+        "required": [
+          "key",
+          "counter",
+          "target",
+          "progress",
+          "unlocked"
+        ],
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "counter": {
+            "type": "string"
+          },
+          "target": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "progress": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "unlocked": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PetDto": {
+        "required": [
+          "species",
+          "palette",
+          "name",
+          "accessory",
+          "mood",
+          "stage",
+          "satiety",
+          "affection",
+          "treats",
+          "level",
+          "xp",
+          "levelXp",
+          "nextLevelXp",
+          "daysSinceStudy",
+          "studiedToday",
+          "streak",
+          "bestStreak",
+          "patsLeft",
+          "lessonsCompleted",
+          "treatsEaten",
+          "wordsAdded",
+          "textsRead",
+          "quizCorrect",
+          "gamesPlayed",
+          "questsCompleted",
+          "quests",
+          "decor",
+          "accessories",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "species": {
+            "type": "string"
+          },
+          "palette": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "accessory": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mood": {
+            "type": "string"
+          },
+          "stage": {
+            "type": "string"
+          },
+          "satiety": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "affection": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "treats": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "xp": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "levelXp": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "nextLevelXp": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "daysSinceStudy": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "studiedToday": {
+            "type": "boolean"
+          },
+          "streak": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "bestStreak": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "patsLeft": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "lessonsCompleted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "treatsEaten": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "wordsAdded": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "textsRead": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "quizCorrect": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "gamesPlayed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "questsCompleted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "quests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PetQuestDto"
+            }
+          },
+          "decor": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PetDecorDto"
+            }
+          },
+          "accessories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PetProgressDto": {
+        "required": [
+          "pet",
+          "completed"
+        ],
+        "type": "object",
+        "properties": {
+          "pet": {
+            "$ref": "#/components/schemas/PetDto"
+          },
+          "completed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PetQuestDto"
+            }
+          }
+        }
+      },
+      "PetQuestDto": {
+        "required": [
+          "kind",
+          "target",
+          "progress",
+          "treats",
+          "xp",
+          "done"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "target": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "progress": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "treats": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "xp": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "done": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PetQuizAnswerRequest": {
+        "required": [
+          "correct"
+        ],
+        "type": "object",
+        "properties": {
+          "correct": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PetSpecies": {
+        "enum": [
+          "Cat",
+          "Corgi",
+          "Hamster"
         ]
       },
       "PlacementAnswerRequest": {
@@ -6352,6 +6963,31 @@
           }
         }
       },
+      "UpdatePetRequest": {
+        "required": [
+          "palette",
+          "name",
+          "accessory"
+        ],
+        "type": "object",
+        "properties": {
+          "palette": {
+            "maxLength": 16,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 24,
+            "type": "string"
+          },
+          "accessory": {
+            "maxLength": 16,
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "UpdateSettingsRequest": {
         "required": [
           "interfaceLanguage",
@@ -6821,6 +7457,9 @@
     },
     {
       "name": "Admin: grammar"
+    },
+    {
+      "name": "Pet"
     }
   ]
 }

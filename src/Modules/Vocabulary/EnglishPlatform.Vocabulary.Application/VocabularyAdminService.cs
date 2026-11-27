@@ -89,12 +89,15 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
         }
 
         List<string> texts = rows.Select(r => TextNormalizer.Normalize(r.Get(CsvTable.Columns.Text))).Where(t => t.Length > 0).Distinct().ToList();
-        Dictionary<(string, PartOfSpeech?), Lexeme> existing = (await db.Lexemes
+        // В общей базе одно слово — одна запись: совпадение ищем по тексту, часть речи не важна.
+        Dictionary<string, Lexeme> existing = (await db.Lexemes
                 .Where(l => texts.Contains(l.NormalizedText))
                 .ToListAsync(cancellationToken))
-            .ToDictionary(l => (l.NormalizedText, l.PartOfSpeech));
+            .ToDictionary(l => l.NormalizedText);
 
-        var seenInFile = new HashSet<(string, PartOfSpeech?)>();
+        // Слово встретилось в файле ещё раз (book — книга; book — бронировать) — это не повтор, а ещё значения:
+        // склеиваем в одну запись.
+        var inFile = new Dictionary<string, (LexemeData Data, Lexeme? Lexeme)>();
         var updated = new List<Lexeme>();
         var forMyWords = new List<(Lexeme Lexeme, string? Note)>();
         int added = 0;
@@ -107,10 +110,12 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
                 continue;
             }
 
-            (string, PartOfSpeech?) key = (TextNormalizer.Normalize(data.Text), data.PartOfSpeech);
-            if (!seenInFile.Add(key))
+            string key = TextNormalizer.Normalize(data.Text);
+            if (inFile.TryGetValue(key, out (LexemeData Data, Lexeme? Lexeme) earlier))
             {
-                issues.Add(row.Line, $"«{data.Text}» уже было выше в файле");
+                LexemeData merged = MergeRows(earlier.Data, data);
+                earlier.Lexeme?.Update(merged, now);
+                inFile[key] = (merged, earlier.Lexeme);
                 continue;
             }
 
@@ -124,6 +129,9 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
                 else
                 {
                     skipped++;
+                    inFile[key] = (data, null);
+                    forMyWords.Add((lexeme, note));
+                    continue;
                 }
             }
             else
@@ -133,6 +141,7 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
                 added++;
             }
 
+            inFile[key] = (data, lexeme);
             forMyWords.Add((lexeme, note));
         }
 
@@ -177,8 +186,7 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
             word.Edit(word.ToData() with { Type = kind.Type, PartOfSpeech = partOfSpeech, Note = kind.Note }, now);
 
             List<Lexeme> candidates = byText.TryGetValue(word.NormalizedText, out List<Lexeme>? found) ? found : [];
-            Lexeme? match = candidates.FirstOrDefault(l => l.PartOfSpeech == partOfSpeech)
-                            ?? candidates.FirstOrDefault(l => l.PartOfSpeech is null || partOfSpeech is null);
+            Lexeme? match = candidates.FirstOrDefault();
             if (match is not null)
             {
                 word.LinkToLexeme(match, Language, keepOwnContent: true, now);
@@ -292,7 +300,7 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
     {
         foreach (UserWord word in words)
         {
-            await eventBus.PublishAsync(new UserWordAdded(word.UserId, word.Id, now), cancellationToken);
+            await eventBus.PublishAsync(new UserWordAdded(word.UserId, word.Id, now, ByUser: false), cancellationToken);
         }
     }
 
@@ -422,6 +430,23 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
         return (data, TruncateOrNull(kind.Note, UserWord.MaxNoteLength));
     }
 
+    /// <summary>
+    /// Две строки одного слова в файле: главная — с более базовым уровнем (при равенстве — первая),
+    /// переводы, примеры и категории второй добавляются следом.
+    /// </summary>
+    public static LexemeData MergeRows(LexemeData first, LexemeData second)
+    {
+        int Rank(LexemeData d) => d.Level is { } level ? (int)level : int.MaxValue;
+        (LexemeData main, LexemeData other) = Rank(second) < Rank(first) ? (second, first) : (first, second);
+        return main with
+        {
+            Transcription = main.Transcription ?? other.Transcription,
+            Translations = main.Translations.Concat(other.Translations).ToList(),
+            Examples = main.Examples.Concat(other.Examples).DistinctBy(e => e.Text.ToLowerInvariant()).ToList(),
+            CategoryIds = main.CategoryIds.Union(other.CategoryIds).ToList(),
+        };
+    }
+
     private async Task<Error?> ValidateLexemeAsync(LexemeData data, Guid? excludeId, CancellationToken cancellationToken)
     {
         List<Guid> categoryIds = data.CategoryIds.Distinct().ToList();
@@ -432,9 +457,7 @@ public sealed class VocabularyAdminService(IVocabularyDb db, ICurrentUser curren
         }
 
         string normalized = TextNormalizer.Normalize(data.Text);
-        bool duplicate = await db.Lexemes.AnyAsync(
-            l => l.NormalizedText == normalized && l.PartOfSpeech == data.PartOfSpeech && l.Id != excludeId,
-            cancellationToken);
+        bool duplicate = await db.Lexemes.AnyAsync(l => l.NormalizedText == normalized && l.Id != excludeId, cancellationToken);
         return duplicate ? VocabularyErrors.DuplicateLexeme : null;
     }
 

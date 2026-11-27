@@ -6,6 +6,7 @@ using EnglishPlatform.Grammar.Infrastructure;
 using EnglishPlatform.Identity.Infrastructure;
 using EnglishPlatform.LearningProfiles.Infrastructure;
 using EnglishPlatform.LearningSessions.Infrastructure;
+using EnglishPlatform.Pets.Infrastructure;
 using EnglishPlatform.SpacedRepetition.Infrastructure;
 using EnglishPlatform.Users.Infrastructure;
 using EnglishPlatform.Vocabulary.Infrastructure;
@@ -27,5 +28,6 @@ internal static class ModuleCatalog
         new GrammarModule(),
         new AiModule(),
         new AnalyticsModule(),
+        new PetsModule(),
     ];
 }

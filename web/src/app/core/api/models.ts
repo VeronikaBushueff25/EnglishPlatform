@@ -3,6 +3,7 @@
 
 export type { AddMyWordRequest } from './models/add-my-word-request';
 export type { AdminUserDto } from './models/admin-user-dto';
+export type { AdoptPetRequest } from './models/adopt-pet-request';
 export type { AnswerRequest } from './models/answer-request';
 export type { AnswerResultDto } from './models/answer-result-dto';
 export type { AnswerVerdict } from './models/answer-verdict';
@@ -43,6 +44,7 @@ export type { LexemeType } from './models/lexeme-type';
 export type { LoginRequest } from './models/login-request';
 export type { LookupResultDto } from './models/lookup-result-dto';
 export type { MeResponse } from './models/me-response';
+export type { MyPetResponse } from './models/my-pet-response';
 export type { MyWordDto } from './models/my-word-dto';
 export type { NextStepDto } from './models/next-step-dto';
 export type { PagedResultOfAdminUserDto } from './models/paged-result-of-admin-user-dto';
@@ -52,6 +54,14 @@ export type { PagedResultOfPlacementQuestionDto } from './models/paged-result-of
 export type { PagedResultOfReadingTextSummaryDto } from './models/paged-result-of-reading-text-summary-dto';
 export type { PagedResultOfSessionDto } from './models/paged-result-of-session-dto';
 export type { PartOfSpeech } from './models/part-of-speech';
+export type { PetActivity } from './models/pet-activity';
+export type { PetActivityRequest } from './models/pet-activity-request';
+export type { PetDecorDto } from './models/pet-decor-dto';
+export type { PetDto } from './models/pet-dto';
+export type { PetProgressDto } from './models/pet-progress-dto';
+export type { PetQuestDto } from './models/pet-quest-dto';
+export type { PetQuizAnswerRequest } from './models/pet-quiz-answer-request';
+export type { PetSpecies } from './models/pet-species';
 export type { PlacementAnswerRequest } from './models/placement-answer-request';
 export type { PlacementLength } from './models/placement-length';
 export type { PlacementProgress } from './models/placement-progress';
@@ -90,6 +100,7 @@ export type { TranslationDto } from './models/translation-dto';
 export type { UpdateErrorTagRequest } from './models/update-error-tag-request';
 export type { UpdateMeRequest } from './models/update-me-request';
 export type { UpdateMyWordRequest } from './models/update-my-word-request';
+export type { UpdatePetRequest } from './models/update-pet-request';
 export type { UpdateSettingsRequest } from './models/update-settings-request';
 export type { WeakFormatDto } from './models/weak-format-dto';
 export type { WeakSpotsDto } from './models/weak-spots-dto';

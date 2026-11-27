@@ -172,11 +172,9 @@ namespace EnglishPlatform.Vocabulary.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_lexemes_needs_review")
                         .HasFilter("needs_review");
 
-                    b.HasIndex("NormalizedText", "PartOfSpeech")
+                    b.HasIndex("NormalizedText")
                         .IsUnique()
-                        .HasDatabaseName("ix_lexemes_normalized_text_part_of_speech");
-
-                    NpgsqlIndexBuilderExtensions.AreNullsDistinct(b.HasIndex("NormalizedText", "PartOfSpeech"), false);
+                        .HasDatabaseName("ix_lexemes_normalized_text");
 
                     b.ToTable("lexemes", "vocabulary");
                 });

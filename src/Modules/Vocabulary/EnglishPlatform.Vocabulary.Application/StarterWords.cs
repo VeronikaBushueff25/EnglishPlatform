@@ -60,7 +60,7 @@ public sealed class StarterWords(IVocabularyDb db, IEventBus eventBus, TimeProvi
         await db.SaveChangesAsync(cancellationToken);
         foreach (UserWord word in words)
         {
-            await eventBus.PublishAsync(new UserWordAdded(userId, word.Id, now), cancellationToken);
+            await eventBus.PublishAsync(new UserWordAdded(userId, word.Id, now, ByUser: false), cancellationToken);
         }
 
         return new StarterWordsResult(words.Count, candidates.Count);

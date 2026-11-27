@@ -39,9 +39,12 @@ public sealed class VocabularyFlowTests(ApiFactory factory) : IClassFixture<ApiF
         Texts(foodWords).ShouldContain("apple");
         Texts(foodWords).ShouldNotContain("recipe");
 
-        // Одно слово — две части речи.
+        // Одно слово — одна запись: значения разных частей речи в ней вместе (книга, бронировать).
         JsonElement book = await GetJsonAsync(client, "/api/v1/lexemes?search=book");
-        book.GetProperty("items").EnumerateArray().Count(i => i.GetProperty("text").GetString() == "book").ShouldBe(2);
+        JsonElement[] books = book.GetProperty("items").EnumerateArray().Where(i => i.GetProperty("text").GetString() == "book").ToArray();
+        books.Length.ShouldBe(1);
+        books[0].GetProperty("partOfSpeech").GetString().ShouldBe("Noun");
+        books[0].GetProperty("translations").EnumerateArray().Select(t => t.GetString()).ShouldBe(["книга", "бронировать"], ignoreOrder: true);
     }
 
     [Fact]

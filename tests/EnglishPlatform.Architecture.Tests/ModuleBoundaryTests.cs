@@ -15,7 +15,7 @@ public sealed class ModuleBoundaryTests
     public static readonly string[] Modules =
     [
         "Identity", "Users", "LearningProfiles", "Vocabulary", "LearningSessions",
-        "Exercises", "SpacedRepetition", "Grammar", "Ai", "Analytics",
+        "Exercises", "SpacedRepetition", "Grammar", "Ai", "Analytics", "Pets",
     ];
 
     private static readonly string[] Layers = ["Domain", "Application", "Infrastructure", "Contracts"];

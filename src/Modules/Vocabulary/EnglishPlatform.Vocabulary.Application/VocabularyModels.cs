@@ -240,7 +240,7 @@ public static class VocabularyErrors
 
     public static readonly Error AlreadyInMyWords = Error.Conflict("vocabulary.already_in_my_words", "Это слово уже есть в вашем словаре");
 
-    public static readonly Error DuplicateLexeme = Error.Conflict("vocabulary.duplicate_lexeme", "Такое слово с этой частью речи уже есть в общей базе");
+    public static readonly Error DuplicateLexeme = Error.Conflict("vocabulary.duplicate_lexeme", "Такое слово уже есть в общей базе");
 
     public static readonly Error SlugTaken = Error.Conflict("vocabulary.slug_taken", "Категория с таким идентификатором уже есть");
 

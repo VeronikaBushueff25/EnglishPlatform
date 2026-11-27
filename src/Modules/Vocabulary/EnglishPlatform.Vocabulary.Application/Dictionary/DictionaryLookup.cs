@@ -162,11 +162,8 @@ public sealed class DictionaryLookup(
                 ?? entries.FirstOrDefault(e => e.Translations.Count > 0);
         }
 
-        // Часть речи ставим, только если такой пары «текст + часть речи» в базе ещё нет (уникальный индекс).
-        PartOfSpeech? pos = lexeme.PartOfSpeech is null && entry?.PartOfSpeech is { } candidate
-            && !await db.Lexemes.AnyAsync(l => l.Id != lexeme.Id && l.NormalizedText == lexeme.NormalizedText && l.PartOfSpeech == candidate, cancellationToken)
-                ? candidate
-                : null;
+        // В общей базе одно слово — одна запись, поэтому пустую часть речи можно ставить смело.
+        PartOfSpeech? pos = lexeme.PartOfSpeech is null ? entry?.PartOfSpeech : null;
         TranslatedExample? example = needsExample ? await examples.FindAsync(lexeme.Text, cancellationToken) : null;
         DateTimeOffset now = time.GetUtcNow();
         bool changed = lexeme.FillGaps(
@@ -293,29 +290,9 @@ public sealed class DictionaryLookup(
         }
 
         DateTimeOffset now = time.GetUtcNow();
-        var created = new List<Lexeme>();
-        // Пример с переводом из Tatoeba — один на слово, первой записи (обычно главная часть речи).
+        // Пример с переводом из Tatoeba — один на слово.
         TranslatedExample? withTranslation = await examples.FindAsync(translated[0].Text, cancellationToken);
-        foreach (DictionaryEntry entry in translated.DistinctBy(e => e.PartOfSpeech).Take(MaxEntriesPerWord))
-        {
-            List<LexemeExample> lexemeExamples = entry.Examples.Select(e => new LexemeExample(e, null)).ToList();
-            if (created.Count == 0 && withTranslation is not null)
-            {
-                lexemeExamples.Insert(0, new LexemeExample(withTranslation.Text, withTranslation.Translation));
-            }
-
-            var data = new LexemeData(
-                entry.Text,
-                entry.Type,
-                entry.PartOfSpeech,
-                entry.Transcription,
-                LevelFor(entry.Text, entry.PartOfSpeech, entry.Type),
-                null,
-                entry.Translations.Select(t => new LexemeTranslation(Lexeme.DefaultLanguage, t)).ToList(),
-                lexemeExamples,
-                []);
-            created.Add(Lexeme.FromDictionary(data, now));
-        }
+        List<Lexeme> created = [Lexeme.FromDictionary(MergeEntries(translated, withTranslation), now)];
 
         try
         {
@@ -329,7 +306,7 @@ public sealed class DictionaryLookup(
         }
         catch (DbUpdateException)
         {
-            // Это же слово только что добавил другой запрос (уникальный индекс текст + часть речи) — берём из базы.
+            // Это же слово только что добавил другой запрос (уникальный индекс по тексту) — берём из базы.
             foreach (Lexeme lexeme in created)
             {
                 db.Lexemes.Entry(lexeme).State = EntityState.Detached;
@@ -337,6 +314,41 @@ public sealed class DictionaryLookup(
 
             return (await FindAsync([TextNormalizer.Normalize(translated[0].Text)], cancellationToken), null);
         }
+    }
+
+    /// <summary>
+    /// В общей базе одно слово — одна запись (иначе ученик видит «access» дважды). Главная часть речи — та,
+    /// у которой самый базовый уровень CEFR (при равенстве — первая в словаре); переводы и примеры
+    /// остальных частей речи добавляются следом: access — доступ, …, получить доступ.
+    /// </summary>
+    public LexemeData MergeEntries(IReadOnlyList<DictionaryEntry> translated, TranslatedExample? withTranslation)
+    {
+        List<DictionaryEntry> entries = translated.DistinctBy(e => e.PartOfSpeech).Take(MaxEntriesPerWord).ToList();
+        DictionaryEntry main = entries.OrderBy(e => (int?)LevelFor(e.Text, e.PartOfSpeech, e.Type) ?? int.MaxValue).First();
+        List<DictionaryEntry> ordered = [main, .. entries.Where(e => e != main)];
+
+        List<LexemeTranslation> translations = ordered.SelectMany(e => e.Translations)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Take(Lexeme.MaxTranslations)
+            .Select(t => new LexemeTranslation(Lexeme.DefaultLanguage, t))
+            .ToList();
+        IEnumerable<LexemeExample> fromTatoeba = withTranslation is null ? [] : [new LexemeExample(withTranslation.Text, withTranslation.Translation)];
+        List<LexemeExample> lexemeExamples = fromTatoeba
+            .Concat(ordered.SelectMany(e => e.Examples).Select(e => new LexemeExample(e, null)))
+            .DistinctBy(e => e.Text, StringComparer.OrdinalIgnoreCase)
+            .Take(Lexeme.MaxExamples)
+            .ToList();
+
+        return new LexemeData(
+            main.Text,
+            main.Type,
+            main.PartOfSpeech,
+            main.Transcription ?? ordered.Select(e => e.Transcription).FirstOrDefault(t => t is not null),
+            LevelFor(main.Text, main.PartOfSpeech, main.Type),
+            null,
+            translations,
+            lexemeExamples,
+            []);
     }
 
     private Task<List<Lexeme>> FindAsync(IReadOnlyCollection<string> normalized, CancellationToken cancellationToken) =>

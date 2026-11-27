@@ -9,6 +9,7 @@ import { Api } from '../../core/api/api';
 import { getPracticeWords } from '../../core/api/fn/practice/get-practice-words';
 import { PracticeWordDto } from '../../core/api/models/practice-word-dto';
 import { Pronunciation } from '../../shared/pronunciation';
+import { reportWhenDone } from '../pet/pet-store';
 import { BlitzRound, bestScore, blitzRounds, mainTranslation, scrambleCandidates, scrambled, shuffle } from './game-logic';
 
 const ICONS = { lucideArrowLeft, lucideCheck, lucideDelete, lucideLightbulb, lucideRotateCcw, lucideSkipForward, lucideTrophy, lucideX };
@@ -123,6 +124,8 @@ export class MatchGame {
   private timer: ReturnType<typeof setInterval> | undefined;
 
   constructor() {
+    // Питомец засчитывает сыгранную игру (просьбы дня, гирлянда в комнате).
+    reportWhenDone(this.state, 'Match');
     inject(DestroyRef).onDestroy(() => clearInterval(this.timer));
     void this.start();
   }
@@ -238,6 +241,8 @@ export class BlitzGame {
   private timer: ReturnType<typeof setInterval> | undefined;
 
   constructor() {
+    // Питомец засчитывает сыгранную игру (просьбы дня, гирлянда в комнате).
+    reportWhenDone(this.state, 'Blitz');
     inject(DestroyRef).onDestroy(() => clearInterval(this.timer));
     void this.start();
   }
@@ -382,6 +387,8 @@ export class ScrambleGame {
   });
 
   constructor() {
+    // Питомец засчитывает сыгранную игру (просьбы дня, гирлянда в комнате).
+    reportWhenDone(this.state, 'Scramble');
     void this.start();
   }
 

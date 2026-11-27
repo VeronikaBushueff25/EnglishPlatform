@@ -29,6 +29,7 @@
     <ProjectReference Include="../../BuildingBlocks/EnglishPlatform.BuildingBlocks.Infrastructure/EnglishPlatform.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="../../Modules/Identity/EnglishPlatform.Identity.Infrastructure/EnglishPlatform.Identity.Infrastructure.csproj" />
     <ProjectReference Include="../../Modules/Users/EnglishPlatform.Users.Infrastructure/EnglishPlatform.Users.Infrastructure.csproj" />
+    <ProjectReference Include="../../Modules/Pets/EnglishPlatform.Pets.Infrastructure/EnglishPlatform.Pets.Infrastructure.csproj" />
     <ProjectReference Include="../../Modules/LearningProfiles/EnglishPlatform.LearningProfiles.Infrastructure/EnglishPlatform.LearningProfiles.Infrastructure.csproj" />
     <ProjectReference Include="../../Modules/Vocabulary/EnglishPlatform.Vocabulary.Infrastructure/EnglishPlatform.Vocabulary.Infrastructure.csproj" />
     <ProjectReference Include="../../Modules/LearningSessions/EnglishPlatform.LearningSessions.Infrastructure/EnglishPlatform.LearningSessions.Infrastructure.csproj" />

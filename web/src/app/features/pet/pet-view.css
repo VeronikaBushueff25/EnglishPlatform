@@ -1,0 +1,201 @@
+/* Питомец: движения и настроение. Классы (is-eating, stage-baby, wear-bow…) — на обёртке app-pet-view. */
+.pet-stage {
+  /* Мягкое пятно света под питомцем: тёмные окрасы видны и на тёмной теме. */
+  background: radial-gradient(ellipse 52% 46% at 46% 56%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 72%);
+}
+.dark .pet-stage { background: radial-gradient(ellipse 52% 46% at 46% 56%, oklch(1 0 0 / .13), transparent 72%); }
+.pet-stage.plain { background: none; }
+.pet { width: 100%; height: auto; overflow: visible; color: #000; display: block; transition: transform .3s; }
+.facing-left .pet { transform: scaleX(-1); }
+
+.pet .eye-open, .pet .mouth > *, .pet .pouch, .pet .fx-hearts > *, .pet .fx-tear, .pet .k, .pet .crumbs > *,
+.pet .seed, .pet .paw, .pet .hand, .pet .fx-nom, .pet .fx-hungry, .pet .hands { transform-box: fill-box; transform-origin: center; }
+.pet .grow { transform-origin: 100px 192px; transition: transform .6s ease; }
+.pet .figure { transform-origin: 100px 190px; }
+.pet .breath { transform-origin: 100px 186px; }
+.pet .head { transform-origin: 100px 130px; transition: transform .4s ease; }
+.pet .ear { transition: transform .4s ease; }
+.pet .mouth > .tongue { transform-origin: top center; }
+
+/* Рост: малыш, подросток, взрослый */
+.stage-baby .pet .grow { transform: scale(.8); }
+.stage-teen .pet .grow { transform: scale(.9); }
+
+/* По умолчанию скрыто */
+.pet .eye-happy, .pet .eye-closed, .pet .mouth-happy, .pet .mouth-sad, .pet .tongue, .pet .teeth, .pet .acc { display: none; }
+.pet .brows, .pet .bowl, .pet .fx-hearts, .pet .fx-zzz, .pet .fx-tear, .pet .fx-nom, .pet .fx-hungry, .pet .fx-ball, .pet .crumbs, .pet .seed { opacity: 0; }
+.pet .bowl, .pet .brows { transition: opacity .3s; }
+.wear-bow .acc-bow, .wear-scarf .acc-scarf, .wear-glasses .acc-glasses, .wear-hat .acc-hat, .wear-crown .acc-crown { display: inline; }
+
+/* Живость: дыхание, моргание, хвост, уши, глаза за указателем */
+.pet .breath { animation: pet-breath 3.2s ease-in-out infinite; }
+.pet .eye-open { animation: pet-blink 5.5s infinite; }
+.pet .tail { animation: pet-wag 2.6s ease-in-out infinite; }
+.pet .ear-l { animation: pet-twitch 7s ease-in-out 1s infinite; }
+.pet .pupil { transform: translate(var(--look-x, 0px), var(--look-y, 0px)); transition: transform .12s linear; }
+.pet-corgi .tail { animation-duration: 1.2s; }
+
+@keyframes pet-breath { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.012, 1.03); } }
+@keyframes pet-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@keyframes pet-wag { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(9deg); } }
+@keyframes pet-twitch { 0%, 90%, 100% { transform: rotate(0); } 93% { transform: rotate(-9deg); } 96% { transform: rotate(3deg); } }
+
+/* Радуется */
+.is-happy .pet .eye-open, .is-petted .pet .eye-open { display: none; }
+.is-happy .pet .eye-happy, .is-petted .pet .eye-happy { display: inline; }
+.is-happy .pet .mouth-idle { display: none; }
+.is-happy .pet .mouth-happy { display: inline; }
+.is-happy .pet-corgi .tongue { display: inline; }
+.is-happy .pet .figure { animation: pet-hop .9s ease-in-out infinite; }
+.is-happy .pet .tail { animation-duration: .45s; }
+.is-happy .pet .fx-hearts, .is-petted .pet .fx-hearts { opacity: 1; }
+.is-happy .pet .fx-hearts > *, .is-petted .pet .fx-hearts > * { animation: pet-float 1.8s ease-out infinite; opacity: 0; }
+.pet .fx-hearts .h2 { animation-delay: .6s !important; }
+.pet .fx-hearts .h3 { animation-delay: 1.2s !important; }
+@keyframes pet-hop { 0%, 100% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.04, .95); } 45% { transform: translateY(-14px) scale(.98, 1.03); } 75% { transform: translateY(0) scale(1.03, .97); } }
+@keyframes pet-float { 0% { transform: translateY(8px) scale(.6); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-22px) scale(1); opacity: 0; } }
+
+/* Погладили: жмурится и ёрзает */
+.is-petted .pet .figure { animation: pet-wiggle .5s ease-in-out 3; }
+.is-petted .pet .ear-l { transform: rotate(-10deg); animation: none; }
+.is-petted .pet .ear-r { transform: rotate(10deg); }
+@keyframes pet-wiggle { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-4deg); } 70% { transform: rotate(4deg); } }
+
+/* Ест (цикл 4,5 с): два захода к миске — пригнулся, хрум-хрум, корм пропадает, крошки летят;
+   поднял голову — жуёт, «nom!»; в конце облизывается. */
+.is-eating .pet .bowl, .is-eating .pet .crumbs { opacity: 1; }
+.is-eating .pet .tail { animation-duration: .9s; }
+.is-eating .pet:not(.pet-hamster) .head { animation: eat-head 4.5s ease-in-out infinite; transition: none; }
+.is-eating .pet:not(.pet-hamster) .breath { animation: eat-crouch 4.5s ease-in-out infinite; }
+.is-eating .pet .mouth-idle { animation: eat-chew 4.5s linear infinite; }
+.is-eating .pet:not(.pet-hamster) .tongue { display: inline; animation: eat-lick 4.5s ease-in-out infinite; }
+.is-eating .pet .k1 { animation: eat-k1 4.5s infinite; }
+.is-eating .pet .k2 { animation: eat-k2 4.5s infinite; }
+.is-eating .pet .k3 { animation: eat-k3 4.5s infinite; }
+.is-eating .pet .k4 { animation: eat-k4 4.5s infinite; }
+.is-eating .pet .c1 { animation: eat-crumb-l 4.5s infinite; }
+.is-eating .pet .c2 { animation: eat-crumb-r 4.5s 2.2s infinite; }
+.is-eating .pet .c3 { animation: eat-crumb-l 4.5s .4s infinite; }
+.is-eating .pet .fx-nom { animation: eat-nom 4.5s infinite; }
+@keyframes eat-head {
+  0% { transform: none; }
+  10%, 18%, 26% { transform: translateY(46px) scale(.97); }
+  14%, 22% { transform: translateY(41px) scale(.97); }
+  34%, 48% { transform: translateY(0); }
+  58%, 66%, 74% { transform: translateY(46px) scale(.97); }
+  62%, 70% { transform: translateY(41px) scale(.97); }
+  82%, 100% { transform: none; }
+}
+@keyframes eat-crouch { 0%, 34%, 48%, 82%, 100% { transform: scale(1, 1); } 12%, 26%, 60%, 74% { transform: scale(1.04, .92); } }
+@keyframes eat-chew {
+  0%, 35%, 38%, 41%, 44%, 47%, 83%, 86%, 89%, 100% { transform: scaleY(1); }
+  36.5%, 39.5%, 42.5%, 45.5%, 84.5%, 87.5% { transform: scaleY(.35); }
+}
+@keyframes eat-lick { 0%, 90%, 100% { opacity: 0; transform: scaleY(.2); } 93%, 97% { opacity: 1; transform: scaleY(1); } }
+@keyframes eat-k1 { 0%, 17% { opacity: 1; transform: none; } 20%, 99% { opacity: 0; transform: translateY(-8px) scale(.3); } 100% { opacity: 1; transform: none; } }
+@keyframes eat-k2 { 0%, 25% { opacity: 1; transform: none; } 28%, 99% { opacity: 0; transform: translateY(-8px) scale(.3); } 100% { opacity: 1; transform: none; } }
+@keyframes eat-k3 { 0%, 65% { opacity: 1; transform: none; } 68%, 99% { opacity: 0; transform: translateY(-8px) scale(.3); } 100% { opacity: 1; transform: none; } }
+@keyframes eat-k4 { 0%, 73% { opacity: 1; transform: none; } 76%, 99% { opacity: 0; transform: translateY(-8px) scale(.3); } 100% { opacity: 1; transform: none; } }
+@keyframes eat-crumb-l { 0%, 16% { opacity: 0; transform: none; } 19% { opacity: 1; } 30%, 100% { opacity: 0; transform: translate(-14px, -18px); } }
+@keyframes eat-crumb-r { 0%, 16% { opacity: 0; transform: none; } 19% { opacity: 1; } 30%, 100% { opacity: 0; transform: translate(14px, -16px); } }
+@keyframes eat-nom { 0%, 35% { opacity: 0; transform: scale(.5); } 39% { opacity: 1; transform: scale(1.1); } 46% { opacity: 1; transform: scale(1); } 50%, 83% { opacity: 0; } 87% { opacity: 1; transform: scale(1.1); } 94%, 100% { opacity: 0; } }
+
+/* Хомяк ест по-своему: лапки тянутся к миске, достают семечку и грызут её, щёки набиваются */
+.is-eating .pet-hamster .hands { animation: ham-hands 4.5s ease-in-out infinite; }
+.is-eating .pet-hamster .seed { animation: ham-seed 4.5s ease-in-out infinite; }
+.is-eating .pet-hamster .pouch { animation: ham-pouch 4.5s ease-in-out infinite; }
+.is-eating .pet-hamster .teeth { display: inline; animation: ham-nibble 4.5s linear infinite; }
+.is-eating .pet-hamster .mouth { display: none; }
+.is-eating .pet-hamster .k1, .is-eating .pet-hamster .k3, .is-eating .pet-hamster .k4 { animation: none; }
+.is-eating .pet-hamster .k2 { animation: ham-k 4.5s infinite; }
+@keyframes ham-hands {
+  0% { transform: none; } 10% { transform: translateY(30px); } 18% { transform: translateY(-14px); }
+  24%, 32%, 40%, 48%, 56%, 64%, 72% { transform: translateY(-14px); } 28%, 36%, 44%, 52%, 60%, 68%, 76% { transform: translateY(-11px); }
+  86%, 100% { transform: none; }
+}
+@keyframes ham-seed { 0%, 15% { opacity: 0; transform: translateY(28px); } 18% { opacity: 1; transform: translateY(-12px) scale(1); } 76% { opacity: 1; transform: translateY(-12px) scale(.55); } 80%, 100% { opacity: 0; transform: translateY(-12px) scale(.3); } }
+@keyframes ham-pouch { 0%, 30% { transform: scale(1); } 80% { transform: scale(1.16, 1.12); } 100% { transform: scale(1); } }
+@keyframes ham-nibble { 0%, 18%, 80%, 100% { transform: none; } 20%, 26%, 32%, 38%, 44%, 50%, 56%, 62%, 68%, 74% { transform: translateY(1.5px); } 23%, 29%, 35%, 41%, 47%, 53%, 59%, 65%, 71%, 77% { transform: none; } }
+@keyframes ham-k { 0%, 11% { opacity: 1; transform: none; } 14%, 99% { opacity: 0; transform: translateY(-10px) scale(.3); } 100% { opacity: 1; } }
+
+/* Голоден: пустая миска, смотрит на неё, мечтает о еде */
+.is-hungry .pet .bowl, .is-hungry .pet .brows { opacity: 1; }
+.is-hungry .pet .kibble { opacity: 0; }
+.is-hungry .pet .pupil { transform: translate(0, 3px); }
+.is-hungry .pet .mouth-idle { display: none; }
+.is-hungry .pet .mouth-sad { display: inline; }
+.is-hungry .pet .head { transform: translateY(4px) rotate(-3deg); }
+.is-hungry .pet .tail { animation-duration: 5s; }
+.is-hungry .pet .fx-hungry { animation: hungry-bubble 4s ease-in-out infinite; }
+@keyframes hungry-bubble { 0%, 20% { opacity: 0; transform: scale(.6); } 30%, 80% { opacity: 1; transform: scale(1); } 90%, 100% { opacity: 0; } }
+
+/* Грустит */
+.is-sad .pet .brows { opacity: 1; }
+.is-sad .pet .mouth-idle { display: none; }
+.is-sad .pet .mouth-sad { display: inline; }
+.is-sad .pet .bowl { opacity: 1; }
+.is-sad .pet .kibble { opacity: 0; }
+.is-sad .pet .ear-l { transform: rotate(-28deg); animation: none; }
+.is-sad .pet .ear-r { transform: rotate(28deg); }
+.is-sad .pet-hamster .ear-l { transform: rotate(-12deg) translateY(6px); }
+.is-sad .pet-hamster .ear-r { transform: rotate(12deg) translateY(6px); }
+.is-sad .pet .head { transform: translateY(4px); }
+.is-sad .pet .breath { animation-duration: 5s; }
+.is-sad .pet .tail { animation: none; transform: rotate(-8deg); }
+.is-sad .pet .pupil { transform: translate(0, 2px); }
+.is-sad .pet .fx-tear { animation: pet-tear 2.6s ease-in infinite; }
+@keyframes pet-tear { 0%, 30% { opacity: 0; transform: translateY(0); } 40% { opacity: 1; } 90% { opacity: 1; transform: translateY(16px); } 100% { opacity: 0; transform: translateY(18px); } }
+
+/* Спит */
+.is-sleeping .pet .eye-open { display: none; }
+.is-sleeping .pet .eye-closed { display: inline; }
+.is-sleeping .pet .breath { animation: pet-breath-deep 4.5s ease-in-out infinite; }
+.is-sleeping .pet .head { transform: translateY(5px) rotate(-6deg); }
+.is-sleeping .pet .tail { animation: none; }
+.is-sleeping .pet .ear-l { animation: none; transform: rotate(-8deg); }
+.is-sleeping .pet .ear-r { transform: rotate(8deg); }
+.is-sleeping .pet .fx-zzz { opacity: 1; }
+.is-sleeping .pet .fx-zzz text { animation: pet-zzz 3s ease-out infinite; opacity: 0; }
+.is-sleeping .pet .fx-zzz .z2 { animation-delay: 1s; }
+.is-sleeping .pet .fx-zzz .z3 { animation-delay: 2s; }
+@keyframes pet-breath-deep { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.025, 1.05); } }
+@keyframes pet-zzz { 0% { opacity: 0; transform: translate(0, 6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(8px, -10px); } }
+
+/* Играет: мячик скачет туда-обратно, питомец следит глазами и подпрыгивает, когда мяч рядом */
+.is-playing .pet .fx-ball { opacity: 1; animation: play-ball 2.8s linear infinite; }
+.is-playing .pet .pupil { animation: play-look 2.8s ease-in-out infinite; transition: none; }
+.is-playing .pet .figure { animation: play-jump 2.8s ease-in-out infinite; }
+.is-playing .pet .tail { animation-duration: .4s; }
+.is-playing .pet .mouth-idle { display: none; }
+.is-playing .pet .mouth-happy { display: inline; }
+@keyframes play-ball {
+  0% { transform: translate(196px, 190px) rotate(0); }
+  12% { transform: translate(172px, 122px) rotate(-120deg); }
+  25% { transform: translate(150px, 190px) rotate(-240deg); }
+  37% { transform: translate(100px, 70px) rotate(-420deg); }
+  50% { transform: translate(40px, 190px) rotate(-600deg); }
+  62% { transform: translate(24px, 128px) rotate(-480deg); }
+  75% { transform: translate(60px, 190px) rotate(-360deg); }
+  87% { transform: translate(130px, 104px) rotate(-180deg); }
+  100% { transform: translate(196px, 190px) rotate(0); }
+}
+@keyframes play-look { 0%, 100% { transform: translate(3px, 1px); } 37% { transform: translate(0, -3px); } 50% { transform: translate(-3px, 1px); } 62% { transform: translate(-3px, -1px); } 87% { transform: translate(2px, -2px); } }
+@keyframes play-jump { 0%, 28%, 46%, 80%, 94%, 100% { transform: translateY(0) scale(1, 1); } 33% { transform: translateY(-4px) scale(1.04, .95); } 38% { transform: translateY(-26px) scale(.97, 1.04); } 86% { transform: translateY(-18px); } }
+
+/* Идёт: шажки, покачивание, хвост вовсю */
+.is-walking .pet .figure { animation: walk-bob .5s ease-in-out infinite; }
+.is-walking .pet .paw-l { animation: walk-step .5s ease-in-out infinite; }
+.is-walking .pet .paw-r { animation: walk-step .5s ease-in-out -.25s infinite; }
+.is-walking .pet .tail { animation-duration: .5s; }
+@keyframes walk-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-5px) rotate(2deg); } }
+@keyframes walk-step { 0%, 50%, 100% { transform: translateY(0); } 25% { transform: translateY(-7px); } }
+
+/* Ушёл гулять */
+.pet .figure, .pet .shadow { transition: opacity .6s; }
+.is-away .pet .figure, .is-away .pet .shadow { opacity: 0; }
+.is-away .pet .bowl { opacity: 1; }
+.is-away .pet .kibble { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pet *, .pet { animation: none !important; transition: none !important; }
+}

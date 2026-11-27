@@ -143,3 +143,17 @@ export type { AdminDeleteGrammarTopic$Params as AdminDeleteGrammarTopic$Params }
 export { adminDeleteGrammarTopic as adminDeleteGrammarTopic } from './fn/admin-grammar/admin-delete-grammar-topic';
 export type { AdminUpdateErrorTag$Params as AdminUpdateErrorTag$Params } from './fn/admin-grammar/admin-update-error-tag';
 export { adminUpdateErrorTag as adminUpdateErrorTag } from './fn/admin-grammar/admin-update-error-tag';
+export type { GetMyPet$Params as GetMyPet$Params } from './fn/pet/get-my-pet';
+export { getMyPet as getMyPet } from './fn/pet/get-my-pet';
+export type { UpdatePet$Params as UpdatePet$Params } from './fn/pet/update-pet';
+export { updatePet as updatePet } from './fn/pet/update-pet';
+export type { AdoptPet$Params as AdoptPet$Params } from './fn/pet/adopt-pet';
+export { adoptPet as adoptPet } from './fn/pet/adopt-pet';
+export type { FeedPet$Params as FeedPet$Params } from './fn/pet/feed-pet';
+export { feedPet as feedPet } from './fn/pet/feed-pet';
+export type { PatPet$Params as PatPet$Params } from './fn/pet/pat-pet';
+export { patPet as patPet } from './fn/pet/pat-pet';
+export type { RecordPetActivity$Params as RecordPetActivity$Params } from './fn/pet/record-pet-activity';
+export { recordPetActivity as recordPetActivity } from './fn/pet/record-pet-activity';
+export type { AnswerPetQuiz$Params as AnswerPetQuiz$Params } from './fn/pet/answer-pet-quiz';
+export { answerPetQuiz as answerPetQuiz } from './fn/pet/answer-pet-quiz';

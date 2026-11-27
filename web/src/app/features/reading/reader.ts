@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideChevronsRight, lucidePause, lucideVolume2, lucideX } from '@ng-icons/lucide';
+import { lucideCheck, lucideChevronsRight, lucidePause, lucideVolume2, lucideX } from '@ng-icons/lucide';
+import { toast } from '@spartan-ng/brain/sonner';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { Api } from '../../core/api/api';
 import { listMyWordTexts } from '../../core/api/fn/my-words/list-my-word-texts';
 import { Pronunciation } from '../../shared/pronunciation';
 import { WordLookup } from '../../shared/word-lookup';
+import { PetStore } from '../pet/pet-store';
 import { Token, baseForms, normalizeWord, paragraphsOf, phrase, tokenize } from './tokens';
 
 interface Selection {
@@ -22,7 +24,7 @@ interface Selection {
 @Component({
   selector: 'app-reader',
   imports: [NgIcon, WordLookup, HlmButtonImports],
-  providers: [provideIcons({ lucideChevronsRight, lucidePause, lucideVolume2, lucideX })],
+  providers: [provideIcons({ lucideCheck, lucideChevronsRight, lucidePause, lucideVolume2, lucideX })],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .w {
@@ -75,6 +77,16 @@ interface Selection {
           </p>
         }
       </article>
+
+      <!-- Дочитал — питомец благодарит: просьба «почитай мне», кресло в комнате. -->
+      <div class="flex flex-wrap items-center gap-3 border-t pt-4">
+        @if (finished()) {
+          <p class="text-success flex items-center gap-1.5 text-sm font-medium"><ng-icon name="lucideCheck" /> Текст прочитан</p>
+        } @else {
+          <button hlmBtn variant="outline" type="button" (click)="markRead()"><ng-icon name="lucideCheck" /> Я дочитал(а)</button>
+          <p class="text-muted-foreground text-sm">Отметьте — питомец тоже любит, когда ему читают.</p>
+        }
+      </div>
     </div>
 
     @if (query(); as q) {
@@ -100,6 +112,8 @@ interface Selection {
 })
 export class Reader {
   private readonly api = inject(Api);
+  private readonly petStore = inject(PetStore);
+  protected readonly finished = signal(false);
   protected readonly pronunciation = inject(Pronunciation);
 
   readonly body = input.required<string>();
@@ -118,6 +132,12 @@ export class Reader {
     if (!s || s.to - s.from >= 4) return false;
     return this.paragraphs()[s.paragraph].some((t) => t.word && t.index === s.to + 1);
   });
+
+  protected async markRead(): Promise<void> {
+    this.finished.set(true);
+    const done = await this.petStore.record('Reading');
+    if (done.length > 0) toast.success('Питомец благодарит за текст!', { description: 'Просьба выполнена — угощения уже у него.' });
+  }
 
   constructor() {
     void this.api

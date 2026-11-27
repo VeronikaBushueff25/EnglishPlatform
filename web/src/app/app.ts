@@ -1,18 +1,19 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { IsActiveMatchOptions, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideBookOpen, lucideChartColumn, lucideGamepad2, lucideLogOut, lucidePlay, lucideShieldCheck, lucideUserRound } from './core/header-icons';
+import { lucideBookOpen, lucideChartColumn, lucideGamepad2, lucideLogOut, lucidePawPrint, lucidePlay, lucideShieldCheck, lucideUserRound } from './core/header-icons';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmToasterImports } from '@spartan-ng/helm/sonner';
+import { HlmToaster } from '@spartan-ng/helm/sonner';
 import { Api } from './core/api/api';
 import { getMe } from './core/api/fn/profile/get-me';
 import { AuthService } from './core/auth/auth.service';
 import { I18n } from './core/i18n/i18n';
+import { PetCompanion } from './features/pet/pet-companion';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIcon, HlmButtonImports, HlmToasterImports],
-  providers: [provideIcons({ lucideBookOpen, lucideChartColumn, lucideGamepad2, lucideLogOut, lucidePlay, lucideShieldCheck, lucideUserRound })],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIcon, HlmButtonImports, HlmToaster, PetCompanion],
+  providers: [provideIcons({ lucideBookOpen, lucideChartColumn, lucideGamepad2, lucideLogOut, lucidePawPrint, lucidePlay, lucideShieldCheck, lucideUserRound })],
   templateUrl: './app.html',
   host: { class: 'flex min-h-dvh flex-col' },
   changeDetection: ChangeDetectionStrategy.OnPush,

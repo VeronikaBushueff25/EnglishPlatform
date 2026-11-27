@@ -35,6 +35,18 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
   },
   {
+    path: 'pet',
+    title: 'Питомец',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/pet/pet-page').then((m) => m.PetPage),
+  },
+  {
+    // Витрина рисунков: все звери, окрасы, состояния и аксессуары.
+    path: 'pet/lab',
+    title: 'Питомцы',
+    loadComponent: () => import('./features/pet/pet-lab').then((m) => m.PetLab),
+  },
+  {
     path: 'profile',
     title: 'Профиль',
     canActivate: [authGuard],

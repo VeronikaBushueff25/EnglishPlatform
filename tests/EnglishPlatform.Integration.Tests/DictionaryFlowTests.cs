@@ -40,7 +40,7 @@ public sealed class DictionaryFlowTests(ApiFactory factory) : IClassFixture<ApiF
     }
 
     [Fact]
-    public async Task Word_form_leads_to_lemma_and_both_parts_of_speech_are_kept()
+    public async Task Word_form_leads_to_lemma_and_parts_of_speech_merge_into_one_entry()
     {
         factory.SkipIfUnavailable();
         HttpClient client = await UserClientAsync();
@@ -49,10 +49,14 @@ public sealed class DictionaryFlowTests(ApiFactory factory) : IClassFixture<ApiF
         overslept.GetProperty("formOf").GetString().ShouldBe("overslept");
         overslept.GetProperty("items")[0].GetProperty("text").GetString().ShouldBe("oversleep");
 
-        // Две части речи — две записи в базе; слова нет в списках CEFR — C1.
+        // Две части речи — одна запись: переводы обеих вместе; слова нет в списках CEFR — C1.
         JsonElement quixotic = await GetJsonAsync(client, "/api/v1/dictionary/lookup?text=quixotic");
-        quixotic.GetProperty("items").GetArrayLength().ShouldBe(2);
-        quixotic.GetProperty("items").EnumerateArray().ShouldAllBe(i => i.GetProperty("level").GetString() == "C1");
+        quixotic.GetProperty("items").GetArrayLength().ShouldBe(1);
+        JsonElement entry = quixotic.GetProperty("items")[0];
+        entry.GetProperty("level").GetString().ShouldBe("C1");
+        entry.GetProperty("partOfSpeech").GetString().ShouldBe("Adjective");
+        entry.GetProperty("translations").EnumerateArray().Select(t => t.GetProperty("text").GetString())
+            .ShouldBe(["донкихотский", "мечтательный", "мечтатель"]);
     }
 
     [Fact]

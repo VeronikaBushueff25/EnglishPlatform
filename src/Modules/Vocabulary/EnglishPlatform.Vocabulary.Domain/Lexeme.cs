@@ -273,6 +273,7 @@ public sealed class Lexeme : Entity<Guid>
 }
 
 /// <summary>Поля единицы лексики при создании и правке.</summary>
+/// <summary>Данные слова общей базы (создание, правка, импорт).</summary>
 public sealed record LexemeData(
     string Text,
     LexemeType Type,

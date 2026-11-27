@@ -1,16 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  afterNextRender,
-  computed,
-  inject,
-  signal,
-  viewChild,
-  Injector,
-} from '@angular/core';
+import { afterNextRender, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, Injector, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -46,6 +36,7 @@ import { WeakSpotsDto } from '../../core/api/models/weak-spots-dto';
 import { problemMessage } from '../../core/http/problem';
 import { ErrorAlert } from '../../shared/error-alert';
 import { Pronunciation, SpeakButton } from '../../shared/pronunciation';
+import { PetSignals } from '../../core/pet-signals';
 import { formatTranscription } from '../dictionary/vocabulary-labels';
 import { formatDuration, formatNextReview, pluralRu } from './learn-format';
 
@@ -95,6 +86,7 @@ const RETRIES = 2;
 })
 export class Learn {
   private readonly api = inject(Api);
+  private readonly petSignals = inject(PetSignals);
   private readonly pronunciation = inject(Pronunciation);
   private readonly injector = inject(Injector);
 
@@ -157,6 +149,12 @@ export class Learn {
 
   constructor() {
     void this.loadToday();
+    // Питомец радуется окончанию занятия (и проверяет, сколько угощений принесло занятие).
+    effect(() => {
+      if (this.phase() === 'finished') {
+        untracked(() => this.petSignals.emit('finished'));
+      }
+    });
   }
 
   protected async loadToday(): Promise<void> {
@@ -360,6 +358,7 @@ export class Learn {
         return;
       }
       this.result.set(result);
+      this.petSignals.emit(result.verdict === 'Wrong' ? 'wrong' : 'correct');
       this.phase.set('feedback');
       this.focus(this.nextButton);
     } catch (e) {

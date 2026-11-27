@@ -70,7 +70,8 @@ internal sealed class LexemeConfiguration : IEntityTypeConfiguration<Lexeme>
         lexeme.OwnsMany(l => l.Examples, e => e.ToJson());
 
         // Одно и то же слово может быть разными частями речи (run — глагол и существительное), но не дважды одной.
-        lexeme.HasIndex(l => new { l.NormalizedText, l.PartOfSpeech }).IsUnique().AreNullsDistinct(false);
+        // Одно слово — одна запись: разные части речи — это переводы одной записи, а не повторы.
+        lexeme.HasIndex(l => l.NormalizedText).IsUnique();
         lexeme.HasIndex(l => l.CategoryIds).HasMethod("gin");
         lexeme.HasIndex(l => l.Level);
         lexeme.Property(l => l.Source).HasConversion<string>().HasMaxLength(16).HasDefaultValue(LexemeSource.Manual).HasSentinel((LexemeSource)(-1));

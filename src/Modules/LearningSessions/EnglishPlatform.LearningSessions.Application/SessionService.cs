@@ -103,6 +103,7 @@ public sealed class SessionService(
         UserLearningSettings s = await settings.GetAsync(userId, cancellationToken);
         DateTimeOffset dayStart = DayStart(now, s.TimeZone);
 
+        SessionFinished? finished = null;
         if (await FindActiveAsync(userId, dayStart, kind, cancellationToken) is { } active)
         {
             if (active.Remaining > 0)
@@ -110,7 +111,7 @@ public sealed class SessionService(
                 return ToDto(active);
             }
 
-            active.Finish(now);
+            finished = MarkFinished(active, now);
         }
 
         WeaknessProfile weakness = await weaknesses.GetAsync(userId, cancellationToken);
@@ -157,6 +158,7 @@ public sealed class SessionService(
             if (empty is not null)
             {
                 await db.SaveChangesAsync(cancellationToken);
+                await PublishFinishedAsync(finished, cancellationToken);
                 return ToDto(empty);
             }
 
@@ -165,6 +167,7 @@ public sealed class SessionService(
 
         db.Sessions.Add(session);
         await db.SaveChangesAsync(cancellationToken);
+        await PublishFinishedAsync(finished, cancellationToken);
         return ToDto(session);
     }
 
@@ -227,8 +230,9 @@ public sealed class SessionService(
             return Step(session, ToView(task, item));
         }
 
-        session.Finish(now);
+        SessionFinished? done = MarkFinished(session, now);
         await db.SaveChangesAsync(cancellationToken);
+        await PublishFinishedAsync(done, cancellationToken);
         return new NextStepDto(true, null, Progress(session), Stats(session));
     }
 
@@ -336,8 +340,9 @@ public sealed class SessionService(
             return SessionErrors.NotFound;
         }
 
-        session.Finish(time.GetUtcNow());
+        SessionFinished? done = MarkFinished(session, time.GetUtcNow());
         await db.SaveChangesAsync(cancellationToken);
+        await PublishFinishedAsync(done, cancellationToken);
         return ToDto(session);
     }
 
@@ -422,6 +427,19 @@ public sealed class SessionService(
 
         return new RuleDto(hint.TagTitle, hint.TopicSlug, hint.TopicTitle, hint.Rule);
     }
+
+    /// <summary>Завершает занятие; событие — только при первом завершении и если были ответы.</summary>
+    private static SessionFinished? MarkFinished(LearningSession session, DateTimeOffset now)
+    {
+        bool first = !session.IsFinished;
+        session.Finish(now);
+        return first && session.Answered > 0
+            ? new SessionFinished(session.UserId, session.Id, session.Kind, session.Answered, session.Correct, now)
+            : null;
+    }
+
+    private Task PublishFinishedAsync(SessionFinished? finished, CancellationToken cancellationToken) =>
+        finished is null ? Task.CompletedTask : eventBus.PublishAsync(finished, cancellationToken);
 
     private Task PublishAsync(
         Guid userId, SessionItem item, ExerciseTask task, CheckResult check, bool isWarmUp, int elapsedMs, DateTimeOffset now, CancellationToken cancellationToken) =>

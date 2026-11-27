@@ -7,33 +7,37 @@
 
     <nav class="nav flex items-center gap-1">
       @if (auth.isAuthenticated()) {
-        <a hlmBtn variant="ghost" size="sm" routerLink="/learn" routerLinkActive="text-primary" aria-label="Занятие">
+        <a hlmBtn variant="ghost" size="sm" routerLink="/learn" routerLinkActive="text-primary" class="nav-tip" aria-label="Занятие">
           <ng-icon name="lucidePlay" />
           <span class="hidden md:inline">Занятие</span>
         </a>
-        <a hlmBtn variant="ghost" size="sm" routerLink="/dictionary" routerLinkActive="text-primary" aria-label="Словарь">
+        <a hlmBtn variant="ghost" size="sm" routerLink="/dictionary" routerLinkActive="text-primary" class="nav-tip" aria-label="Словарь">
           <ng-icon name="lucideBookOpen" />
           <span class="hidden md:inline">Словарь</span>
         </a>
-        <a hlmBtn variant="ghost" size="sm" routerLink="/practice" routerLinkActive="text-primary" aria-label="Практика">
+        <a hlmBtn variant="ghost" size="sm" routerLink="/practice" routerLinkActive="text-primary" class="nav-tip" aria-label="Практика">
           <ng-icon name="lucideGamepad2" />
           <span class="hidden md:inline">Практика</span>
         </a>
-        <a hlmBtn variant="ghost" size="sm" routerLink="/stats" routerLinkActive="text-primary" aria-label="Статистика">
+        <a hlmBtn variant="ghost" size="sm" routerLink="/stats" routerLinkActive="text-primary" class="nav-tip" aria-label="Статистика">
           <ng-icon name="lucideChartColumn" />
           <span class="hidden md:inline">Статистика</span>
         </a>
+        <a hlmBtn variant="ghost" size="sm" routerLink="/pet" routerLinkActive="text-primary" class="nav-tip nav-tip-lg" aria-label="Питомец">
+          <ng-icon name="lucidePawPrint" />
+          <span class="hidden lg:inline">Питомец</span>
+        </a>
         @if (auth.isAdmin()) {
-          <a hlmBtn variant="ghost" size="sm" routerLink="/admin" routerLinkActive="text-primary" [routerLinkActiveOptions]="adminMatch" aria-label="Админка">
+          <a hlmBtn variant="ghost" size="sm" routerLink="/admin" routerLinkActive="text-primary" [routerLinkActiveOptions]="adminMatch" class="nav-tip nav-tip-lg" aria-label="Админка">
             <ng-icon name="lucideShieldCheck" />
             <span class="hidden lg:inline">Админка</span>
           </a>
         }
-        <a hlmBtn variant="ghost" size="sm" routerLink="/profile" routerLinkActive="text-primary" aria-label="Профиль">
+        <a hlmBtn variant="ghost" size="sm" routerLink="/profile" routerLinkActive="text-primary" class="nav-tip" aria-label="Профиль">
           <ng-icon name="lucideUserRound" />
           <span class="hidden md:inline">Профиль</span>
         </a>
-        <button hlmBtn variant="ghost" size="sm" type="button" (click)="logout()" aria-label="Выйти">
+        <button hlmBtn variant="ghost" size="sm" type="button" (click)="logout()" class="nav-tip nav-tip-lg" aria-label="Выйти">
           <ng-icon name="lucideLogOut" />
           <span class="hidden lg:inline">Выйти</span>
         </button>
@@ -49,4 +53,14 @@
   <router-outlet />
 </main>
 
-<hlm-toaster position="top-center" richColors />
+<!-- Питомец на страницах — отдельный чанк, грузится, когда браузер свободен. -->
+@if (auth.isAuthenticated()) {
+  @defer (on idle) {
+    <app-pet-companion />
+  }
+}
+
+<!-- Всплывающие сообщения грузятся отдельно, сразу после первой отрисовки: в стартовом бандле им не место. -->
+@defer (on idle) {
+  <hlm-toaster position="top-center" richColors />
+}

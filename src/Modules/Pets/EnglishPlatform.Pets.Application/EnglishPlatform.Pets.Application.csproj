@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../EnglishPlatform.Pets.Domain/EnglishPlatform.Pets.Domain.csproj" />
+    <ProjectReference Include="../EnglishPlatform.Pets.Contracts/EnglishPlatform.Pets.Contracts.csproj" />
+    <ProjectReference Include="../../LearningSessions/EnglishPlatform.LearningSessions.Contracts/EnglishPlatform.LearningSessions.Contracts.csproj" />
+    <ProjectReference Include="../../Users/EnglishPlatform.Users.Contracts/EnglishPlatform.Users.Contracts.csproj" />
+    <ProjectReference Include="../../Vocabulary/EnglishPlatform.Vocabulary.Contracts/EnglishPlatform.Vocabulary.Contracts.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+</Project>

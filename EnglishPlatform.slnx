@@ -50,6 +50,12 @@
     <Project Path="src/Modules/LearningSessions/EnglishPlatform.LearningSessions.Domain/EnglishPlatform.LearningSessions.Domain.csproj" />
     <Project Path="src/Modules/LearningSessions/EnglishPlatform.LearningSessions.Infrastructure/EnglishPlatform.LearningSessions.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/Pets/">
+    <Project Path="src/Modules/Pets/EnglishPlatform.Pets.Application/EnglishPlatform.Pets.Application.csproj" />
+    <Project Path="src/Modules/Pets/EnglishPlatform.Pets.Contracts/EnglishPlatform.Pets.Contracts.csproj" />
+    <Project Path="src/Modules/Pets/EnglishPlatform.Pets.Domain/EnglishPlatform.Pets.Domain.csproj" />
+    <Project Path="src/Modules/Pets/EnglishPlatform.Pets.Infrastructure/EnglishPlatform.Pets.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/SpacedRepetition/">
     <Project Path="src/Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Application/EnglishPlatform.SpacedRepetition.Application.csproj" />
     <Project Path="src/Modules/SpacedRepetition/EnglishPlatform.SpacedRepetition.Contracts/EnglishPlatform.SpacedRepetition.Contracts.csproj" />
@@ -73,6 +79,7 @@
     <Project Path="tests/EnglishPlatform.Identity.Tests/EnglishPlatform.Identity.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Integration.Tests/EnglishPlatform.Integration.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Learning.Tests/EnglishPlatform.Learning.Tests.csproj" />
+    <Project Path="tests/EnglishPlatform.Pets.Tests/EnglishPlatform.Pets.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Users.Tests/EnglishPlatform.Users.Tests.csproj" />
     <Project Path="tests/EnglishPlatform.Vocabulary.Tests/EnglishPlatform.Vocabulary.Tests.csproj" />
   </Folder>
