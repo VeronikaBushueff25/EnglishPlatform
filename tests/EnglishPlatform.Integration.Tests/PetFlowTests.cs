@@ -42,6 +42,14 @@ public sealed class PetFlowTests(ApiFactory factory) : IClassFixture<ApiFactory>
         // Аксессуар не открыт на первом уровне.
         (await client.PutAsJsonAsync("/api/v1/pet", new { palette = "tabby", name = "Пушок", accessory = "crown" }, Ct))
             .StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+
+        // Сердечко — только тем, кто поддержал проект.
+        (await client.PutAsJsonAsync("/api/v1/pet", new { palette = "ginger", name = "Пушок", accessory = "heart" }, Ct))
+            .StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await PostJsonAsync(client, "/api/v1/me/supporter", new { })).GetProperty("supporter").GetBoolean().ShouldBeTrue();
+        (await PutJsonAsync(client, "/api/v1/pet", new { palette = "ginger", name = "Пушок", accessory = "heart" }))
+            .GetProperty("accessory").GetString().ShouldBe("heart");
+        (await GetJsonAsync(client, "/api/v1/support")).ValueKind.ShouldBe(JsonValueKind.Object);
         JsonElement restyled = await PutJsonAsync(client, "/api/v1/pet", new { palette = "tabby", name = "Барсик", accessory = (string?)null });
         restyled.GetProperty("palette").GetString().ShouldBe("tabby");
         restyled.GetProperty("name").GetString().ShouldBe("Барсик");

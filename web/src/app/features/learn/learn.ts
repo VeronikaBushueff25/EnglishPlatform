@@ -37,6 +37,7 @@ import { problemMessage } from '../../core/http/problem';
 import { ErrorAlert } from '../../shared/error-alert';
 import { Pronunciation, SpeakButton } from '../../shared/pronunciation';
 import { PetSignals } from '../../core/pet-signals';
+import { SupportInvite } from '../../shared/support-invite';
 import { formatTranscription } from '../dictionary/vocabulary-labels';
 import { formatDuration, formatNextReview, pluralRu } from './learn-format';
 
@@ -51,7 +52,7 @@ const RETRIES = 2;
  */
 @Component({
   selector: 'app-learn',
-  imports: [
+  imports: [SupportInvite, 
     NgTemplateOutlet,
     FormsModule,
     RouterLink,

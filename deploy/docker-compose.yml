@@ -35,6 +35,12 @@ services:
       Identity__PublicUrl: ${PUBLIC_URL:-http://localhost:8080}
       Identity__AdminEmail: ${ADMIN_EMAIL:-}
       Identity__AdminPassword: ${ADMIN_PASSWORD:-}
+      # «Поддержать проект»: ссылки на CloudTips/Boosty и необязательная цель сбора (см. docs/deploy.md).
+      Support__CloudTipsUrl: ${SUPPORT_CLOUDTIPS_URL:-}
+      Support__BoostyUrl: ${SUPPORT_BOOSTY_URL:-}
+      Support__GoalTitle: ${SUPPORT_GOAL_TITLE:-}
+      Support__GoalAmount: ${SUPPORT_GOAL_AMOUNT:-}
+      Support__GoalRaised: ${SUPPORT_GOAL_RAISED:-}
     depends_on:
       postgres:
         condition: service_healthy

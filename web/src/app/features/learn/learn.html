@@ -156,6 +156,9 @@
             </div>
           }
         }
+        @if (+(stats()?.answered ?? 0) > 0) {
+          <app-support-invite class="px-6" occasion="lesson" />
+        }
         <div hlmCardFooter class="flex flex-col gap-2 sm:flex-row">
           <button hlmBtn type="button" class="h-12 w-full sm:w-auto" (click)="again()">Проверить, есть ли ещё</button>
           <a hlmBtn variant="ghost" class="h-12 w-full sm:w-auto" routerLink="/dictionary">Мой словарь</a>

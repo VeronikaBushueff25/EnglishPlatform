@@ -78,6 +78,17 @@ public sealed class UserProfile : Entity<Guid>
 
     public DateTimeOffset UpdatedAt { get; private set; }
 
+    /// <summary>Когда пользователь отметил, что поддержал проект (на доверии: оплата идёт через внешний сервис).</summary>
+    public DateTimeOffset? SupporterSince { get; private set; }
+
+    public bool IsSupporter => SupporterSince is not null;
+
+    public void MarkSupporter(DateTimeOffset now)
+    {
+        SupporterSince ??= now;
+        UpdatedAt = now;
+    }
+
     public static UserProfile CreateDefault(Guid userId, DateTimeOffset now) => new(userId, now);
 
     public void UpdateProfile(string? displayName, string timeZone, DateTimeOffset now)

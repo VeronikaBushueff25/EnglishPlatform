@@ -96,11 +96,15 @@ public static class PetErrors
 /// <summary>День пользователя по его часовому поясу: от него зависят просьбы и серия занятий.</summary>
 public sealed class PetDays(IUserLearningSettings settings, TimeProvider time)
 {
-    public async Task<DateOnly> TodayAsync(Guid userId, DateTimeOffset now, CancellationToken cancellationToken)
+    public async Task<DateOnly> TodayAsync(Guid userId, DateTimeOffset now, CancellationToken cancellationToken) =>
+        (await UserDayAsync(userId, now, cancellationToken)).Today;
+
+    /// <summary>День пользователя и поддержал ли он проект (сердечко для питомца).</summary>
+    public async Task<(DateOnly Today, bool Supporter)> UserDayAsync(Guid userId, DateTimeOffset now, CancellationToken cancellationToken)
     {
         UserLearningSettings s = await settings.GetAsync(userId, cancellationToken);
         TimeZoneInfo zone = TimeZoneInfo.TryFindSystemTimeZoneById(s.TimeZone, out TimeZoneInfo? found) ? found : TimeZoneInfo.Utc;
-        return DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime);
+        return (DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(now, zone).DateTime), s.Supporter);
     }
 
     public DateTimeOffset Now => time.GetUtcNow();
@@ -118,7 +122,7 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
         }
 
         DateTimeOffset now = days.Now;
-        DateOnly today = await days.TodayAsync(pet.Id, now, cancellationToken);
+        (DateOnly today, bool supporter) = await days.UserDayAsync(pet.Id, now, cancellationToken);
         DateOnly before = pet.QuestDay;
         pet.EnsureQuests(today);
         if (pet.QuestDay != before)
@@ -126,7 +130,7 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
             await db.SaveChangesAsync(cancellationToken); // новые просьбы на новый день
         }
 
-        return ToDto(pet, now, today);
+        return ToDto(pet, now, today, supporter);
     }
 
     public async Task<Result<PetDto>> AdoptAsync(AdoptPetRequest request, CancellationToken cancellationToken)
@@ -148,13 +152,13 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
         }
 
         DateTimeOffset now = days.Now;
-        DateOnly today = await days.TodayAsync(userId, now, cancellationToken);
+        (DateOnly today, bool supporter) = await days.UserDayAsync(userId, now, cancellationToken);
         Pet pet = Pet.Adopt(userId, request.Species, request.Palette, request.Name, now);
         pet.EnsureQuests(today);
         db.Pets.Add(pet);
         await db.SaveChangesAsync(cancellationToken);
         await eventBus.PublishAsync(new PetAdopted(userId, request.Species.ToString(), now), cancellationToken);
-        return ToDto(pet, now, today);
+        return ToDto(pet, now, today, supporter);
     }
 
     public async Task<Result<PetDto>> UpdateAsync(UpdatePetRequest request, CancellationToken cancellationToken)
@@ -175,15 +179,16 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
             return PetErrors.UnknownPalette;
         }
 
-        if (!pet.Wear(string.IsNullOrWhiteSpace(request.Accessory) ? null : request.Accessory))
+        DateTimeOffset now = days.Now;
+        (DateOnly today, bool supporter) = await days.UserDayAsync(pet.Id, now, cancellationToken);
+        if (!pet.Wear(string.IsNullOrWhiteSpace(request.Accessory) ? null : request.Accessory, supporter))
         {
             return PetErrors.LockedAccessory;
         }
 
         pet.Rename(request.Name);
         await db.SaveChangesAsync(cancellationToken);
-        DateTimeOffset now = days.Now;
-        return ToDto(pet, now, await days.TodayAsync(pet.Id, now, cancellationToken));
+        return ToDto(pet, now, today, supporter);
     }
 
     public async Task<Result<PetDto>> FeedAsync(CancellationToken cancellationToken)
@@ -202,7 +207,7 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
             PetActionResult.NoTreats => PetErrors.NoTreats,
             PetActionResult.Full => PetErrors.Full,
             PetActionResult.Away => PetErrors.Away,
-            _ => ToDto(pet, now, await days.TodayAsync(pet.Id, now, cancellationToken)),
+            _ => await DtoAsync(pet, now, cancellationToken),
         };
     }
 
@@ -216,10 +221,10 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
         }
 
         DateTimeOffset now = days.Now;
-        DateOnly today = await days.TodayAsync(pet.Id, now, cancellationToken);
+        (DateOnly today, bool supporter) = await days.UserDayAsync(pet.Id, now, cancellationToken);
         PetActionResult result = pet.Pat(today, now);
         await db.SaveChangesAsync(cancellationToken);
-        return result == PetActionResult.Away ? PetErrors.Away : ToDto(pet, now, today);
+        return result == PetActionResult.Away ? PetErrors.Away : ToDto(pet, now, today, supporter);
     }
 
     /// <summary>Клиент сообщает о сделанном: сыграл в игру, дочитал текст. Занятия и новые слова засчитываются сами.</summary>
@@ -245,10 +250,16 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
         }
 
         DateTimeOffset now = days.Now;
-        DateOnly today = await days.TodayAsync(pet.Id, now, cancellationToken);
+        (DateOnly today, bool supporter) = await days.UserDayAsync(pet.Id, now, cancellationToken);
         IReadOnlyList<PetQuest> completed = action(pet, today, now);
         await db.SaveChangesAsync(cancellationToken);
-        return new PetProgressDto(ToDto(pet, now, today), completed.Select(ToDto).ToList());
+        return new PetProgressDto(ToDto(pet, now, today, supporter), completed.Select(ToDto).ToList());
+    }
+
+    private async Task<PetDto> DtoAsync(Pet pet, DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        (DateOnly today, bool supporter) = await days.UserDayAsync(pet.Id, now, cancellationToken);
+        return ToDto(pet, now, today, supporter);
     }
 
     private Task<Pet?> FindAsync(CancellationToken cancellationToken) =>
@@ -256,7 +267,7 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
 
     public static PetQuestDto ToDto(PetQuest q) => new(q.Kind.ToString(), q.Target, q.Progress, q.Treats, q.Xp, q.Done);
 
-    public static PetDto ToDto(Pet pet, DateTimeOffset now, DateOnly today)
+    public static PetDto ToDto(Pet pet, DateTimeOffset now, DateOnly today, bool supporter = false)
     {
         int level = pet.Level;
         return new PetDto(
@@ -291,7 +302,7 @@ public sealed class PetService(IPetsDb db, ICurrentUser currentUser, IEventBus e
                 int progress = pet.CounterValue(d.Counter);
                 return new PetDecorDto(d.Key, d.Counter.ToString(), d.Target, Math.Min(progress, d.Target), progress >= d.Target);
             }).ToList(),
-            pet.UnlockedAccessories,
+            pet.AccessoriesFor(supporter),
             pet.CreatedAt);
     }
 }

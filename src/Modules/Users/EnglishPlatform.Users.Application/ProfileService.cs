@@ -45,6 +45,15 @@ public sealed class ProfileService(IUsersDb db, ICurrentUser currentUser, TimePr
         return ToResponse(profile);
     }
 
+    /// <summary>Пользователь отметил, что поддержал проект: значок в профиле и сердечко для питомца.</summary>
+    public async Task<MeResponse> MarkSupporterAsync(CancellationToken cancellationToken)
+    {
+        UserProfile profile = await GetOrCreateAsync(currentUser.UserId, cancellationToken);
+        profile.MarkSupporter(timeProvider.GetUtcNow());
+        await db.SaveChangesAsync(cancellationToken);
+        return ToResponse(profile);
+    }
+
     private async Task<UserProfile> GetOrCreateAsync(Guid userId, CancellationToken cancellationToken)
     {
         UserProfile? profile = await db.Profiles.SingleOrDefaultAsync(p => p.Id == userId, cancellationToken);
@@ -66,7 +75,8 @@ public sealed class ProfileService(IUsersDb db, ICurrentUser currentUser, TimePr
         profile.DisplayName,
         profile.TimeZone,
         profile.Plan,
-        new LearningSettingsDto(profile.InterfaceLanguage, profile.Goals, profile.DailyNewWords, profile.DailyReviews, profile.AutoAddWords));
+        new LearningSettingsDto(profile.InterfaceLanguage, profile.Goals, profile.DailyNewWords, profile.DailyReviews, profile.AutoAddWords),
+        profile.IsSupporter);
 }
 
 /// <summary>Создаёт профиль с настройками по умолчанию сразу после регистрации.</summary>
@@ -95,6 +105,7 @@ public sealed class UserLearningSettingsQuery(IUsersDb db) : IUserLearningSettin
             {
                 Goals = profile.Goals.Select(g => g.ToString()).ToList(),
                 AutoAddWords = profile.AutoAddWords,
+                Supporter = profile.IsSupporter,
             };
 
         UserProfile defaults = UserProfile.CreateDefault(userId, DateTimeOffset.UnixEpoch);

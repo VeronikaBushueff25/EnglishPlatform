@@ -8,6 +8,9 @@ public sealed record UserLearningSettings(Guid UserId, int DailyNewWords, int Da
 
     /// <summary>Добавлять слова своего уровня из общей базы, когда свои новые слова закончились.</summary>
     public bool AutoAddWords { get; init; } = true;
+
+    /// <summary>Поддержал проект — питомцу открыто сердечко.</summary>
+    public bool Supporter { get; init; }
 }
 
 public interface IUserLearningSettings

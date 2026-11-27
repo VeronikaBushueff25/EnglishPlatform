@@ -135,7 +135,7 @@ type Phase = 'intro' | 'question' | 'result';
                 </span>
                 <p class="text-muted-foreground text-sm">Ваш уровень</p>
                 <h1 class="text-5xl font-semibold tracking-tight">{{ r.overall }}</h1>
-                <p class="text-muted-foreground">{{ cefrLabels[r.overall] }} · верных ответов {{ r.correct }} из {{ r.answered }}</p>
+                <p class="text-muted-foreground">{{ r.overall ? cefrLabels[r.overall] : "" }} · верных ответов {{ r.correct }} из {{ r.answered }}</p>
                 @if (r.length === 'Short') {
                   <p class="text-muted-foreground mt-1 text-xs">Быстрый тест может ошибиться на ступень — точный уточнит.</p>
                 }

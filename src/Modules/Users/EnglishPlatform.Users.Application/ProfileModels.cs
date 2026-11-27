@@ -11,7 +11,30 @@ public sealed record MeResponse(
     string? DisplayName,
     string TimeZone,
     SubscriptionPlan Plan,
-    LearningSettingsDto Settings);
+    LearningSettingsDto Settings,
+    bool Supporter = false);
+
+/// <summary>
+/// «Поддержать проект»: ссылки на сервисы донатов и необязательная цель сбора. Задаются в настройках сервера
+/// (раздел Support), чтобы менять их без пересборки. Пустая ссылка — кнопка не показывается.
+/// </summary>
+public sealed class SupportOptions
+{
+    public string? CloudTipsUrl { get; set; }
+
+    public string? BoostyUrl { get; set; }
+
+    /// <summary>На что сейчас собираем, например «Разговорный партнёр на ИИ».</summary>
+    public string? GoalTitle { get; set; }
+
+    /// <summary>Сумма цели в рублях (строкой: пустое значение из переменной окружения — «цели нет»).</summary>
+    public string? GoalAmount { get; set; }
+
+    /// <summary>Сколько уже собрано — обновляется вручную.</summary>
+    public string? GoalRaised { get; set; }
+}
+
+public sealed record SupportInfoDto(string? CloudTipsUrl, string? BoostyUrl, string? GoalTitle, int? GoalAmount, int? GoalRaised);
 
 public sealed record LearningSettingsDto(
     InterfaceLanguage InterfaceLanguage,

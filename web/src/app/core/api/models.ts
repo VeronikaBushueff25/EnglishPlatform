@@ -94,6 +94,7 @@ export type { StartSessionRequest } from './models/start-session-request';
 export type { StatsSummaryDto } from './models/stats-summary-dto';
 export type { SubscriptionPlan } from './models/subscription-plan';
 export type { SuggestionsPageDto } from './models/suggestions-page-dto';
+export type { SupportInfoDto } from './models/support-info-dto';
 export type { TaskView } from './models/task-view';
 export type { TodayDto } from './models/today-dto';
 export type { TranslationDto } from './models/translation-dto';

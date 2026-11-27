@@ -47,6 +47,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/pet/pet-lab').then((m) => m.PetLab),
   },
   {
+    path: 'support',
+    title: 'Поддержать Owlish',
+    loadComponent: () => import('./features/support/support-page').then((m) => m.SupportPage),
+  },
+  {
     path: 'profile',
     title: 'Профиль',
     canActivate: [authGuard],

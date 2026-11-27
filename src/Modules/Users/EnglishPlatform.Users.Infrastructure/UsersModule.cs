@@ -22,6 +22,7 @@ public sealed class UsersModule : IModule
         services.AddModuleDbContext<UsersDb>(configuration, UsersDb.SchemaName);
         services.AddScoped<IUsersDb>(sp => sp.GetRequiredService<UsersDb>());
         services.AddScoped<ProfileService>();
+        services.Configure<SupportOptions>(configuration.GetSection("Support"));
         services.AddScoped<IUserLearningSettings, UserLearningSettingsQuery>();
         services.AddScoped<IIntegrationEventHandler<UserRegistered>, CreateProfileOnUserRegistered>();
     }

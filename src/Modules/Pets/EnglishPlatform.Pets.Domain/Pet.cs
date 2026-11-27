@@ -312,7 +312,13 @@ public sealed class Pet : Entity<Guid>
         _ => PetStage.Adult,
     };
 
+    /// <summary>Сердечко — не за уровень, а в благодарность за поддержку проекта.</summary>
+    public const string SupporterAccessory = "heart";
+
     public IReadOnlyList<string> UnlockedAccessories => Accessories.Where(a => Level >= a.Value).Select(a => a.Key).ToList();
+
+    public IReadOnlyList<string> AccessoriesFor(bool supporter) =>
+        supporter ? [SupporterAccessory, .. UnlockedAccessories] : UnlockedAccessories;
 
     public int CounterValue(DecorCounter counter) => counter switch
     {
@@ -493,10 +499,10 @@ public sealed class Pet : Entity<Guid>
         return true;
     }
 
-    /// <summary>Надеть аксессуар (null — снять). Только открытые по уровню.</summary>
-    public bool Wear(string? accessory)
+    /// <summary>Надеть аксессуар (null — снять). Только открытые по уровню (и сердечко — тем, кто поддержал проект).</summary>
+    public bool Wear(string? accessory, bool supporter = false)
     {
-        if (accessory is not null && !UnlockedAccessories.Contains(accessory))
+        if (accessory is not null && !AccessoriesFor(supporter).Contains(accessory))
         {
             return false;
         }

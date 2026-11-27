@@ -53,6 +53,11 @@
   <router-outlet />
 </main>
 
+<footer class="text-muted-foreground mx-auto w-full max-w-3xl px-4 pt-2 pb-8 text-center text-sm">
+  Owlish делается одним человеком ·
+  <a routerLink="/support" class="hover:text-primary underline-offset-4 hover:underline">Поддержать проект ♥</a>
+</footer>
+
 <!-- Питомец на страницах — отдельный чанк, грузится, когда браузер свободен. -->
 @if (auth.isAuthenticated()) {
   @defer (on idle) {

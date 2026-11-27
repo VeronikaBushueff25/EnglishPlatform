@@ -31,11 +31,12 @@ import { problemMessage } from '../../core/http/problem';
 import { Appearance } from '../../shared/appearance';
 import { ErrorAlert } from '../../shared/error-alert';
 import { I18n } from '../../core/i18n/i18n';
+import { SupportInvite } from '../../shared/support-invite';
 import { GOAL_LABELS, LANGUAGE_LABELS, PLAN_LABELS, allTimeZones, browserTimeZone } from './profile-labels';
 
 @Component({
   selector: 'app-profile',
-  imports: [
+  imports: [SupportInvite, 
     Appearance,
     ReactiveFormsModule,
     NgIcon,

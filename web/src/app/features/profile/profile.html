@@ -18,11 +18,18 @@
       <div hlmCardHeader>
         <h2 hlmCardTitle>Аккаунт</h2>
         <p hlmCardDescription class="break-all">{{ profile.email }}</p>
-        <div hlmCardAction>
+        <div hlmCardAction class="flex flex-wrap justify-end gap-1.5">
+          @if (profile.supporter) {
+            <span hlmBadge class="bg-rose-100 text-rose-700 dark:bg-rose-400/15 dark:text-rose-200">♥ Поддерживает Owlish</span>
+          }
           <span hlmBadge variant="secondary">{{ planLabels[profile.plan] }}</span>
         </div>
       </div>
     </section>
+
+    @if (!profile.supporter) {
+      <app-support-invite occasion="profile" />
+    }
 
     <section hlmCard>
       <div hlmCardHeader>

@@ -10,5 +10,6 @@ export interface MeResponse {
   plan: SubscriptionPlan;
   roles: Array<string>;
   settings: LearningSettingsDto;
+  supporter?: boolean;
   timeZone: string;
 }

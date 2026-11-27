@@ -290,6 +290,8 @@ function writeLocal(key: string, value: string): void {
             @for (a of accessoryKeys; track a) {
               @if (unlocked(pet, a)) {
                 <button type="button" class="rounded-full border px-3 py-1.5 text-sm" [class.border-primary]="pet.accessory === a" [class.text-primary]="pet.accessory === a" (click)="wear(a)">{{ accessories[a].label }}</button>
+              } @else if (a === 'heart') {
+                <a routerLink="/support" class="text-muted-foreground hover:text-primary rounded-full border border-dashed px-3 py-1.5 text-sm">{{ accessories[a].label }} · за поддержку проекта</a>
               } @else {
                 <span class="text-muted-foreground rounded-full border border-dashed px-3 py-1.5 text-sm">{{ accessories[a].label }} · с {{ accessories[a].level }} уровня</span>
               }

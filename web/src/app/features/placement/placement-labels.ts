@@ -8,7 +8,7 @@ export const SKILL_LABELS: Record<Skill, string> = {
 };
 
 /** Описание уровня CEFR простыми словами. */
-export const CEFR_LABELS: Record<Cefr, string> = {
+export const CEFR_LABELS: Record<NonNullable<Cefr>, string> = {
   A1: 'Начальный',
   A2: 'Элементарный',
   B1: 'Средний',

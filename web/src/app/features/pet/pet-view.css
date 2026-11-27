@@ -25,7 +25,7 @@
 .pet .eye-happy, .pet .eye-closed, .pet .mouth-happy, .pet .mouth-sad, .pet .tongue, .pet .teeth, .pet .acc { display: none; }
 .pet .brows, .pet .bowl, .pet .fx-hearts, .pet .fx-zzz, .pet .fx-tear, .pet .fx-nom, .pet .fx-hungry, .pet .fx-ball, .pet .crumbs, .pet .seed { opacity: 0; }
 .pet .bowl, .pet .brows { transition: opacity .3s; }
-.wear-bow .acc-bow, .wear-scarf .acc-scarf, .wear-glasses .acc-glasses, .wear-hat .acc-hat, .wear-crown .acc-crown { display: inline; }
+.wear-heart .acc-heart, .wear-bow .acc-bow, .wear-scarf .acc-scarf, .wear-glasses .acc-glasses, .wear-hat .acc-hat, .wear-crown .acc-crown { display: inline; }
 
 /* Живость: дыхание, моргание, хвост, уши, глаза за указателем */
 .pet .breath { animation: pet-breath 3.2s ease-in-out infinite; }

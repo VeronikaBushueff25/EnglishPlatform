@@ -67,6 +67,10 @@ namespace EnglishPlatform.Users.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(16)")
                         .HasColumnName("plan");
 
+                    b.Property<DateTimeOffset?>("SupporterSince")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("supporter_since");
+
                     b.Property<string>("TimeZone")
                         .IsRequired()
                         .HasMaxLength(64)

@@ -7,7 +7,7 @@
 export type PetSpecies = 'cat' | 'corgi' | 'hamster';
 export type PetMood = 'idle' | 'happy' | 'eating' | 'hungry' | 'sad' | 'sleeping' | 'playing' | 'walking' | 'away';
 export type PetStage = 'baby' | 'teen' | 'adult';
-export type PetAccessory = 'bow' | 'scarf' | 'glasses' | 'hat' | 'crown';
+export type PetAccessory = 'heart' | 'bow' | 'scarf' | 'glasses' | 'hat' | 'crown';
 
 export interface PetPalette {
   label: string;
@@ -47,6 +47,8 @@ export const SPECIES_LABELS: Record<PetSpecies, string> = { cat: 'Котик', c
 
 /** Аксессуары и уровень, с которого открываются (те же числа, что на сервере). */
 export const ACCESSORIES: Record<PetAccessory, { label: string; level: number }> = {
+  // Сердечко — не за уровень, а в благодарность за поддержку проекта (level 0 — особый случай).
+  heart: { label: 'Сердечко', level: 0 },
   bow: { label: 'Бантик', level: 2 },
   scarf: { label: 'Шарф', level: 3 },
   glasses: { label: 'Очки', level: 4 },
@@ -130,6 +132,10 @@ function headAccessories(species: PetSpecies): string {
     <g class="acc acc-glasses" fill="rgba(190,225,255,.28)" stroke="#3A3045" stroke-width="2.6">
       <circle cx="${lx}" cy="${ey}" r="${lens}"/><circle cx="${rx}" cy="${ey}" r="${lens}"/>
       <path d="M${lx + lens} ${ey - 1} Q100 ${ey - 6} ${rx - lens} ${ey - 1}" fill="none"/>
+    </g>
+    <g class="acc acc-heart" transform="translate(${bx} ${by + 2}) rotate(14)">
+      <path d="M0 9 C -14 0 -14 -12 -6 -12 C -2 -12 0 -9 0 -7 C 0 -9 2 -12 6 -12 C 14 -12 14 0 0 9 Z" fill="#F25C7A" stroke="#B8306A" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M-7 -6 q2 -3 5 -2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"/>
     </g>
     <g class="acc acc-bow" transform="translate(${bx} ${by}) rotate(18)">
       <path d="M0 0 C -6 -12 -20 -10 -18 1 C -16 11 -6 9 0 0 Z M0 0 C 6 -12 20 -10 18 1 C 16 11 6 9 0 0 Z" fill="#F25C9A" stroke="#B8306A" stroke-width="2" stroke-linejoin="round"/>

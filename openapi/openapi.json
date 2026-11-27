@@ -379,6 +379,27 @@
         }
       }
     },
+    "/api/v1/me/supporter": {
+      "post": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Пользователь поддержал проект (отмечает сам) — значок и сердечко для питомца",
+        "operationId": "MarkSupporter",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me/settings": {
       "put": {
         "tags": [
@@ -419,157 +440,19 @@
         }
       }
     },
-    "/api/v1/placement/start": {
-      "post": {
+    "/api/v1/support": {
+      "get": {
         "tags": [
-          "Placement"
+          "Support"
         ],
-        "operationId": "StartPlacement",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "type": "null"
-                  },
-                  {
-                    "$ref": "#/components/schemas/StartPlacementRequest"
-                  }
-                ]
-              }
-            }
-          }
-        },
+        "operationId": "GetSupportInfo",
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PlacementStepDto"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/placement/{id}/answers": {
-      "post": {
-        "tags": [
-          "Placement"
-        ],
-        "operationId": "AnswerPlacement",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PlacementAnswerRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlacementStepDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/placement/{id}/finish": {
-      "post": {
-        "tags": [
-          "Placement"
-        ],
-        "operationId": "FinishPlacement",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PlacementResultDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
+                  "$ref": "#/components/schemas/SupportInfoDto"
                 }
               }
             }
@@ -793,6 +676,164 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StatsSummaryDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/placement/start": {
+      "post": {
+        "tags": [
+          "Placement"
+        ],
+        "operationId": "StartPlacement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/StartPlacementRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacementStepDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/placement/{id}/answers": {
+      "post": {
+        "tags": [
+          "Placement"
+        ],
+        "operationId": "AnswerPlacement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlacementAnswerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacementStepDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/placement/{id}/finish": {
+      "post": {
+        "tags": [
+          "Placement"
+        ],
+        "operationId": "FinishPlacement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacementResultDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -3744,7 +3785,8 @@
           "B1",
           "B2",
           "C1",
-          "C2"
+          "C2",
+          null
         ]
       },
       "CefrLevel": {
@@ -4645,6 +4687,10 @@
           },
           "settings": {
             "$ref": "#/components/schemas/LearningSettingsDto"
+          },
+          "supporter": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -6634,6 +6680,54 @@
           }
         }
       },
+      "SupportInfoDto": {
+        "required": [
+          "cloudTipsUrl",
+          "boostyUrl",
+          "goalTitle",
+          "goalAmount",
+          "goalRaised"
+        ],
+        "type": "object",
+        "properties": {
+          "cloudTipsUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "boostyUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "goalTitle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "goalAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "goalRaised": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "TaskView": {
         "required": [
           "taskId",
@@ -7418,6 +7512,9 @@
     },
     {
       "name": "Profile"
+    },
+    {
+      "name": "Support"
     },
     {
       "name": "Placement"
